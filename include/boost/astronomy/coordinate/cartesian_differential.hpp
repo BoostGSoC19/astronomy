@@ -18,15 +18,14 @@ namespace boost
         {
             //! represents differential of cartesian representation
             //! uses three coordinate to represent a differential (dx, dy, dz)
-            struct cartesian_differential : public boost::astronomy::coordinate::base_differential
-                <3, boost::geometry::cs::cartesian>
+            struct cartesian_differential : public boost::astronomy::coordinate::base_differential<CoordinateType,3, boost::geometry::cs::cartesian>
             {
             public:
                 // default constructor no initialization
                 cartesian_differential() {}
 
                 //!constructs object from provided value of differential
-                cartesian_differential(double dx, double dy, double dz = 0.0)
+                cartesian_differential(CoordinateType dx, CoordinateType dy, CoordinateType dz = 0.0)
                 {
                     boost::geometry::set<0>(this->diff, dx);
                     boost::geometry::set<1>(this->diff, dy);
@@ -34,8 +33,8 @@ namespace boost
                 }
 
                 //!constructs object from boost::geometry::model::point object
-                template <std::size_t DimensionCount, typename System>
-                cartesian_differential(boost::geometry::model::point<double, DimensionCount, System> const& pointObject)
+                template <std::size_t DimensionCount, typename CoordinateSystem>
+                cartesian_differential(boost::geometry::model::point<CoordinateType, DimensionCount, CoordinateSystem> const& pointObject)
                 {
                     boost::geometry::transform(pointObject, this->diff);
                 }
@@ -57,59 +56,59 @@ namespace boost
                     boost::geometry::transform(other.get_differential(), this->diff);
                 }
 
-                //! returns the (dx, dy, dz) in the form of tuple
-                std::tuple<double, double, double> get_dx_dy_dz() const
-                {
-                    return std::make_tuple(boost::geometry::get<0>(this->diff),
-                        boost::geometry::get<1>(this->diff), boost::geometry::get<2>(this->diff));
-                }
-
                 //!returns the dx component of differential
-                double get_dx() const
+                CoordinateType get_dx() const
                 {
                     return boost::geometry::get<0>(this->diff);
                 }
 
                 //!returns the dy component of differential
-                double get_dy() const
+                CoordinateType get_dy() const
                 {
                     return boost::geometry::get<1>(this->diff);
                 }
 
                 //!returns the dz component of differential
-                double get_dz() const
+                CoordinateType get_dz() const
                 {
                     return boost::geometry::get<2>(this->diff);
                 }
 
-                //!set value of (dx, dy, dz) in current object
-                void set_dx_dy_dz(double dx, double dy, double dz)
+                //! returns the (dx, dy, dz) in the form of tuple
+                std::tuple<CoordinateType, CoordinateType, CoordinateType> get_coordinates() const
                 {
-                    boost::geometry::set<0>(this->diff, dx);
-                    boost::geometry::set<1>(this->diff, dy);
-                    boost::geometry::set<2>(this->diff, dz);
+                    return std::make_tuple(get_dx(),get_dy(),get_dz());
                 }
 
                 //!set value of dx component of differential
-                void set_dx(double dx)
+                void set_dx(CoordinateType dx)
                 {
                     boost::geometry::set<0>(this->diff, dx);
                 }
 
                 //!set value of dy component of differential
-                void set_dy(double dy)
+                void set_dy(CoordinateType dy)
                 {
                     boost::geometry::set<1>(this->diff, dy);
                 }
 
                 //!set value of dz component of differential
-                void set_dz(double dz)
+                void set_dz(CoordinateType dz)
                 {
                     boost::geometry::set<2>(this->diff, dz);
                 }
 
+                //!set value of (dx, dy, dz) in current object
+                void set_coordinates(CoordinateType dx, CoordinateType dy, CoordinateType dz)
+                {
+                    boost::geometry::set<0>(this->diff, dx);
+                    boost::geometry::set<1>(this->diff, dy);
+                    boost::geometry::set<2>(this->diff, dz);
+                }
+
+
                 boost::astronomy::coordinate::cartesian_differential
-                    operator +(boost::astronomy::coordinate::cartesian_differential const& diff) const
+                operator +(boost::astronomy::coordinate::cartesian_differential const& diff) const
                 {
                     boost::astronomy::coordinate::cartesian_differential temp(this->diff);
 
@@ -121,13 +120,13 @@ namespace boost
                 }
 
                 boost::astronomy::coordinate::cartesian_differential
-                    operator *(double multiplier) const
+                    operator *(double scalar) const
                 {
                     boost::astronomy::coordinate::cartesian_differential temp(this->diff);
 
-                    temp.set_dx(temp.get_dx() * multiplier);
-                    temp.set_dy(temp.get_dy() * multiplier);
-                    temp.set_dz(temp.get_dz() * multiplier);
+                    temp.set_dx(temp.get_dx() * scalar);
+                    temp.set_dy(temp.get_dy() * scalar);
+                    temp.set_dz(temp.get_dz() * scalar);
 
                     return temp;
                 }
