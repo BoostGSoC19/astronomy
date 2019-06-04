@@ -75,7 +75,7 @@ namespace boost
                 }
 
                 //! returns the (dx, dy, dz) in the form of tuple
-                std::tuple<CoordinateType, CoordinateType, CoordinateType> get_coordinates() const
+                std::tuple<CoordinateType, CoordinateType, CoordinateType> get_d_xyz() const
                 {
                     return std::make_tuple(get_dx(),get_dy(),get_dz());
                 }
@@ -99,7 +99,7 @@ namespace boost
                 }
 
                 //!set value of (dx, dy, dz) in current object
-                void set_coordinates(CoordinateType dx, CoordinateType dy, CoordinateType dz)
+                void set_d_xyz(CoordinateType dx, CoordinateType dy, CoordinateType dz)
                 {
                     boost::geometry::set<0>(this->diff, dx);
                     boost::geometry::set<1>(this->diff, dy);
