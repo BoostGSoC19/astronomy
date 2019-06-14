@@ -18,6 +18,11 @@ file(GLOB_RECURSE  _hpp_io RELATIVE
   "${CMAKE_SOURCE_DIR}/include/boost/astronomy/io/*.hpp")
 list(APPEND _headers ${_hpp_io})
 
+file(GLOB_RECURSE  _hpp_units RELATIVE
+  "${CMAKE_SOURCE_DIR}/include/boost/astronomy"
+  "${CMAKE_SOURCE_DIR}/include/boost/astronomy/units/*.hpp")
+list(APPEND _headers ${_hpp_units})
+
 #-----------------------------------------------------------------------------
 # Target: test_headers_self_contained
 # Bundles all targets of self-contained header tests,

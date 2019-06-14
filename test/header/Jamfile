@@ -33,4 +33,4 @@ rule generate_self_contained_headers ( headers_subpath * : exclude_subpaths * )
     return $(targets) ;
 }
 
-alias headers : [ generate_self_contained_headers coordinate exception io : detail ] ;
+alias headers : [ generate_self_contained_headers coordinate exception io units : detail ] ;
