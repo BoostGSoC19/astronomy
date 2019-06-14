@@ -31,7 +31,16 @@
 *.exe
 *.out
 *.app
+
+# Builds
 /.vs
+/.vscode
+/build
+/.idea
+/cmake-build-debug
+/x64/Debug
+
+# Project files
 /include/boost/astronomy/coordinate/Source.cpp
 /testing
 /Debug
@@ -39,9 +48,6 @@
 /astronomy.vcxproj.filters
 /astronomy.vcxproj
 /astronomy.sln
-/ClassDiagram.cd
-/doc/tutorials/.vscode/settings.json
-/.idea
-/cmake-build-debug
 *.user
-/x64/Debug
+/ClassDiagram.cd
+

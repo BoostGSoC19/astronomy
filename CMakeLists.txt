@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.10)
 option(ASTRONOMY_BUILD_TEST "Build tests" ON)
 option(ASTRONOMY_USE_CLANG_TIDY "Set CMAKE_CXX_CLANG_TIDY property on targets to enable clang-tidy linting" OFF)
 option(ASTRONOMY_DOWNLOAD_FINDBOOST "Download FindBoost.cmake from latest CMake release" OFF)
-set(CMAKE_CXX_STANDARD 11 CACHE STRING "C++ standard version to use (default is 11)")
+set(CMAKE_CXX_STANDARD 14 CACHE STRING "C++ standard version to use (default is 14)")
 
 #-----------------------------------------------------------------------------
 # Project
