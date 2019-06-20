@@ -7,15 +7,19 @@
 #include <boost/units/systems/si/length.hpp>
 #include <boost/units/systems/si/velocity.hpp>
 #include <boost/units/systems/si/time.hpp>
+#include <boost/units/systems/si/plane_angle.hpp>
+#include <boost/units/systems/angle/degrees.hpp>
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/geometries/point.hpp>
 
 #include <boost/astronomy/coordinate/cartesian_differential.hpp>
-
+#include <boost/astronomy/coordinate/spherical_differential.hpp>
 
 using namespace std;
 using namespace boost::astronomy::coordinate;
 using namespace boost::units::si;
+using namespace boost::units::degree;
+using namespace boost::units::angle;
 using namespace boost::geometry;
 using namespace boost::units;
 
@@ -25,8 +29,7 @@ BOOST_AUTO_TEST_CASE(cartesian)
 {
     //checking construction from value
     auto motion1 = make_cartesian_differential
-        (quantity<velocity>(1.5*meters/seconds), quantity<velocity>(9*meters/seconds),
-         quantity<velocity>(3.5*meters/seconds));
+        (1.5*meters/seconds, 9.0*meters/seconds, 3.5*meters/seconds);
 
     BOOST_CHECK_CLOSE(motion1.get_dx().value(), 1.5, 0.001);
     BOOST_CHECK_CLOSE(motion1.get_dy().value(), 9.0, 0.001);
@@ -39,49 +42,52 @@ BOOST_AUTO_TEST_CASE(cartesian)
     BOOST_CHECK_CLOSE(motion1.get_dz().value(), motion2.get_dz().value(), 0.001);
 
     //constructing from boost::geometry::model::point
-    model::point<double, 2, cs::spherical<degree>> model_point(30, 60);
+    model::point<double, 2, cs::spherical<boost::geometry::degree>> model_point(30, 60);
     auto motion3 = make_cartesian_differential
         <double, quantity<velocity>, quantity<velocity>, quantity<velocity>>(model_point);
     BOOST_CHECK_CLOSE(motion3.get_dx().value(), 0.75, 0.001);
     BOOST_CHECK_CLOSE(motion3.get_dy().value(), 0.4330127019, 0.001);
     BOOST_CHECK_CLOSE(motion3.get_dz().value(), 0.5, 0.001);
 
-    //constructing from another differential
-    // spherical_differential<radian> spherical_motion(0.523599, 1.047198, 1);
-    // cartesian_differential motion4(spherical_motion);
-    // BOOST_CHECK_CLOSE(motion4.get_dx(), 0.75, 0.001);
-    // BOOST_CHECK_CLOSE(motion4.get_dy(), 0.4330127019, 0.001);
-    // BOOST_CHECK_CLOSE(motion4.get_dz(), 0.5, 0.001);
+    // constructing from another differential
+    auto spherical_motion = make_spherical_differential
+        (0.523599*radians, 1.047198*radians, 1.0*meters/seconds);
+    auto motion4 = make_cartesian_differential(spherical_motion);
+    BOOST_CHECK_CLOSE(motion4.get_dx().value(), 0.75, 0.001);
+    BOOST_CHECK_CLOSE(motion4.get_dy().value(), 0.4330127019, 0.001);
+    BOOST_CHECK_CLOSE(motion4.get_dz().value(), 0.5, 0.001);
 }
 
-// BOOST_AUTO_TEST_CASE(spherical)
-// {
-//     //checking construction from value
-//     spherical_differential<degree> motion1(45.0, 18, 3.5);
-//     BOOST_CHECK_CLOSE(motion1.get_dlat(), 45.0, 0.001);
-//     BOOST_CHECK_CLOSE(motion1.get_dlon(), 18.0, 0.001);
-//     BOOST_CHECK_CLOSE(motion1.get_ddist(), 3.5, 0.001);
+BOOST_AUTO_TEST_CASE(spherical)
+{
+    //checking construction from value
+    auto motion1 = make_spherical_differential
+        (45.0 * degrees, 18.0 * degrees, 3.5 * meters/seconds);
+    BOOST_CHECK_CLOSE(motion1.get_dlat().value(), 45.0, 0.001);
+    BOOST_CHECK_CLOSE(motion1.get_dlon().value(), 18.0, 0.001);
+    BOOST_CHECK_CLOSE(motion1.get_ddist().value(), 3.5, 0.001);
 
-//     //copy constructor
-//     spherical_differential<degree> motion2(motion1);
-//     BOOST_CHECK_CLOSE(motion1.get_dlat(), motion2.get_dlat(), 0.001);
-//     BOOST_CHECK_CLOSE(motion1.get_dlon(), motion2.get_dlon(), 0.001);
-//     BOOST_CHECK_CLOSE(motion1.get_ddist(), motion2.get_ddist(), 0.001);
+    //copy constructor
+    auto motion2 = make_spherical_differential(motion1);
+    BOOST_CHECK_CLOSE(motion1.get_dlat().value(), motion2.get_dlat().value(), 0.001);
+    BOOST_CHECK_CLOSE(motion1.get_dlon().value(), motion2.get_dlon().value(), 0.001);
+    BOOST_CHECK_CLOSE(motion1.get_ddist().value(), motion2.get_ddist().value(), 0.001);
 
-//     //constructing from boost::geometry::model::point
-//     boost::geometry::model::point<double, 3, boost::geometry::cs::cartesian> model_point(50, 20, 30);
-//     spherical_differential<radian> motion3(model_point);
-//     BOOST_CHECK_CLOSE(motion3.get_dlat(), 0.38050637711237, 0.001);
-//     BOOST_CHECK_CLOSE(motion3.get_dlon(), 1.0625290806236, 0.001);
-//     BOOST_CHECK_CLOSE(motion3.get_ddist(), 61.64414002969, 0.001);
+    //constructing from boost::geometry::model::point
+    model::point<double, 3, boost::geometry::cs::cartesian> model_point(50, 20, 30);
+    auto motion3 = make_spherical_differential(model_point);
+    BOOST_CHECK_CLOSE(motion3.get_dlat().value(), 0.38050637711237, 0.001);
+    BOOST_CHECK_CLOSE(motion3.get_dlon().value(), 1.0625290806236, 0.001);
+    BOOST_CHECK_CLOSE(motion3.get_ddist().value(), 61.64414002969, 0.001);
 
-//     //constructing from another representation
-//     cartesian_differential cartesian_motion(60, 45, 85);
-//     spherical_differential<degree> motion4(cartesian_motion);
-//     BOOST_CHECK_CLOSE(motion4.get_dlat(), 36.869897645844, 0.001);
-//     BOOST_CHECK_CLOSE(motion4.get_dlon(), 41.423665625003, 0.001);
-//     BOOST_CHECK_CLOSE(motion4.get_ddist(), 113.35784048755, 0.001);
-// }
+    //constructing from another representation
+    auto cartesian_motion = make_cartesian_differential
+        (60.0 * meters/seconds, 45.0 * meters/seconds, 85.0 * meters/seconds);
+    auto motion4 = make_spherical_differential(cartesian_motion);
+    BOOST_CHECK_CLOSE(motion4.get_dlat().value(), 0.64350110879328, 0.001);
+    BOOST_CHECK_CLOSE(motion4.get_dlon().value(), 0.72297935340149, 0.001);
+    BOOST_CHECK_CLOSE(motion4.get_ddist().value(), 113.35784048755, 0.001);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -104,11 +110,9 @@ BOOST_AUTO_TEST_SUITE(differential_operators)
 BOOST_AUTO_TEST_CASE(addition)
 {
     auto motion1 = make_cartesian_differential
-        (quantity<velocity>(11*meters/seconds), quantity<velocity>(15*meters/seconds),
-        quantity<velocity>(19*meters/seconds));
+        (11.0*meters/seconds, 15.0*meters/seconds, 19.0*meters/seconds);
     auto motion2 = make_cartesian_differential
-        (quantity<velocity>(6*meters/seconds), quantity<velocity>(10*meters/seconds),
-        quantity<velocity>(11*meters/seconds));
+        (6.0*meters/seconds, 10.0*meters/seconds, 11.0*meters/seconds);
     //point1 with motion1 and motion2 after one instance of time
     auto _1_instance = make_cartesian_differential(motion1 + motion2);
 
@@ -120,8 +124,7 @@ BOOST_AUTO_TEST_CASE(addition)
 BOOST_AUTO_TEST_CASE(multiplication)
 {
     auto motion1 = make_cartesian_differential
-        (quantity<velocity>(3*meters/seconds), quantity<velocity>(9*meters/seconds),
-        quantity<velocity>(6*meters/seconds));
+        (3.0*meters/seconds, 9.0*meters/seconds, 6.0*meters/seconds);
 
     //point1 with motion1 after 5 instance of time 
     auto _1_instance = make_cartesian_differential
