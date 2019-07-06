@@ -1,5 +1,4 @@
-#define BOOST_TEST_DYN_LINK
-
+#define BOOST_TEST_MODULE representation_test
 
 #include <boost/test/unit_test.hpp>
 #include <boost/units/quantity.hpp>
@@ -28,7 +27,7 @@ BOOST_AUTO_TEST_CASE(cartesian)
 {
     //checking construction from value
     auto point1 = make_cartesian_representation
-    (1.5*meter, 9.0*kilo*meter, 3.0*centi*meter);
+    (1.5*meter, 9.0*si::kilo*meter, 3.0*si::centi*meter);
     BOOST_CHECK_CLOSE(point1.get_x().value(), 1.5, 0.001);
     BOOST_CHECK_CLOSE(point1.get_y().value(), 9.0, 0.001);
     BOOST_CHECK_CLOSE(point1.get_z().value(), 3, 0.001);
@@ -99,8 +98,8 @@ BOOST_AUTO_TEST_SUITE(representation_functions)
 
 BOOST_AUTO_TEST_CASE(cross_product)
 {
-    auto point1 = make_cartesian_representation(3.0 * meters, 5.0 * kilo *meters, 4.0 * mega * meters);
-    auto point2 = make_cartesian_representation(3.0 * milli * meters, 5.0 * centi * meters, 4.0 * meters);
+    auto point1 = make_cartesian_representation(3.0 * meters, 5.0 * si::kilo *meters, 4.0 * si::mega * meters);
+    auto point2 = make_cartesian_representation(3.0 * si::milli * meters, 5.0 * si::centi * meters, 4.0 * meters);
     //spherical_representation<degree> point2(45, 45, 3);
 
     auto result = cross(point1, point2);
@@ -112,8 +111,8 @@ BOOST_AUTO_TEST_CASE(cross_product)
 
 BOOST_AUTO_TEST_CASE(dot_product)
 {
-    auto point1 = make_cartesian_representation(3.0 * meters, 5.0 * kilo *meters, 4.0 * mega * meters);
-    auto point2 = make_cartesian_representation(3.0 * milli * meters, 5.0 * centi * meters, 4.0 * meters);
+    auto point1 = make_cartesian_representation(3.0 * meters, 5.0 * si::kilo *meters, 4.0 * si::mega * meters);
+    auto point2 = make_cartesian_representation(3.0 * si::milli * meters, 5.0 * si::centi * meters, 4.0 * meters);
 
     auto result = dot(point1, point2);
 
@@ -133,7 +132,7 @@ BOOST_AUTO_TEST_CASE(unit_vector)
 
 BOOST_AUTO_TEST_CASE(magnitude)
 {
-    auto point1 = make_cartesian_representation(25.0 * meter, 3600.0 * centi*meter, 90.0 * meter);
+    auto point1 = make_cartesian_representation(25.0 * meter, 3600.0 * si::centi*meter, 90.0 * meter);
 
     auto result = boost::astronomy::coordinate::magnitude(point1);
 
@@ -143,8 +142,8 @@ BOOST_AUTO_TEST_CASE(magnitude)
 
 BOOST_AUTO_TEST_CASE(sum)
 {
-    auto point1 = make_cartesian_representation(10.0 * meter, 20.0 * kilo * meters, 30.0 * meter);
-    auto point2 = make_cartesian_representation(50.0 * centi * meter, 60.0 * meter, 30.0 * meter);
+    auto point1 = make_cartesian_representation(10.0 * meter, 20.0 * si::kilo * meters, 30.0 * meter);
+    auto point2 = make_cartesian_representation(50.0 * si::centi * meter, 60.0 * meter, 30.0 * meter);
 
     auto result = point1 + point2;
 
@@ -155,8 +154,8 @@ BOOST_AUTO_TEST_CASE(sum)
 
 BOOST_AUTO_TEST_CASE(mean)
 {
-    auto point1 = make_cartesian_representation(10.0 * meter, 20.0 * kilo * meters, 30.0 * meter);
-    auto point2 = make_cartesian_representation(50.0 * centi * meter, 60.0 * meter, 30.0 * meter);
+    auto point1 = make_cartesian_representation(10.0 * meter, 20.0 * si::kilo * meters, 30.0 * meter);
+    auto point2 = make_cartesian_representation(50.0 * si::centi * meter, 60.0 * meter, 30.0 * meter);
 
     auto result = boost::astronomy::coordinate::mean(point1, point2);
 
