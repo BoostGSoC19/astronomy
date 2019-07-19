@@ -4,171 +4,251 @@
 #include <boost/astronomy/coordinate/base_frame.hpp>
 #include <boost/astronomy/coordinate/spherical_representation.hpp>
 #include <boost/astronomy/coordinate/spherical_coslat_differential.hpp>
-namespace boost
+
+namespace boost { namespace astronomy { namespace coordinate {
+
+template <typename Representation, typename Differential>
+struct supergalactic : public base_frame<Representation, Differential>
 {
-    namespace astronomy
+    ///@cond INTERNAL
+    BOOST_STATIC_ASSERT_MSG((std::is_base_of
+        <spherical_representation<typename Representation::type,
+        typename Representation::quantity1, typename Representation::quantity2,
+        typename Representation::quantity3>, Representation>::value),
+        "argument type is expected to be a spherical_representation class");
+    BOOST_STATIC_ASSERT_MSG((std::is_base_of
+        <spherical_coslat_differential<typename Differential::type,
+        typename Differential::quantity1, typename Differential::quantity2,
+        typename Differential::quantity3>, Differential>::value),
+        "argument type is expected to be a spherical_coslat_differential class");
+    ///@endcond
+
+public:
+    //default constructor no initialization
+    supergalactic() {}
+
+    //!creates coordinate in supergalactic frame using any subclass of base_representation
+    template <typename OtherRepresentation>
+    supergalactic(OtherRepresentation const& representation_data)
     {
-        namespace coordinate
-        {
-            template <typename RepresentationDegreeOrRadian = degree,
-                typename DifferentialDegreeOrRadian = degree>
-            struct supergalactic : public boost::astronomy::coordinate::base_frame
-                <boost::astronomy::coordinate::spherical_representation<RepresentationDegreeOrRadian>,
-                boost::astronomy::coordinate::spherical_coslat_differential<DifferentialDegreeOrRadian>>
-            {
-            public:
-                //default constructor no initialization
-                supergalactic() {}
+        BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+         <boost::astronomy::coordinate::base_representation, OtherRepresentation>::value),
+         "Invalid representation class");
 
-                //!creates coordinate in supergalactic frame using any subclass of base_representation
-                template <typename Representation>
-                supergalactic(Representation const& representation_data)
-                {
-                    BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-                        <boost::astronomy::coordinate::base_representation, Representation>::value),
-                        "Invalid representation class");
+        auto temp = make_spherical_representation
+            <
+            typename Representation::type,
+            typename Representation::quantity1,
+            typename Representation::quantity2,
+            typename Representation::quantity3,
+            typename OtherRepresentation::type,
+            typename OtherRepresentation::quantity1,
+            typename OtherRepresentation::quantity2,
+            typename OtherRepresentation::quantity3
+            >(representation_data);
 
-                    this->data = representation_data;
-                }
+        this->data = temp;
+    }
 
-                //!creates coordinate from given values
-                //!sgb -> latitude, sgl -> longitude
-                supergalactic(double sgb, double sgl, double distance)
-                {
-                    this->data.set_lat_lon_dist(sgb, sgl, distance);
-                }
+    //!creates coordinate from given values
+    //!sgb -> latitude, sgl -> longitude
+    supergalactic
+    (
+        typename Representation::quantity1 const& sgb,
+        typename Representation::quantity2 const& sgl,
+        typename Representation::quantity3 const& distance
+    )
+    {
+        this->data.set_lat_lon_dist(sgb, sgl, distance);
+    }
 
-                //!creates coordinate with motion from given values
-                //!sgb -> latitude, sgl -> longitude
-                //!pm_sgb -> proper motion in sgb, pm_sgl_cossgb -> proper motion in sgl including cos(sgb) 
-                supergalactic(double sgb, double sgl, double distance, double pm_sgb, double pm_sgl_cossgb, double radial_velocity) :
-                    supergalactic(sgb, sgl, distance)
-                {
-                    this->motion.set_dlat_dlon_coslat_ddist(pm_sgb, pm_sgl_cossgb, radial_velocity);
-                }
+    //!creates coordinate with motion from given values
+    //!sgb -> latitude, sgl -> longitude
+    //!pm_sgb -> proper motion in sgb, pm_sgl_cossgb -> proper motion in sgl including cos(sgb) 
+    supergalactic
+    (
+        typename Representation::quantity1 const& sgb,
+        typename Representation::quantity2 const& sgl,
+        typename Representation::quantity3 const& distance,
+        typename Differential::quantity1 const& pm_sgb,
+        typename Differential::quantity2 const& pm_sgl_cossgb,
+        typename Differential::quantity3 const& radial_velocity
+    ) : supergalactic(sgb, sgl, distance)
+    {
+        this->motion.set_dlat_dlon_coslat_ddist(pm_sgb, pm_sgl_cossgb, radial_velocity);
+    }
 
-                //!creates coordinate with motion
-                //!representation class is used for coordinate data
-                //!differential class is used for motion data
-                template <typename Representation, typename Differential>
-                supergalactic(Representation const& representation_data, Differential const& diff)
-                {
-                    BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-                        <boost::astronomy::coordinate::base_representation, Representation>::value),
-                        "argument type is expected to be a differential class");
-                    this->data = representation_data;
+    //!creates coordinate with motion
+    //!representation class is used for coordinate data
+    //!differential class is used for motion data
+    template <typename OtherRepresentation, typename OtherDifferential>
+    supergalactic
+    (
+        OtherRepresentation const& representation_data,
+        OtherDifferential const& differential_data
+    )
+    {
+        BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+         <boost::astronomy::coordinate::base_representation, OtherRepresentation>::value),
+         "argument type is expected to be a differential class");
 
-                    BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-                        <boost::astronomy::coordinate::base_differential, Differential>::value),
-                        "argument type is expected to be a differential class");
-                    this->motion = diff;
-                }
+        BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+            <boost::astronomy::coordinate::base_differential, OtherDifferential>::value),
+            "argument type is expected to be a differential class");
 
-                //copy constructor
-                supergalactic(supergalactic const& other)
-                {
-                    this->data = other.get_data();
-                    this->motion = other.get_differential();
-                }
+        auto rep_temp = make_spherical_representation
+            <
+                typename Representation::type,
+                typename Representation::quantity1,
+                typename Representation::quantity2,
+                typename Representation::quantity3,
+                typename OtherRepresentation::type,
+                typename OtherRepresentation::quantity1,
+                typename OtherRepresentation::quantity2,
+                typename OtherRepresentation::quantity3
+            >(representation_data);
+        this->data = rep_temp;
 
-                //!returns component sgb of the supergalactic coordinate
-                double get_sgb() const
-                {
-                    return this->data.get_lat();
-                }
+        auto dif_temp = make_spherical_coslat_differential
+            <
+                typename Differential::type,
+                typename Differential::quantity1,
+                typename Differential::quantity2,
+                typename Differential::quantity3,
+                typename OtherDifferential::type,
+                typename OtherDifferential::quantity1,
+                typename OtherDifferential::quantity2,
+                typename OtherDifferential::quantity3
+            >(differential_data);
+        this->motion = dif_temp;
+    }
 
-                //!returns component sgl of the supergalactic coordinate
-                double get_sgl() const
-                {
-                    return this->data.get_lon();
-                }
+    //copy constructor
+    supergalactic(supergalactic<Representation, Differential> const& other)
+    {
+        this->data = other.get_data();
+        this->motion = other.get_differential();
+    }
 
-                //!returns distance component of the supergalactic coordinate
-                double get_distance() const
-                {
-                    return this->data.get_dist();
-                }
+    //!returns component sgb of the supergalactic coordinate
+    typename Representation::quantity1 get_sgb() const
+    {
+        return this->data.get_lat();
+    }
 
-                //!returns the (sgb, sgl, dist) in the form of tuple
-                std::tuple<double, double, double> get_sgb_sgl_dist() const
-                {
-                    return this->data.get_lat_lon_dist();
-                }
+    //!returns component sgl of the supergalactic coordinate
+    typename Representation::quantity2 get_sgl() const
+    {
+        return this->data.get_lon();
+    }
 
-                //!returns proper motion in supergalactic latitude
-                double get_pm_sgb() const
-                {
-                    return this->motion.get_dlat();
-                }
+    //!returns distance component of the supergalactic coordinate
+    typename Representation::quantity3 get_distance() const
+    {
+        return this->data.get_dist();
+    }
 
-                //!returns proper motion in supergalactic longitude including cos(b)
-                double get_pm_sgl_cossgb() const
-                {
-                    return this->motion.get_dlon_coslat();
-                }
+    //!returns the (sgb, sgl, dist) in the form of tuple
+    std::tuple
+    <
+        typename Representation::quantity1,
+        typename Representation::quantity2,
+        typename Representation::quantity3
+    > get_sgb_sgl_dist() const
+    {
+        return this->data.get_lat_lon_dist();
+    }
 
-                //!returns radial_velocity
-                double get_radial_velocity() const
-                {
-                    return this->motion.get_ddist();
-                }
+    //!returns proper motion in supergalactic latitude
+    typename Differential::quantity1 get_pm_sgb() const
+    {
+        return this->motion.get_dlat();
+    }
 
-                //!returns the proper motion in form of tuple including cos(b)
-                std::tuple<double, double, double> get_pm_sgb_sgl_radial() const
-                {
-                    return this->motion.get_dlat_dlon_coslat_ddist();
-                }
+    //!returns proper motion in supergalactic longitude including cos(b)
+    typename Differential::quantity2 get_pm_sgl_cossgb() const
+    {
+        return this->motion.get_dlon_coslat();
+    }
 
-                //!sets value of component b of the supergalactic coordinate
-                double set_sgb(double sgb)
-                {
-                    this->data.set_lat(sgb);
-                }
+    //!returns radial_velocity
+    typename Differential::quantity3 get_radial_velocity() const
+    {
+        return this->motion.get_ddist();
+    }
 
-                //!sets value of component sgl of the supergalactic coordinate
-                double set_sgl(double sgl) const
-                {
-                    this->data.set_lon(sgl);
-                }
+    //!returns the proper motion in form of tuple including cos(b)
+    std::tuple
+    <
+        typename Differential::quantity1,
+        typename Differential::quantity2,
+        typename Differential::quantity3
+    > get_pm_sgb_sgl_radial() const
+    {
+        return this->motion.get_dlat_dlon_coslat_ddist();
+    }
 
-                //!sets value of distance component of the supergalactic coordinate
-                double set_distance(double distance)
-                {
-                    this->data.set_dist(distance);
-                }
+    //!sets value of component b of the supergalactic coordinate
+    void set_sgb(typename Representation::quantity1 const& sgb)
+    {
+        this->data.set_lat(sgb);
+    }
 
-                //!sets value of all component of the coordinate 
-                void set_sgb_sgl_dist(double sgb, double sgl, double dist)
-                {
-                    this->data.set_lat_lon_dist(sgb, sgl, dist);
-                }
+    //!sets value of component sgl of the supergalactic coordinate
+    void set_sgl(typename Representation::quantity2 const& sgl) const
+    {
+        this->data.set_lon(sgl);
+    }
 
-                //!sets the proper motion in supergalactic latitude
-                double set_pm_sgb(double pm_sgb)
-                {
-                    this->motion.set_dlat(pm_sgb);
-                }
+    //!sets value of distance component of the supergalactic coordinate
+    void set_distance(typename Representation::quantity3 const& distance)
+    {
+        this->data.set_dist(distance);
+    }
 
-                //!sets the proper motion in supergalactic longitude including cos(b)
-                double set_pm_sgl_cossgb(double pm_sgl_cossgb)
-                {
-                    this->motion.set_dlon_coslat(pm_sgl_cossgb);
-                }
+    //!sets value of all component of the coordinate 
+    void set_sgb_sgl_dist
+    (
+        typename Representation::quantity1 const& sgb,
+        typename Representation::quantity2 const& sgl,
+        typename Representation::quantity3 const& dist
+    )
+    {
+        this->data.set_lat_lon_dist(sgb, sgl, dist);
+    }
 
-                //!sets the radial_velocity
-                double set_radial_velocity(double radial_velocity)
-                {
-                    this->motion.set_ddist(radial_velocity);
-                }
+    //!sets the proper motion in supergalactic latitude
+    void set_pm_sgb(typename Differential::quantity1 const& pm_sgb)
+    {
+        this->motion.set_dlat(pm_sgb);
+    }
 
-                //!set value of motion including cos(b)
-                void set_pm_sgb_sgl_radial(double pm_sgb, double pm_sgl_cosb, double radial_velocity)
-                {
-                    this->motion.set_dlat_dlon_coslat_ddist(pm_sgb, pm_sgl_cosb, radial_velocity);
-                }
-            };
-        } //namespace coordinate
-    } //namespace astronomy
-} //namespace boost
+    //!sets the proper motion in supergalactic longitude including cos(b)
+    void set_pm_sgl_cossgb(typename Differential::quantity2 const& pm_sgl_cossgb)
+    {
+        this->motion.set_dlon_coslat(pm_sgl_cossgb);
+    }
+
+    //!sets the radial_velocity
+    void set_radial_velocity(typename Differential::quantity3 const& radial_velocity)
+    {
+        this->motion.set_ddist(radial_velocity);
+    }
+
+    //!set value of motion including cos(b)
+    void set_pm_sgb_sgl_radial
+    (
+        typename Differential::quantity1 const& pm_sgb,
+        typename Differential::quantity2 const& pm_sgl_cosb,
+        typename Differential::quantity3 const& radial_velocity
+    )
+    {
+        this->motion.set_dlat_dlon_coslat_ddist(pm_sgb, pm_sgl_cosb, radial_velocity);
+    }
+
+};
+
+}}} //namespace boost::astronomy::coordinate
+
 #endif // !BOOST_ASTRONOMY_COORDINATE_SUPERGALACTIC_HPP
 
