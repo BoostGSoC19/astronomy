@@ -112,7 +112,7 @@ stages:
         sudo -E apt-get -yq --no-install-suggests --no-install-recommends install ${PACKAGES}
 
         git clone --branch master https://github.com/boostorg/boost-ci.git boost-ci
-        cp -pr boost-ci/ci boost-ci/.codecov.yml .
+        cp -pr boost-ci/ci . # boost-ci/.codecov.yml .
         rm -rf boost-ci
         source ci/azure-pipelines/install.sh
 
@@ -231,7 +231,7 @@ stages:
         which clang++
 
         git clone --branch master https://github.com/boostorg/boost-ci.git boost-ci
-        cp -pr boost-ci/ci boost-ci/.codecov.yml .
+        cp -pr boost-ci/ci . # boost-ci/.codecov.yml .
         rm -rf boost-ci
         source ci/azure-pipelines/install.sh
 

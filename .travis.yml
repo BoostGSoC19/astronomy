@@ -11,7 +11,7 @@ env:
 
 install:
   - git clone https://github.com/boostorg/boost-ci.git boost-ci
-  - cp -pr boost-ci/ci boost-ci/.codecov.yml .
+  - cp -pr boost-ci/ci . # boost-ci/.codecov.yml .
   - source ci/travis/install.sh
 
 addons:
@@ -113,16 +113,16 @@ jobs:
     #     - cd $BOOST_ROOT/libs/$SELF
     #     - ci/travis/bdde.sh
 
-    - os: linux
-      env:
-        - COMMENT=codecov.io
-        - B2_CXXSTD=14
-        - B2_TOOLSET=gcc-8
-        - B2_DEFINES="define=BOOST_NO_STRESS_TEST=1"
-      addons: *gcc-8
-      script:
-        - cd $BOOST_ROOT/libs/$SELF
-        - ci/travis/codecov.sh
+    # - os: linux
+    #   env:
+    #     - COMMENT=codecov.io
+    #     - B2_CXXSTD=14
+    #     - B2_TOOLSET=gcc-8
+    #     - B2_DEFINES="define=BOOST_NO_STRESS_TEST=1"
+    #   addons: *gcc-8
+    #   script:
+    #     - cd $BOOST_ROOT/libs/$SELF
+    #     - ci/travis/codecov.sh
 
     - os: linux
       env:
