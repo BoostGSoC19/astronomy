@@ -1,130 +1,157 @@
 #ifndef BOOST_ASTRONOMY_COORDINATE_SKY_POINT_HPP
 #define BOOST_ASTRONOMY_COORDINATE_SKY_POINT_HPP
 
-
 #include <string>
 #include <type_traits>
 #include <cmath>
 
-#include <boost/units/systems/angle/degrees.hpp>
 #include <boost/units/io.hpp>
 #include <boost/static_assert.hpp>
 
 #include <boost/astronomy/coordinate/frame.hpp>
 #include <boost/astronomy/detail/is_base_template_of.hpp>
 
+namespace boost { namespace astronomy { namespace coordinate {
 
-namespace boost
+namespace bu = boost::units;
+namespace bg = boost::geometry;
+
+/*!sky_point is used to represent a point(coordinate) in the sky*/
+template <typename CoordinateSystem>
+struct sky_point
 {
-    namespace astronomy
+    ///@cond INTERNAL
+    BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_frame_of
+            <boost::astronomy::coordinate::base_frame, CoordinateSystem>::value),
+            "Template argument is expected to be a frame class");
+    ///@endcond
+    
+protected:
+    CoordinateSystem point;
+
+public:
+    typedef CoordinateSystem system;
+    
+    //constructors  
+
+    //!default constructor
+    sky_point() {}
+
+    //!create point with the given coordinates
+    sky_point(CoordinateSystem const& object) : point(object) {}
+
+    //!create point with providing representation and differential class object
+    template <typename Representation, typename Differential>
+    sky_point
+    (
+        Representation const& representation_data,
+        Differential const& differential_data
+    )
     {
-        namespace coordinate
-        {
-            //typedef boost::units::quantity<boost::units::degree::plane_angle> degree;
+        BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+            <boost::astronomy::coordinate::base_representation, Representation>::value),
+            "argument type is expected to be a representation class");
 
-            /*sky_point is used to represent a point(coordinate) in the sky*/
-            template <typename System>
-            struct sky_point
-            {
-                ///@cond INTERNAL
-                BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-                    <boost::astronomy::coordinate::base_frame, System>::value),
-                    "Template argument is expected to be a fram class");
-                ///@endcond
-                
-            protected:
-                System point;
+        BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+            <boost::astronomy::coordinate::base_differential, Differential>::value),
+            "argument type is expected to be a differential class");
 
-            public:
-                //constructors  
+        point = CoordinateSystem(representation_data, differential_data);
+    }
 
-                //default constructor
-                sky_point() {}
+    //!create point with direct values of representation and differential
+    sky_point
+    (
+        typename CoordinateSystem::representation::quantity1 const& lat,
+        typename CoordinateSystem::representation::quantity2 const& lon,
+        typename CoordinateSystem::representation::quantity3 const& distance,
+        typename CoordinateSystem::differential::quantity1 const& pm_lat,
+        typename CoordinateSystem::differential::quantity2 const& pm_lon_coslat,
+        typename CoordinateSystem::differential::quantity3 const& radian_velocity
+    )
+    {
+        point = CoordinateSystem(lat, lon, distance, pm_lat, pm_lon_coslat,
+                    radian_velocity);
+    }
 
-                sky_point(System const& object) : point(object) {}
+    template<class OtherCoordinateSystem>
+    sky_point(sky_point<OtherCoordinateSystem> const& object);
 
-                //create point with providing representation and differential class object
-                template <typename Representation, typename Differential>
-                sky_point(Representation const& point, Differential const& diff)
-                {
-                    BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-                        <boost::astronomy::coordinate::base_representation, Representation>::value),
-                        "argument type is expected to be a representation class");
-                    this->data = representation_data;
+    //!constructing from direct value of representation
+    sky_point
+    (
+        typename CoordinateSystem::representation::quantity1 const& lat,
+        typename CoordinateSystem::representation::quantity2 const& lon,
+        typename CoordinateSystem::representation::quantity3 const& distance
+    )
+    {
+        point = CoordinateSystem(lat, lon, distance);
+    }
 
-                    BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-                        <boost::astronomy::coordinate::base_differential, Differential>::value),
-                        "argument type is expected to be a differential class");
+    //constructing from name of object if available in the calatoge
+    sky_point(std::string const& name);
 
-                    point = System(point, diff);
-                }
+    std::string get_constillation();
 
-                //create point with direct values of representation and differential
-                sky_point(double lat, double lon, double distance, double pm_lat, double pm_lon_coslat, double radial_velocity)
-                {
-                    point = System(lat, lon, distance, pm_lat, pm_lon_coslat, radian_velocity);
-                }
+    sky_point<CoordinateSystem> from_name(std::string const& name);
 
-                template<class OtherSystem>
-                sky_point(const sky_point<OtherSystem> object);
+    //!angular separation between two coordinates in radians
+    bu::quantity<bu::si::plane_angle> separation(sky_point<CoordinateSystem> const& 
+        object) const
+    {
+        return this->point.get_angular_separation(object.get_point());
+    }
 
-                //constructing from direct value of representation
-                sky_point(double lat, double lon, double distance=1)
-                {
-                    System temp(lat, lon, distance);
-                    this->point = temp;
-                }
+    //!returns positional angle in the radian
+    bu::quantity<bu::si::plane_angle> positional_angle(sky_point<CoordinateSystem>
+        const& object) const
+    {
+        auto p1 = make_spherical_representation(this->point.get_data());
+        auto p2 = make_spherical_representation(object.get_point().get_data());
 
-                //constructing from name of object if available in the calatoge
-                sky_point(std::string const& name);
+        auto diff = p2.get_lon() - p1.get_lon();
 
-                std::string get_constillation();
+        double temp_p1 = static_cast<bu::quantity<bu::si::plane_angle,
+            typename CoordinateSystem::representation::type>>(p1.get_lat()).value();
+        double temp_p2 = static_cast<bu::quantity<bu::si::plane_angle,
+            typename CoordinateSystem::representation::type>>(p2.get_lat()).value();
+        double temp_diff = static_cast<bu::quantity<bu::si::plane_angle,
+            typename CoordinateSystem::representation::type>>(diff).value();
 
-                sky_point<System> from_name(std::string const& name);
+        double coslat = std::cos(temp_p2);
 
-                double separation(const sky_point<System> object)
-                {
-                    return this->point.separation(object.get_point());
-                }
+        double x = std::sin(temp_p2) * std::cos(temp_p1) - 
+            coslat * std::sin(temp_p1) * std::cos(temp_diff);
+        double y = std::sin(temp_diff) * coslat;
 
-                // Returns positional angle in the radian
-                double positional_angle(const sky_point<System> object)
-                {
-                    boost::astronomy::coordinate::spherical_representation<boost::astronomy::coordinate::radian> 
-                        p1(this->point.get_data()), p2(object.get_point().get_data());
+        return bu::quantity<bu::si::plane_angle>::from_value(std::atan2(x, y));
+    }
 
-                    double diff = p2.get_lon() - p1.get_lon();
-                    double coslat = std::cos(p2.get_lat());
+    //!returns true if both coordinate systems are same else returns false
+    template<class OtherCoordinateSystem>
+    bool is_equivalent_system(sky_point<OtherCoordinateSystem> const& object)
+    {
+        return std::is_same<CoordinateSystem, OtherCoordinateSystem>::value;
+    }
 
-                    double x = std::sin(p2.get_lat()) * std::cos(p1.get_lat()) - coslat * std::sin(p1.get_lat()) * std::cos(diff);
-                    double y = std::sin(diff) * coslat;
+    template<class OtherCoordinateSystem>
+    sky_point<OtherCoordinateSystem> transform_to();
 
-                    return std::atan2(x, y);
-                }
+    //!returns the point
+    CoordinateSystem get_point() const
+    {
+        return this->point;
+    }
 
-                template<class OtherSystem>
-                bool is_equivalant_system(const sky_point<OtherSystem> object)
-                {
-                    return std::is_same<System, otherSystem>::value;
-                }
+    //!sets the point with given object
+    void set_point(CoordinateSystem const& otherPoint)
+    {
+        this->point = otherPoint;
+    }
 
-                template<class OtherSystem>
-                sky_point<OtherSystem> transform_to();
+}; //sky_point
 
-                System get_point() const
-                {
-                    return this->point;
-                }
-
-                void set_point(System otherPoint)
-                {
-                    this->point = otherPoint;
-                }
-
-            }; //sky_point
-
-        } // namespace coordinate
-    } // namespace astronomy
-} // namespace boost
+}}} //namespace boost::astronomy::coordinate
 
 #endif // !BOOST_ASTRONOMY_COORDINATE_SKY_POINT_HPP
+
