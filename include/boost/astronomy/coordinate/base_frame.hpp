@@ -96,10 +96,11 @@ public:
     //}
 
     //!angular separation between two coordinates in radians
-    bu::quantity<bu::si::dimensionless> separation(base_frame const& other) const
+    bu::quantity<bu::si::plane_angle> get_angular_separation(base_frame const& other) const
     {
-        return bu::quantity<bu::si::dimensionless>::from_value(
-            std::acos(dot(this->data, other.get_data()))
+        return bu::quantity<bu::si::plane_angle>::from_value(
+            std::acos((dot(this->data, other.get_data()) / 
+                (magnitude(this->data) * magnitude(other.get_data()))).value())
         );
     }
                 

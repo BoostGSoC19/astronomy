@@ -9,10 +9,10 @@
 #include <boost/geometry/algorithms/transform.hpp>
 #include <boost/geometry/algorithms/equals.hpp>
 #include <boost/units/quantity.hpp>
-#include <boost/unis/systems/si/base.hpp>
+#include <boost/units/systems/si/base.hpp>
 #include <boost/units/systems/si/pressure.hpp>
 #include <boost/units/systems/temperature/celsius.hpp>
-#include <boost/units/system/angle/degree.hpp>
+#include <boost/units/systems/angle/degrees.hpp>
 #include <boost/units/systems/si/volume.hpp>
 #include <boost/units/systems/si/mass.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -83,9 +83,9 @@ public:
 
     alt_az
     (
-        Representation::quantity1 const& alt,
-        Representation::quantity2 const& az,
-        Representation::quantity3 const& distance
+        typename Representation::quantity1 const& alt,
+        typename Representation::quantity2 const& az,
+        typename Representation::quantity3 const& distance
     )
     {
         this->data.set_lat_lon_dist(alt, az, distance);
@@ -93,12 +93,12 @@ public:
 
     alt_az
     (
-        Representation::quantity1 const& alt,
-        Representation::quantity2 const& az,
-        Representation::quantity3 const& distance,
-        Differential::quantity1 const& pm_alt,
-        Differential::quantity2 const& pm_az_cosalt,
-        Differential::quantity3 const& radial_velocity) :
+        typename Representation::quantity1 const& alt,
+        typename Representation::quantity2 const& az,
+        typename Representation::quantity3 const& distance,
+        typename Differential::quantity1 const& pm_alt,
+        typename Differential::quantity2 const& pm_az_cosalt,
+        typename Differential::quantity3 const& radial_velocity) :
         alt_az(alt, az, distance)
     {
         this->motion.set_dlat_dlon_coslat_ddist(pm_alt, pm_az_cosalt, radial_velocity);
