@@ -1,3 +1,7 @@
+import ../../config/checks/config : requires ;
+import os ;
+import path ;
+import regex ;
 import testing ;
 
 project
@@ -6,6 +10,39 @@ project
     <library>/boost/test//boost_unit_test_framework
     <link>shared:<define>BOOST_TEST_DYN_LINK=1
     ;
+
+rule generate_self_contained_headers ( headers_subpath * : exclude_subpaths * )
+{
+    # On CI services, test the self-contained headers on-demand only to avoid build timeouts
+    # CI environment is common for Travis CI, AppVeyor, CircleCI, etc.
+    # For example:
+    # if ! [ os.environ CI ] || [ os.environ TEST_HEADERS ] {
+    #    alias self_contained_headers : [ generate_self_contained_headers ] ;
+    # }
+
+    local targets ;
+
+    # NOTE: All '/' in test names are replaced with '-' because apparently
+    #       test scripts have a problem with test names containing slashes.
+
+    local top_headers_path = [ path.make $(BOOST_ROOT)/libs/astronomy/include/boost/astronomy ] ;
+
+    for local file in [ path.glob-tree $(top_headers_path)/$(headers_subpath) : *.hpp : $(exclude_subpaths) ]
+    {
+        local rel_file = [ path.relative-to $(top_headers_path) $(file) ] ;
+        local target_name = [ regex.replace h/$(rel_file) "/" "-" ] ;
+        local target_name = [ regex.replace $(target_name) "\.hpp" "" ] ;
+        targets += [
+            compile $(BOOST_ROOT)/libs/astronomy/test/header/main.cpp
+            : <define>"BOOST_ASTRONOMY_TEST_HEADER=$(rel_file)" <dependency>$(file)
+            : $(target_name)
+        ] ;
+    }
+
+    return $(targets) ;
+}
+
+alias headers : [ generate_self_contained_headers coordinate exception io : detail ] ;
 
 run differential.cpp ;
 run representation.cpp ;
