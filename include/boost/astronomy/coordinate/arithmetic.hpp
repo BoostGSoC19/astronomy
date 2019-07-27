@@ -167,40 +167,49 @@ auto dot(Representation1 const& representation1, Representation2 const& represen
 }
 
 
-//! Returns magnitude of the vector
+//! Returns magnitude of the cartesian vector
+template
+<
+    typename CoordinateType,
+    typename XQuantity,
+    typename YQuantity,
+    typename ZQuantity
+>
+auto magnitude
+(
+    cartesian_representation
+    <
+        CoordinateType,
+        XQuantity,
+        YQuantity,
+        ZQuantity
+    > const& vector
+)
+{
+    CoordinateType result = 0;
+    bg::model::point
+    <
+        CoordinateType,
+        3,
+        bg::cs::cartesian
+    > tempPoint;
+
+    bg::set<0>(tempPoint, vector.get_x().value());
+    bg::set<1>(tempPoint, static_cast<XQuantity>(vector.get_y()).value());
+    bg::set<2>(tempPoint, static_cast<XQuantity>(vector.get_z()).value());
+
+    result += std::pow(bg::get<0>(tempPoint), 2) +
+        std::pow(bg::get<1>(tempPoint), 2) +
+        std::pow(bg::get<2>(tempPoint), 2);
+
+    return std::sqrt(result) * typename XQuantity::unit_type();
+}
+
+
+//! Returns magnitude of the vector other than cartesian
 template <typename Coordinate>
 auto magnitude(Coordinate const& vector)
 {
-    if (std::is_same<typename Coordinate::system, bg::cs::cartesian>::value)
-    {
-        typename Coordinate::type result = 0;
-        bg::model::point
-        <
-            typename Coordinate::type,
-            3,
-            bg::cs::cartesian
-        > tempPoint;
-
-        bg::set<0>(tempPoint, vector.get_x().value());
-        bg::set<1>
-            (
-                tempPoint,
-                static_cast<typename Coordinate::quantity1>
-                (vector.get_y()).value()
-            );
-        bg::set<2>
-            (
-                tempPoint,
-                static_cast<typename Coordinate::quantity1>
-                (vector.get_z()).value()
-            );
-
-        result += std::pow(bg::get<0>(tempPoint), 2) +
-            std::pow(bg::get<1>(tempPoint), 2) +
-            std::pow(bg::get<2>(tempPoint), 2);
-
-        return std::sqrt(result) * typename Coordinate::quantity1::unit_type();
-    }
     return bg::get<2>(vector.get_point()) * typename Coordinate::quantity3::unit_type();
 }
 
