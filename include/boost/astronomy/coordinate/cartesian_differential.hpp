@@ -111,18 +111,18 @@ public:
     //!returns the dx component of differential
     XQuantity get_dx() const
     {
-        return XQuantity(bg::get<0>(this->diff) * typename XQuantity::unit_type());
+        return XQuantity::from_value(bg::get<0>(this->diff));
     }
 
     //!returns the dy component of differential
     YQuantity get_dy() const
     {
-        return YQuantity(bg::get<1>(this->diff) * typename YQuantity::unit_type());
+        return YQuantity::from_value(bg::get<1>(this->diff));
     }
     //!returns the dz component of differential
     ZQuantity get_dz() const
     {
-        return ZQuantity(bg::get<2>(this->diff) * typename ZQuantity::unit_type());
+        return ZQuantity::from_value(bg::get<2>(this->diff));
     }
 
     //!set value of (dx, dy, dz) in current object

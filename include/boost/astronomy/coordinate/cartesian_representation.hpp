@@ -119,19 +119,19 @@ public:
     //!Returns the x quantity component of point
     XQuantity get_x() const
     {
-        return bg::get<0>(this->point)* typename XQuantity::unit_type();
+        return XQuantity::from_value(bg::get<0>(this->point));
     }
 
     //!Returns the y quantity component of point
     YQuantity get_y() const
     {
-        return bg::get<1>(this->point)* typename YQuantity::unit_type();
+        return YQuantity::from_value(bg::get<1>(this->point));
     }
 
     //!Returns the z quantity component of point
     ZQuantity get_z() const
     {
-        return bg::get<2>(this->point)* typename ZQuantity::unit_type();
+        return ZQuantity::from_value(bg::get<2>(this->point));
     }
 
     //!Set value of (x, y, z) in current object
