@@ -45,7 +45,12 @@ public:
     //!key, value and optional comments are expected
     //!all the values will be directly stored as provided so necessary spaces befor values must be provided
     //!spaces after the keyword and value will be taken care implicitly
-    card(std::string const& key, std::string const& value, std::string const& comment = "")
+    card
+    (
+        std::string const& key,
+        std::string const& value,
+        std::string const& comment = ""
+    )
     {
         if (key.length() > 8)
         {
@@ -62,12 +67,14 @@ public:
 
         if (comment.length())
         {
-            this->card_ = std::string(key).append(8 - key.length(), ' ') + "= " + value + " /" + comment +
+            this->card_ = std::string(key).append(8 - key.length(), ' ') +
+                "= " + value + " /" + comment +
                 std::string("").append(68 - value.length() + comment.length(), ' ');
         }
         else
         {
-            this->card_ = std::string(key).append(8 - key.length(), ' ') + "= " + std::string(value).append(70 - key.length(), ' ');
+            this->card_ = std::string(key).append(8 - key.length(), ' ') + "= " +
+                std::string(value).append(70 - key.length(), ' ');
         }
     }
 
@@ -75,7 +82,12 @@ public:
     //!key, value and optional comments are expected
     //!all the values will be directly stored as provided so necessary spaces befor values must be provided
     //!spaces after the keyword and value will be taken care implicitly
-    void create_card(std::string const& key, std::string const& value, std::string const& comment = "")
+    void create_card
+    (
+        std::string const& key,
+        std::string const& value,
+        std::string const& comment = ""
+    )
     {
         if (key.length() > 8)
         {
@@ -92,12 +104,14 @@ public:
 
         if (comment.length())
         {
-            this->card_ = std::string(key).append(8 - key.length(), ' ') + "= " + value + " /" + comment +
+            this->card_ = std::string(key).append(8 - key.length(), ' ') +
+                "= " + value + " /" + comment +
                 std::string("").append(68 - value.length() + comment.length(), ' ');
         }
         else
         {
-            this->card_ = std::string(key).append(8 - key.length(), ' ') + "= " + std::string(value).append(70 - key.length(), ' ');
+            this->card_ = std::string(key).append(8 - key.length(), ' ') +
+                "= " + std::string(value).append(70 - key.length(), ' ');
         }
     }
 
@@ -128,7 +142,13 @@ public:
 
     //!create card for complex value
     template <typename Real, typename Imaginary>
-    void create_card(std::string const& key, Real real, Imaginary imaginary, std::string const& comment = "")
+    void create_card
+    (
+        std::string const& key,
+        Real real,
+        Imaginary imaginary,
+        std::string const& comment = ""
+    )
     {
         std::ostringstream stream;
         stream << real << ", " << imaginary;
@@ -151,7 +171,8 @@ public:
             throw invalid_value_length_exception();
         }
 
-        this->card_ = std::string(key).append(8 - key.length(), ' ') + "  " + std::string(value).append(70 - key.length(), ' ');
+        this->card_ = std::string(key).append(8 - key.length(), ' ') +
+            "  " + std::string(value).append(70 - key.length(), ' ');
     }
 
     //!if whole value is set to true then string is returned with trailing spaces
@@ -164,7 +185,10 @@ public:
         return boost::algorithm::trim_copy(this->card_.substr(0, 8));
     }
 
-    //!return types can be int, float, double, bool, string (date and complex numbers are returned as string surrounded in single quotes or in brackets)
+    /*!
+    return types can be int, float, double, bool, string
+    (date and complex numbers are returned as string surrounded in single quotes or in brackets)
+    */
     template <typename ReturnType>
     ReturnType value() const
     {
@@ -196,13 +220,15 @@ private:
     template <typename ReturnType>
     ReturnType value_imp(boost::type<ReturnType>) const
     {
-        std::string val = boost::algorithm::trim_copy(this->card_.substr(10, this->card_.find('/') - 10));
+        std::string val = boost::algorithm::trim_copy(
+            this->card_.substr(10, this->card_.find('/') - 10));
         return boost::lexical_cast<ReturnType>(val);
     }
 
     bool value_imp(boost::type<bool>) const
     {
-        std::string val = boost::algorithm::trim_copy(this->card_.substr(10, this->card_.find('/') - 10));
+        std::string val = boost::algorithm::trim_copy(
+            this->card_.substr(10, this->card_.find('/') - 10));
         if (val == "T")
         {
             return true;
