@@ -9,6 +9,4 @@ project
 
 
 build-project header ;
-
-run differential.cpp ;
-run representation.cpp ;
+build-project coordinate ;
