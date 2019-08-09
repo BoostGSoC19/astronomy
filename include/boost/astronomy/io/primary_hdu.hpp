@@ -27,8 +27,6 @@ public:
     //!This constructore should be used when file is never read and boost::astronomy::io::hdu object is not created of the file
     primary_hdu(std::fstream &file) : hdu(file)
     {
-        //primary header always starts at the begining of the file
-        file.seekg(0);
         simple = this->value_of<bool>("SIMPLE");
         extend = this->value_of<bool>("EXTEND");
 
@@ -55,8 +53,6 @@ public:
     //!This constructore should be used when boost::astronomy::io::hdu object already exist for the file 
     primary_hdu(std::fstream &file, hdu const& other) : hdu(other)
     {
-        //primary header always starts at the begining of the file
-        file.seekg(0);
         simple = this->value_of<bool>("SIMPLE");
         extend = this->value_of<bool>("EXTEND");
 
