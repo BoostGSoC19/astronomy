@@ -427,18 +427,36 @@ auto make_spherical_coslat_differential
 }
 
 //!constructs cartesian object from spherical_coslat_differential
-//!function placed in this file to avoid circular dependency of header files
+//function placed in this file to avoid circular dependency of header files
 template
 <
-    typename ...Args
+    typename CoordinateType,
+    template <typename Unit1, typename CoordinateType_> class LatQuantity,
+    template <typename Unit2, typename CoordinateType_> class LonQuantity,
+    template <typename Unit3, typename CoordinateType_> class DistQuantity,
+    typename Unit1,
+    typename Unit2,
+    typename Unit3
 >
 auto
 make_cartesian_differential
 (
-    spherical_coslat_differential<Args...> const& other
+    spherical_coslat_differential
+    <
+        CoordinateType,
+        LatQuantity<Unit1, CoordinateType>,
+        LonQuantity<Unit2, CoordinateType>,
+        DistQuantity<Unit3, CoordinateType>
+    > const& other
 )
 {
-    typedef spherical_coslat_differential<Args...> spherical_type;
+    typedef spherical_coslat_differential
+    <
+        CoordinateType,
+        LatQuantity<Unit1, CoordinateType>,
+        LonQuantity<Unit2, CoordinateType>,
+        DistQuantity<Unit3, CoordinateType>
+    > spherical_type;
     bg::model::point<typename spherical_type::type, 3, bg::cs::spherical<radian>> temp;
 
     temp = other.get_differential();
@@ -446,12 +464,12 @@ make_cartesian_differential
     bg::set<1>(temp, bg::get<1>(temp) / cos(bg::get<0>(temp)));
 
     return cartesian_differential
-        <
-            typename spherical_type::type,
-            typename spherical_type::quantity3,
-            typename spherical_type::quantity3,
-            typename spherical_type::quantity3
-        >(temp);
+    <
+        typename spherical_type::type,
+        typename spherical_type::quantity3,
+        typename spherical_type::quantity3,
+        typename spherical_type::quantity3
+    >(temp);
 }
 
 }}} //namespace boost::astronomy::coordinate
