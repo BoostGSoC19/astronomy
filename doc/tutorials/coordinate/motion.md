@@ -2,8 +2,6 @@
 
 Astronomy library provides a way to integrate motions with the coordinate. For every representation class, there is one corresponding differential class for it which will denote the motion of the point. 
 
-Currently as units are not integrated with the coordinate system, it is assumed that representation and differentials are in same corresponding unit.(E.g: if representation is in k.m then differential will be taken with respect to time so in this case units will be k.m/time and here time can be any unit of time).
-
 Creation of differential is exactly as representation classes.
 
 There are 4 available differential classes:
@@ -14,13 +12,11 @@ There are 4 available differential classes:
 
 >**NOTE:** spherical_coslat_differential is the differential longitude with cos(lat) included, latitude and distance. This differential is used in all the astronomical coordinate system.
 
-This classes also provide multiplication and addition operator overload.
-* To add a differential to representation: `representation + differential`
-* To add differential to representation for N instance: `representation + (differential*N)`
+These classes also provide multiplication and addition operator overload.
+* To add a differential to differential: `differential + differential`
+* To multiply a differential with time N instance: `differential * N)`
 
->**Note:** Only corresponding types of representation and differential can be added (in any spherical representation and differential should be in the same degree or radian). But spherical_coslat_differential can be added to any spherical representation.
-
-required header files to inclue all the differential classes:
+Required header files to include all the differential classes:
 
 ```c++
 #include <boost/astronomy/coordinate/coordinate.hpp>
@@ -33,30 +29,28 @@ or
 ## Example:
 ```c++
 #include <iostream>
-#include <boost/astronomy/coordinate/cartesian_representation.hpp>
-#include <boost/astronomy/coordinate/cartesian_differential.hpp>
+#include <boost/astronomy/coordinate/coordinate.hpp>
+#include <boost/units/systems/si/length.hpp>
+#include <boost/units/systems/si/time.hpp>
+#include <boost/units/io.hpp>
 
-using namespace std;
 using namespace boost::astronomy::coordinate;
+using namespace boost::units;
+using namespace boost::units::si;
 
 int main()
 {
-    cartesian_representation point(1.0, 35.0, 45.0);
-    cartesian_differential motion1(1, 2, 0);
-    cartesian_differential motion2(6, -3, 1);
+    auto motion1 = make_cartesian_differential(1.0 * meters/seconds, 2.0 * meters/seconds, 0.0 * meters/seconds);
+    auto motion2 = make_cartesian_differential(6.0 * meters/seconds, -3.0 * meters/seconds, 1.0 * meters/seconds);
 
-    //for a point having only one motion
-    //moving forward for one instance of time
-    cartesian_representation x = point1 + motion1; // x = (1.0, 37.0, 45.0)
+    //adding two motions
+    auto sum = make_cartesian_differential(motion1 + motion2); // sum = (7.0, -1.0, 1.0)
 
-    //we can also add multiple motion to a point
-    x = point + motion1 + motion2; //x = (8.0, 34.0, 46.0)
+    //multiply 5 instance of time with single motion
+    auto product1 = make_cartesian_differential(motion1 * (5 * seconds)); // product1 = (5.0, 10.0 0.0);
 
-    //moving forward for 5 instance of time with single motion
-    x = point + motion1 * 5; // x = (6.0, 45.0 45.0);
-
-    //moving forward for 5 instance of time with multiple motion
-    x = point + (motion1 + motion2) * 5; // x = (36.0, 30.0, 50.0)
+    //multiply 5 instance of time with multiple motion
+    auto product2 = make_cartesian_differential((motion1 + motion2) * (5 * seconds)); // x = (35.0, -5.0, 5.0)
 
     return 0;
 }

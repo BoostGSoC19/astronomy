@@ -10,24 +10,25 @@ Converting one coordinate to another coordinate is really easy. The system is de
 #include <iostream>
 #include <boost/astronomy/coordinate/spherical_representation.hpp>
 #include <boost/astronomy/coordinate/cartesian_representation.hpp>
-
-typedef boost::astronomy::coordinate::spherical_representation spherical;
+#include <boost/units/systems/si/length.hpp>
+#include <boost/units/systems/si/plane_angle.hpp>
 
 using namespace boost::astronomy::coordinate;
+using namespace boost::units;
+using namespace boost::units::si;
 
 int main()
 {
-    cartesian_representation point1(10,20,30);
+    auto point1 = make_cartesian_representation(10.0*meter, 20.0*meter, 30.0*meter);
 
-    //implicit conversion
-    sphrcial_representation<degree> point2 = point1;
+    auto point2 = make_spherical_representation(point1);
 
-    spherical_representation<radian> point3(point1);
+    spherical_representation<double, quantity<si::plane_angle>, quantity<si::plane_angle>,
+        quantity<si::length>> point3(point1);
 
-    //explicit conversion
-    cartesian_representation point4 = static_cast<cartesian_representation>(point3);
+    auto point4 = make_cartesian_representation(point3);
     std::cin.get();
-    return 0
+    return 0;
 }
 ```
 [Previous](coordinate_point.md) | [Next](vector_operation.md)

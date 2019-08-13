@@ -13,34 +13,45 @@ Representation classes have provided a few of the most used vector operations wh
 ```c++
 #include <iostream>
 #include <boost/astronomy/coordinate/representation.hpp>
+#include <boost/astronomy/coordinate/arithmetic.hpp>
+#include <boost/units/systems/si/length.hpp>
+#include <boost/units/systems/si/plane_angle.hpp>
+#include <boost/units/systems/angle/degrees.hpp>
+#include <boost/units/io.hpp>
 
 using namespace boost::astronomy::coordinate;
+using namespace boost::units;
+using namespace boost::units::si;
+namespace bud = boost::units::degree;
 
 int main()
 {
     //Cross Product 
-    cartesian_representation point1(15, 25, 30);
-    spherical_representation<degree> point2(45, 45, 3);
+    auto point1 = make_cartesian_representation(15.0 * meters, 25.0 * meters, 30.0 * meters);
+    auto point2 = make_spherical_representation(45.0 * bud::degrees, 45.0 * bud::degrees, 3.0 * meters);
 
-    cartesian_representation cross_result = point1.cross<cartesian_representation>(point2);
+    cartesian_representation<double, quantity<si::length>, quantity<si::length>, quantity<si::length>>
+        cross_result = cross(point1, point2);
 
     //dot product
-    std::cout << point1.dot(point2) << std::endl;
+    std::cout << dot(point1, point2) << std::endl;
 
     //unit vector
-    cartesian_representation unit_vector = point2.unit_vector<cartesian_representation>();
+    auto unit_vector_point = unit_vector(point1);
 
     //magnitude
-    std::cout << point1.magnitude() << std::endl;
+    std::cout << magnitude(point1) << std::endl;
 
     //sum of two vectors
     //Here we show the flexibility provided by the library to use any representation for the operations and implicit casting
-    //right hand of the equal returns object of cartesian_representation
-    //But it gets converted implicitly into spherical_representation<radian>
-    spherical_representation<radian> sum_result = point1.sum<cartesian_representation>(point2);
+    //right-hand side of the equal returns object of cartesian_representation
+    //But it gets converted implicitly into spherical_representation
+    spherical_representation<double, quantity<si::plane_angle>, quantity<si::plane_angle>,
+        quantity<si::length>> sum_result = sum(point1, point2);
 
     //mean of two vectors
-    spherical_representation<degree> mean_result = point1.mean<spherical_representation<degree>>(point2);
+    spherical_representation<double, quantity<degree::plane_angle>, quantity<degree::plane_angle>,
+        quantity<si::length>> mean_result = mean(point1, point2);
 
     return 0;
 }

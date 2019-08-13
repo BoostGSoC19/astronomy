@@ -20,7 +20,6 @@ This library provides basic functionalities which are required daily in the fiel
 * Knowledge of C++ templates
 
 ## Limitations
-* In this version, units are not supported with the coordinate system but will be added soon
 * Limited functionality for FITS file
 
 ## **Index**
@@ -38,4 +37,4 @@ This library provides basic functionalities which are required daily in the fiel
         * 2.1.1 Accessing headers
         * 2.1.1 Accessing data
 
-[NEXT](coordinate/euclidean_coordinate.md)
+[Next](coordinate/euclidean_coordinate.md)
