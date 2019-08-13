@@ -16,6 +16,15 @@ namespace boost
             }
         };
 
+        class wrong_extension_type :public fits_exception
+        {
+        public:
+            const char* what() const throw()
+            {
+                return "wrong extension type";
+            }
+        };
+
         class invalid_card_length_exception : public fits_exception
         {
         public:
@@ -58,6 +67,15 @@ namespace boost
             const char* what() const throw()
             {
                 return "Key is not defined";
+            }
+        };
+
+        class invalid_table_colum_format : public fits_exception
+        {
+        public:
+            const char* what() const throw()
+            {
+                return "invalid_table_colum_format";
             }
         };
 

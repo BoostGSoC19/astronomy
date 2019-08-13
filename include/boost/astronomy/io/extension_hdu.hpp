@@ -13,6 +13,7 @@ namespace boost { namespace astronomy { namespace io {
 struct extension_hdu : public boost::astronomy::io::hdu
 {
 protected:
+    std::string extname;
     int gcount = 1;
     int pcount = 0;
 
@@ -23,18 +24,21 @@ public:
     {
         gcount = this->value_of<int>("GCOUNT");
         pcount = this->value_of<int>("PCOUNT");
+        extname = this->value_of<std::string>("EXTNAME");
     }
 
     extension_hdu(std::fstream &file, hdu const& other) : hdu(other)
     {
         gcount = this->value_of<int>("GCOUNT");
         pcount = this->value_of<int>("PCOUNT");
+        extname = this->value_of<std::string>("EXTNAME");
     }
 
     extension_hdu(std::fstream &file, std::streampos pos) : hdu(file, pos)
     {
         gcount = this->value_of<int>("GCOUNT");
         pcount = this->value_of<int>("PCOUNT");
+        extname = this->value_of<std::string>("EXTNAME");
     }
 };
 

@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstddef>
 #include <unordered_map>
+#include <memory>
 
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
@@ -14,8 +15,12 @@
 #include <boost/astronomy/io/image.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
 #include <boost/astronomy/io/card.hpp>
+#include <boost/astronomy/io/column.hpp>
 
 namespace boost { namespace astronomy { namespace io {
+
+struct column;
+
 struct hdu
 {
 protected:
@@ -150,6 +155,11 @@ public:
     {
         //set cursor to the end of the HDU unit
         file.seekg((file.tellg() + (2880 - (file.tellg() % 2880))));    
+    }
+
+    virtual std::unique_ptr<column> get_column(std::string name) const
+    {
+        throw wrong_extension_type();
     }
 };
 }}} //namespace boost::astronomy::io
