@@ -139,7 +139,7 @@ public:
     }
 
     //!returns the value of particular naxis
-    std::size_t naxis(std::size_t n = 0)
+    std::size_t naxis(std::size_t n = 0) const
     {
         return this->naxis_[n];
     }
