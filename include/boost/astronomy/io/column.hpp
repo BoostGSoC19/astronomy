@@ -6,11 +6,8 @@
 
 #include <boost/static_assert.hpp>
 
-#include <boost/astronomy/io/hdu.hpp>
 
 namespace boost { namespace astronomy { namespace io {
-
-struct hdu;
 
 struct column
 {
@@ -133,8 +130,6 @@ public:
     {
         dimension = tdim;
     }
-
-    friend struct hdu;
 };
 
 }}}

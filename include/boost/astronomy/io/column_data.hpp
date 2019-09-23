@@ -22,6 +22,12 @@ public:
     {
         return column_data_;
     }
+
+    std::vector<Type>& get_data()
+    {
+        return column_data_;
+    }
+
 };
 
 }}}
