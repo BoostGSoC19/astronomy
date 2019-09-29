@@ -5,7 +5,6 @@ cmake_minimum_required(VERSION 3.10)
 #-----------------------------------------------------------------------------
 option(ASTRONOMY_BUILD_TEST "Build tests" ON)
 option(ASTRONOMY_USE_CLANG_TIDY "Set CMAKE_CXX_CLANG_TIDY property on targets to enable clang-tidy linting" OFF)
-option(ASTRONOMY_DOWNLOAD_FINDBOOST "Download FindBoost.cmake from latest CMake release" OFF)
 set(CMAKE_CXX_STANDARD 14 CACHE STRING "C++ standard version to use (default is 14)")
 
 #-----------------------------------------------------------------------------
@@ -68,24 +67,6 @@ add_library(astronomy_dependencies INTERFACE)
 # - look for default installation location
 # - look for location specified with BOOST_ROOT
 #-----------------------------------------------------------------------------
-if(CMAKE_VERSION VERSION_LESS 3.13 AND NOT ASTRONOMY_DOWNLOAD_FINDBOOST)
-  message(STATUS "Boost.Astronomy: You are using CMake older than 3.13")
-  message(STATUS "Boost.Astronomy: FindBoost.cmake has likely been updated to detect newer or even not yet released Boost")
-  message(STATUS "Boost.Astronomy: Run CMake with -DASTRONOMY_DOWNLOAD_FINDBOOST=ON to get latest version of FindBoost.cmake")
-  message(STATUS "Boost.Astronomy: WARNING:")
-  message(STATUS "Boost.Astronomy:    Newer FindBoost.cmake may fail to find your Boost for many reasons.")
-  message(STATUS "Boost.Astronomy:    For example, this may be due to unrecognised toolset eg. latest Visual Studio 2017.")
-  message(STATUS "Boost.Astronomy:    Try run CMake with -DBoost_COMPILER=\"-vc141\" or value for your toolset.")
-endif()
-
-if(ASTRONOMY_DOWNLOAD_FINDBOOST)
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/cmake/FindBoost.cmake")
-    message(STATUS "Boost.Astronomy: Downloading FindBoost.cmake from https://gitlab.kitware.com/cmake/ release branch")
-    file(DOWNLOAD
-      "https://gitlab.kitware.com/cmake/cmake/raw/release/Modules/FindBoost.cmake"
-      "${CMAKE_BINARY_DIR}/cmake/FindBoost.cmake")
-  endif()
-endif()
 
 if(NOT DEFINED BOOST_ROOT AND NOT DEFINED ENV{BOOST_ROOT})
   message(STATUS "Boost.Astronomy: Looking for Boost from current source tree and libraries from stage.")
