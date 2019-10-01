@@ -148,7 +148,7 @@ public:
     template <typename ReturnType>
     ReturnType value_of(std::string const& key)// const
     {
-        return this->cards[key_index[key]].value<ReturnType>();
+        return this->cards[key_index.at(key)].value<ReturnType>();
     }
 
     void set_unit_end(std::fstream &file) const
