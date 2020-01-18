@@ -18,7 +18,7 @@ To access any of the component in any representation methods as below can be use
 `set_<component>()`<br>
 `get_<component1>_<component2>_<component3>()`<br>
 `set_<component1>_<component2>_<component3>()`<br>
-Here `<component>` is supposed to be replaced by the corrosponding component of the representation.<br>
+Here `<component>` is supposed to be replaced by the corresponding component of the representation.<br>
 >E.g. :- cartesian_representation: `get_x()`, `set_x_y_z()`<br>
 spherical_representation: `get_lat()`, `get_lat_lon_dist()`
 

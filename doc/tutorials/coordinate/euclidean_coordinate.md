@@ -19,7 +19,7 @@ To import all the representation, following is required:
 #include <boost/astronomy/coordinate/representation.hpp>
 ```
 
-### Refrences:
+### References:
 * https://en.wikipedia.org/wiki/Coordinate_system
 * https://en.wikipedia.org/wiki/Euclidean_space
 

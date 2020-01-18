@@ -46,7 +46,7 @@ int main()
     //creating sky point object of icrs frame
     sky_point<icrs<spherical_rep, spherical_coslat_diff>> object3(star2, motion2);
 
-    //to retrive frame from object
+    //to retrieve frame from object
     icrs<spherical_rep, spherical_coslat_diff> frame_object = object1.get_point();
 
     if(object1.is_equivalent_system(object2))

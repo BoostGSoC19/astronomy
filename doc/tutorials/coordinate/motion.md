@@ -14,7 +14,7 @@ There are 4 available differential classes:
 
 These classes also provide multiplication and addition operator overload.
 * To add a differential to differential: `differential + differential`
-* To multiply a differential with time N instance: `differential * N)`
+* To multiply a differential with time N instance: `differential * N`
 
 Required header files to include all the differential classes:
 
