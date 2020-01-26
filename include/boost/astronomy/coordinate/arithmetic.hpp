@@ -33,92 +33,57 @@ auto cross
 (
     Representation1<Args1...> const& representation1,
     Representation2<Args2...> const& representation2
-)
-{
-    /*!both the coordinates/vector are first converted into
-    cartesian coordinate system then cross product of both cartesian
-    vectors is converted into requested type and returned*/
+) {
 
-    /*checking types if it is not subclass of
-    base_representaion then compile time erorr is generated*/
-    //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-    //    <
-    //        boost::astronomy::coordinate::base_representation,
-    //        Representation1<Args1...>
-    //    >::value),
-    //    "First argument type is expected to be a representation class");
-    //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-    //    <
-    //        boost::astronomy::coordinate::base_representation,
-    //        Representation2<Args2...>
-    //    >::value),
-    //    "Second argument type is expected to be a representation class");
+                typedef Representation1<Args1...> representation1_type;
+                typedef Representation2<Args2...> representation2_type;
 
-    /*converting both coordinates/vector into cartesian system*/
+                bg::model::point
+                        <
+                                typename std::conditional
+                                        <
+                                                sizeof(typename representation2_type::type) >=
+                                                sizeof(typename representation1_type::type),
+                                                typename representation2_type::type,
+                                                typename representation1_type::type
+                                        >::type,
+                                3,
+                                bg::cs::cartesian
+                        > tempPoint1, tempPoint2, result;
 
-    typedef Representation1<Args1...> representation1_type;
-    typedef Representation2<Args2...> representation2_type;
+                /**
+                 * We transform the given values into cartesian representation
+                 */
+                bg::transform(representation1.get_point(), tempPoint1);
+                bg::transform(representation2.get_point(), tempPoint2);
 
-    bg::model::point
-    <
-        typename std::conditional
-        <
-            sizeof(typename representation2_type::type) >=
-                sizeof(typename representation1_type::type),
-            typename representation2_type::type,
-            typename representation1_type::type
-        >::type,
-        3,
-        bg::cs::cartesian
-    > tempPoint1, tempPoint2, result;
+                /**
+                 * Now we calculate cross product of cartesian representation
+                 * and save it in result.
+                 */
+                bg::set<0>(result, (bg::get<1>(tempPoint1) * bg::get<2>(tempPoint2)) -
+                                   (bg::get<2>(tempPoint1) * bg::get<1>(tempPoint2) ) );
 
-    bg::transform(representation1.get_point(), tempPoint1);
-    bg::transform(representation2.get_point(), tempPoint2);
+                bg::set<1>(result, (bg::get<2>(tempPoint1) * bg::get<0>(tempPoint2)) -
+                                   (bg::get<0>(tempPoint1) * bg::get<2>(tempPoint2) ) );
 
-    bg::set<0>(result, (bg::get<1>(tempPoint1)*bg::get<2>(tempPoint2)) -
-        ((bg::get<2>(tempPoint1)*
-        bu::conversion_factor(typename representation1_type::quantity3::unit_type(),
-        typename representation1_type::quantity2::unit_type()))*
-        (bg::get<1>(tempPoint2)*
-        bu::conversion_factor(typename representation2_type::quantity2::unit_type(),
-        typename representation2_type::quantity3::unit_type()))));
+                bg::set<2>(result, (bg::get<0>(tempPoint1) * bg::get<1>(tempPoint2)) -
+                                   (bg::get<1>(tempPoint1) * bg::get<0>(tempPoint2) ) );
 
-    bg::set<1>(result, (bg::get<2>(tempPoint1)*bg::get<0>(tempPoint2)) -
-        ((bg::get<0>(tempPoint1)*
-        bu::conversion_factor(typename representation1_type::quantity1::unit_type(),
-        typename representation1_type::quantity3::unit_type()))*
-        (bg::get<2>(tempPoint2)*
-        bu::conversion_factor(typename representation2_type::quantity3::unit_type(),
-        typename representation2_type::quantity1::unit_type()))));
+                /**
+                 * Create a point of the represenation type of
+                 * first parameter.
+                 */
+                auto p1 = representation1.get_point();
 
-    bg::set<2>(result, (bg::get<0>(tempPoint1)*bg::get<1>(tempPoint2)) -
-        ((bg::get<1>(tempPoint1)*
-        bu::conversion_factor(typename representation1_type::quantity2::unit_type(),
-        typename representation1_type::quantity1::unit_type()))*
-        (bg::get<0>(tempPoint2)*
-        bu::conversion_factor(typename representation2_type::quantity1::unit_type(),
-        typename representation2_type::quantity2::unit_type()))));
+                /**
+                 * Converts 'result' which is in cartesian representation
+                 * to the representation of first parameter.
+                 */
+                bg::transform(result, p1);
 
-    return Representation1
-        <
-            typename representation1_type::type,
-            bu::quantity<typename bu::multiply_typeof_helper
-            <
-                typename representation1_type::quantity2::unit_type,
-                typename representation2_type::quantity3::unit_type>::type
-            >,
-            bu::quantity<typename bu::multiply_typeof_helper
-            <
-                typename representation1_type::quantity3::unit_type,
-                typename representation2_type::quantity1::unit_type>::type
-            >,
-            bu::quantity<typename bu::multiply_typeof_helper
-            <
-                typename representation1_type::quantity1::unit_type,
-                typename representation2_type::quantity2::unit_type>::type
-            >
-        >(result);
-}
+                return p1;
+            }
 
 
 //! Returns dot product of representation1 and representation2
