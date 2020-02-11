@@ -1,7 +1,7 @@
 #ifndef BOOST_ASTRONOMY_COORDINATE_CARTESIAN_REPRESENTATION_HPP
 #define BOOST_ASTRONOMY_COORDINATE_CARTESIAN_REPRESENTATION_HPP
 
-
+#include <iostream>
 #include <tuple>
 #include <type_traits>
 
@@ -13,6 +13,7 @@
 #include <boost/units/quantity.hpp>
 #include <boost/units/get_dimension.hpp>
 #include <boost/units/systems/si/dimensionless.hpp>
+#include <boost/units/io.hpp>
 
 #include <boost/astronomy/detail/is_base_template_of.hpp>
 #include <boost/astronomy/coordinate/base_representation.hpp>
@@ -158,6 +159,15 @@ public:
     void set_z(ZQuantity const& z)
     {
         bg::set<2>(this->point, z.value());
+    }
+
+    //!function to display the details of a point
+    void display()
+    {
+        std::cout<<"Cartesian Representation\n";
+        std::cout<<"X coordinate : "<<this->get_x()<<"\n";
+        std::cout<<"Y coordinate : "<<this->get_y()<<"\n";
+        std::cout<<"Z coordinate : "<<this->get_z()<<"\n";
     }
 
     //!"+" operator to add any representation or differential

@@ -1,7 +1,7 @@
 #ifndef BOOST_ASTRONOMY_COORDINATE_SPHERICAL_REPRESENTATION_HPP
 #define BOOST_ASTRONOMY_COORDINATE_SPHERICAL_REPRESENTATION_HPP
 
-
+#include <iostream>
 #include <tuple>
 #include <cstddef>
 
@@ -13,6 +13,7 @@
 #include <boost/units/physical_dimensions/plane_angle.hpp>
 #include <boost/units/systems/si/plane_angle.hpp>
 #include <boost/units/systems/si/dimensionless.hpp>
+#include <boost/units/io.hpp>
 
 #include <boost/astronomy/detail/is_base_template_of.hpp>
 #include <boost/astronomy/coordinate/base_representation.hpp>
@@ -202,6 +203,15 @@ public:
     void set_dist(DistQuantity const& distance)
     {
         bg::set<2>(this->point, distance.value());
+    }
+
+    //!function to display the details of a point
+    void display()
+    {
+        std::cout<<"Spherical Representation\n";
+        std::cout<<"Latitude : "<<this->get_lat()<<"\n";
+        std::cout<<"Longitude : "<<this->get_lon()<<"\n";
+        std::cout<<"Distance : "<<this->get_dist()<<"\n";
     }
 
     template<typename Addend>
