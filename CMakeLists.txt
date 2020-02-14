@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.10)
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
-option(ASTRONOMY_BUILD_TEST "Build tests" ON)
-option(ASTRONOMY_USE_CLANG_TIDY "Set CMAKE_CXX_CLANG_TIDY property on targets to enable clang-tidy linting" OFF)
+option(BOOST_ASTRONOMY_BUILD_TEST "Build tests" ON)
+option(BOOST_ASTRONOMY_USE_CLANG_TIDY "Set CMAKE_CXX_CLANG_TIDY property on targets to enable clang-tidy linting" OFF)
 set(CMAKE_CXX_STANDARD 14 CACHE STRING "C++ standard version to use (default is 14)")
 
 #-----------------------------------------------------------------------------
