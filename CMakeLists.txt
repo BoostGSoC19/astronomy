@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.10)
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
-option(ASTRONOMY_BUILD_TEST "Build tests" ON)
-option(ASTRONOMY_USE_CLANG_TIDY "Set CMAKE_CXX_CLANG_TIDY property on targets to enable clang-tidy linting" OFF)
+option(BOOST_ASTRONOMY_BUILD_TEST "Build tests" ON)
+option(BOOST_ASTRONOMY_USE_CLANG_TIDY "Set CMAKE_CXX_CLANG_TIDY property on targets to enable clang-tidy linting" OFF)
 set(CMAKE_CXX_STANDARD 14 CACHE STRING "C++ standard version to use (default is 14)")
 
 #-----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ target_compile_definitions(astronomy_dependencies
 # clang-tidy
 # - default checks specified in .clang-tidy configuration file
 #-----------------------------------------------------------------------------
-if(ASTRONOMY_USE_CLANG_TIDY AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.6)
+if(BOOST_ASTRONOMY_USE_CLANG_TIDY AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.6)
   find_program(_clang_tidy
     NAMES clang-tidy-7 clang-tidy-6.0 clang-tidy-5.0 clang-tidy-4.0 clang-tidy
     DOC "Path to clang-tidy executable")
@@ -139,6 +139,6 @@ target_include_directories(astronomy_include_directories
 # Tests
 #-----------------------------------------------------------------------------
 enable_testing()
-if(ASTRONOMY_BUILD_TEST)
+if(BOOST_ASTRONOMY_BUILD_TEST)
 	add_subdirectory(test)
 endif()
