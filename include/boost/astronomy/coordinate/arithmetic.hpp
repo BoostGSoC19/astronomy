@@ -204,6 +204,19 @@ unit_vector(cartesian_representation<Args...> const& vector)
     return cartesian_representation<Args...>(tempPoint);
 }
 
+//! Returns unit vector of given vector other than Cartesian
+template <typename Coordinate>
+auto unit_vector(Coordinate const& vector)
+{
+    Coordinate tempVector;
+
+    tempVector.set_lat(vector.get_lat());
+    tempVector.set_lon(vector.get_lon());
+    tempVector.set_dist(1.0 * typename Coordinate::quantity3::unit_type());
+
+    return tempVector;
+}
+
 
 //! Returns sum of representation1 and representation2 
 template<typename Representation1, typename Representation2>
