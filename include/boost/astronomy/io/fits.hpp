@@ -10,6 +10,7 @@
 #include <boost/astronomy/io/extension_hdu.hpp>
 #include <boost/astronomy/io/image_extension.hpp>
 #include <boost/astronomy/io/ascii_table.hpp>
+#include <boost/astronomy/io/binary_table.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
 
 namespace boost { namespace astronomy { namespace io {
@@ -74,6 +75,7 @@ public:
             //It gives us the benefit of knowing which kind of data we need to store
             hdu_.emplace_back(std::make_shared<hdu>(fits_file));
 
+            //image extension
             if (hdu_.back()->value_of<std::string>("XTENSION") == "'IMAGE   '")
             {
                 switch (hdu_.back()->value_of<int>(std::string("BITPIX")))
@@ -103,9 +105,15 @@ public:
                     break;
                 }
             }
+            //ascii_table extension
             else if (hdu_.back()->value_of<std::string>("XTENSION") == "'TABLE   '")
             {
                 hdu_.back() = std::make_shared<ascii_table>(fits_file, *hdu_.back());
+            }
+            //binary_table extension
+            else if (hdu_.back()->value_of<std::string>("XTENSION") == "'BINTABLE'")
+            {
+                hdu_.back() = std::make_shared<binary_table_extension>(fits_file, *hdu_.back());
             }
                         
         }
@@ -115,4 +123,3 @@ public:
 }}} //namespace boost::astronomy::io
 
 #endif // !BOOST_ASTRONOMY_IO_FITS_HPP
-
