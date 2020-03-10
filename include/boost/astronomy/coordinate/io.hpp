@@ -22,9 +22,13 @@ template
     class YQuantity,
     class ZQuantity
 >
-std::ostream& operator<< (std::ostream &out, cartesian_representation< CoordinateType, XQuantity, YQuantity, ZQuantity> const& point)
+std::ostream& operator<< (std::ostream &out, cartesian_representation
+	<CoordinateType, XQuantity, YQuantity, ZQuantity> const& point)
 {
-    out << "Cartesian Representation ( " << point.get_x() << " , " << point.get_y() << " , " << point.get_x() << " )";
+    out << "Cartesian Representation ( " 
+    	<< point.get_x() << " , " 
+        << point.get_y() << " , " 
+        << point.get_z() << " )";
 
     return out;
 }
@@ -37,9 +41,13 @@ template
     class LonQuantity,
     class DistQuantity
 >
-std::ostream& operator<< (std::ostream &out, spherical_equatorial_representation< CoordinateType, LatQuantity, LonQuantity, DistQuantity> const& point)
+std::ostream& operator<< (std::ostream &out, spherical_equatorial_representation
+	<CoordinateType, LatQuantity, LonQuantity, DistQuantity> const& point)
 {
-    out << "Spherical Equatorial Representation ( " << point.get_lat() << " , " << point.get_lon() << " , " << point.get_dist() << " )";
+    out << "Spherical Equatorial Representation ( " 
+    	<< point.get_lat() << " , " 
+        << point.get_lon() << " , " 
+        << point.get_dist() << " )";
 
     return out;
 }
@@ -52,9 +60,13 @@ template
     class LonQuantity,
     class DistQuantity
 >
-std::ostream& operator<< (std::ostream &out, spherical_representation< CoordinateType, LatQuantity, LonQuantity, DistQuantity> const& point)
+std::ostream& operator<< (std::ostream &out, spherical_representation
+	<CoordinateType, LatQuantity, LonQuantity, DistQuantity> const& point)
 {
-    out << "Spherical Representation ( " << point.get_lat() << " , " << point.get_lon() << " , " << point.get_dist() << " )";
+    out << "Spherical Representation ( " 
+    	<< point.get_lat() << " , " 
+        << point.get_lon() << " , " 
+        << point.get_dist() << " )";
 
     return out;
 }
