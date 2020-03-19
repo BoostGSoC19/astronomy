@@ -24,6 +24,7 @@ typename YQuantity = bu::quantity<bu::si::dimensionless, elementType>,
 typename ZQuantity = bu::quantity<bu::si::dimensionless, elementType>
 >
 struct affine_transformation{
+public:
     typedef bac::cartesian_representation<elementType,XQuantity,YQuantity,ZQuantity> cord_rep;
 
     bnu::matrix<elementType> affine_matrix(3,3) = bnu::identity_matrix<elementType>(3);
@@ -38,11 +39,21 @@ struct affine_transformation{
     }
 
     //! construct affine_transformation object with given affine_matrix and translation coordinates
-    affine_transformation(bnu::matrix<elementType> const & affine,bac::cartesian_representation<elementType,si::length,si::length,si::length> const & trans){
+    affine_transformation(bnu::matrix<elementType> const & affine,cord_rep const & trans){
         this->affine_matrix = affine;
         this->translation_vec = trans;
     }
 
+
+    //!set affine matrix of affine_transformation object
+    void set_affine_matrix(bnu::matrix<elementType> const & affine){
+        this->affine_matrix = affine;
+    }
+
+    //! set affine_matrix and translation vector 
+    void set_translation_vector(cord_rep const & trans){
+        this->translation_vec = trans;
+    }
     cord_rep
     get_transformed_representation(cord_repr const &vec){
         std::tuple<XQuantity,YQuantity,ZQuantity> x_y_z = vec.get_x_y_z();

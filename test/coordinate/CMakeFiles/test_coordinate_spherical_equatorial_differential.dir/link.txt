@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/test_coordinate_spherical_equatorial_differential.dir/spherical_equatorial_differential.o  -o test_coordinate_spherical_equatorial_differential -lastronomy_compile_options -lastronomy_include_directories -lastronomy_dependencies 

@@ -1,5 +1,6 @@
 import testing ;
 
+run affine_transformation.cpp ;
 run cartesian_representation.cpp ;
 run cartesian_differential.cpp ;
 run spherical_representation.cpp ;

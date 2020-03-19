@@ -1,4 +1,5 @@
 foreach(_name
+        affine_transformation
         cartesian_representation
         cartesian_differential
         spherical_representation
