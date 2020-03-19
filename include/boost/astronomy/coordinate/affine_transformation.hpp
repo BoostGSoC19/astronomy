@@ -71,7 +71,7 @@ public:
         xyz(0) = get<0>(x_y_z).value();
         xyz(1) = get<1>(x_y_z).value();
         xyz(2) = get<2>(x_y_z).value();
-x
+        
         txtytz(0) = get<0>(tx_ty_tz).value();
         txtytz(1) = get<1>(tx_ty_tz).value();
         txtytz(2) = get<2>(tx_ty_tz).value();
