@@ -15,7 +15,7 @@ namespace bnu = boost::numeric::ublas;
 namespace bac = boost::astronomy::coordinate;
 using namespace boost::units;
 using namespace boost::units::si;
-
+using namespace bnu;
 template
 <
 typename elementType = double,
@@ -27,8 +27,8 @@ struct affine_transformation{
 public:
     typedef bac::cartesian_representation<elementType,XQuantity,YQuantity,ZQuantity> cord_rep;
 
-    bnu::matrix<elementType> affine_matrix(3,3) = bnu::identity_matrix<elementType>(3);
-    cord_rep translation_vec(XQuantity(0.0),YQuantity(0.0),ZQuantity(0.0));
+    bnu::matrix<elementType> affine_matrix(3,3);
+    cord_rep translation_vec;
 
     //default constructor no any initialization
     affine_transformation();
@@ -55,7 +55,7 @@ public:
         this->translation_vec = trans;
     }
     cord_rep
-    get_transformed_representation(cord_repr const &vec){
+    get_transformed_representation(cord_rep const &vec){
         std::tuple<XQuantity,YQuantity,ZQuantity> x_y_z = vec.get_x_y_z();
         std::tuple<XQuantity,YQuantity,ZQuantity> tx_ty_tz = translation_vec.get_x_y_z();
         bnu::vector <elementType> xyz(3);
