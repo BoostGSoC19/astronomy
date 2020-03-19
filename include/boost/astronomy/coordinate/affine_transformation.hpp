@@ -27,11 +27,15 @@ struct affine_transformation{
 public:
     typedef bac::cartesian_representation<elementType,XQuantity,YQuantity,ZQuantity> cord_rep;
 
-    bnu::matrix<elementType> affine_matrix(3,3);
+    bnu::matrix<elementType> affine_matrix;
     cord_rep translation_vec;
 
     //default constructor no any initialization
-    affine_transformation();
+    affine_transformation(){
+        int size1 = 3;
+        int size2 = 3;
+        this->affine_matrix.resize(size1,size2);
+    };
 
     //! construct affine_transformation object with given affine_matrix
     affine_transformation(bnu::matrix<elementType> const & affine){
@@ -47,6 +51,9 @@ public:
 
     //!set affine matrix of affine_transformation object
     void set_affine_matrix(bnu::matrix<elementType> const & affine){
+        int size1 = affine.size1();
+        int size2 = affine.size();
+        this->affine_matrix.resize(size1,size2);
         this->affine_matrix = affine;
     }
 
@@ -60,12 +67,17 @@ public:
         std::tuple<XQuantity,YQuantity,ZQuantity> tx_ty_tz = translation_vec.get_x_y_z();
         bnu::vector <elementType> xyz(3);
         bnu::vector <elementType> txtytz(3);
-        for(unsigned i=0;i<xyz.size();++i){
-            xyz(i) = get<i>(x_y_z).value();
-        }
-        for(unsigned i=0;i<txtytz.size();++i){
-            txtytz(i) = get<i>(tx_ty_tz).value();
-        }
+        
+        xyz(0) = get<0>(x_y_z).value();
+        xyz(1) = get<1>(x_y_z).value();
+        xyz(2) = get<2>(x_y_z).value();
+x
+        txtytz(0) = get<0>(tx_ty_tz).value();
+        txtytz(1) = get<1>(tx_ty_tz).value();
+        txtytz(2) = get<2>(tx_ty_tz).value();
+        
+        
+        
         bnu::vector <elementType> transformed = prod(xyz,affine_matrix) + txtytz;
         return cord_rep(XQuantity(transformed(0)),YQuantity(transformed(1)),ZQuantity(transformed(2)));
     }
