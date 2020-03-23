@@ -12,7 +12,7 @@ namespace boost { namespace astronomy { namespace coordinate {
 namespace bac = boost::astronomy::coordinate;
 using namespace boost::units;
 using namespace boost::units::si;
-
+using namespace bac;
 template
 <
 typename elementType = double
