@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE(affine_transformation_check)
         affine_transformation<double> at;
 
         //define affine_matrix
-        matrix<double> affine(3,3);
+        double affine[3][3];
 
         //initialization of affine matrix
         //here affine is
@@ -41,17 +41,16 @@ BOOST_AUTO_TEST_SUITE(affine_transformation_check)
                 3, 8,-1 
             ]
         */
-        affine(0,0) = 3;
-        affine(0,1) = -1;
-        affine(0,2) = 6;
-        affine(1,0) = 2;
-        affine(1,1) = 5;
-        affine(1,2) = 5;
-        affine(2,0) = 3;
-        affine(2,1) = 8;
-        affine(2,2) = -1;
+        affine[0][0] = 3;
+        affine[0][1] = -1;
+        affine[0][2] = 6;
+        affine[1][0] = 2;
+        affine[1][1] = 5;
+        affine[1][2] = 5;
+        affine[2][0] = 3;
+        affine[2][1] = 8;
+        affine[2][2] = -1;
 
-        std::cout << affine << std::endl;
 
         at.set_affine_matrix(affine);
 
@@ -63,9 +62,9 @@ BOOST_AUTO_TEST_SUITE(affine_transformation_check)
         cord_rep ans = at.get_transformed_representation(point);
 
 
-        BOOST_CHECK_EQUAL(ans.get_x().value(),151);
-        BOOST_CHECK_EQUAL(ans.get_y().value(),198);
-        BOOST_CHECK_EQUAL(ans.get_z().value(),187);
+        BOOST_CHECK_EQUAL(ans.get_x().value(),169);
+        BOOST_CHECK_EQUAL(ans.get_y().value(),207);
+        BOOST_CHECK_EQUAL(ans.get_z().value(),160);
         std::cout << ans.get_x().value() << std::endl;
         std::cout << ans.get_y().value() << std::endl;
         std::cout << ans.get_z().value() << std::endl;
