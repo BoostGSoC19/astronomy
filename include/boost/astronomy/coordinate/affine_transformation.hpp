@@ -51,8 +51,8 @@ public:
 
     //!set affine matrix of affine_transformation object
     void set_affine_matrix(bnu::matrix<elementType> const & affine){
-        int size1 = affine.size1();
-        int size2 = affine.size2();
+        long unsigned int size1 = affine.size1();
+        long unsigned int size2 = affine.size2();
         this->affine_matrix.resize(size1,size2);
         this->affine_matrix = affine;
     }
