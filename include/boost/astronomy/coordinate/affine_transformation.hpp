@@ -1,6 +1,7 @@
 #ifndef AFFINE_TRANSFORMATION_HPP
 #define AFFINE_TRANSFORMATION_HPP
 
+#include <boost/static_assert.hpp>
 #include <boost/astronomy/coordinate/cartesian_representation.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -18,14 +19,13 @@ using namespace boost::units::si;
 using namespace bnu;
 template
 <
-typename elementType = double,
-typename XQuantity = bu::quantity<bu::si::dimensionless, elementType>,
-typename YQuantity = bu::quantity<bu::si::dimensionless, elementType>,
-typename ZQuantity = bu::quantity<bu::si::dimensionless, elementType>
+typename elementType = double
 >
-struct affine_transformation{
+struct affine_transformation
+{
+
 public:
-    typedef bac::cartesian_representation<elementType,XQuantity,YQuantity,ZQuantity> cord_rep;
+    typedef bac::cartesian_representation<elementType,quantity<si::length>,quantity<si::length>,quantity<si::length>> cord_rep;
 
     bnu::matrix<elementType> affine_matrix;
     cord_rep translation_vec;
@@ -38,8 +38,12 @@ public:
     };
 
     //! construct affine_transformation object with given affine_matrix
-    affine_transformation(bnu::matrix<elementType> const & affine){
+    explicit affine_transformation(bnu::matrix<elementType> const & affine){
+        long unsigned int size1 = affine.size1();
+        long unsigned int size2 = affine.size2();
+        this->affine_matrix.resize(size1,size2);
         this->affine_matrix = affine;
+        std::cout << this->affine_matrix << std::endl;
     }
 
     //! construct affine_transformation object with given affine_matrix and translation coordinates
@@ -55,6 +59,7 @@ public:
         long unsigned int size2 = affine.size2();
         this->affine_matrix.resize(size1,size2);
         this->affine_matrix = affine;
+        std::cout << this->affine_matrix << std::endl;
     }
 
     //! set affine_matrix and translation vector 
@@ -63,8 +68,8 @@ public:
     }
     cord_rep
     get_transformed_representation(cord_rep const &vec){
-        std::tuple<XQuantity,YQuantity,ZQuantity> x_y_z = vec.get_x_y_z();
-        std::tuple<XQuantity,YQuantity,ZQuantity> tx_ty_tz = translation_vec.get_x_y_z();
+        std::tuple<quantity<si::length>,quantity<si::length>,quantity<si::length>> x_y_z = vec.get_x_y_z();
+        std::tuple<quantity<si::length>,quantity<si::length>,quantity<si::length>> tx_ty_tz = translation_vec.get_x_y_z();
         bnu::vector <elementType> xyz(3);
         bnu::vector <elementType> txtytz(3);
         

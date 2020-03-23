@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_SUITE(affine_transformation_check)
         cord_rep point = make_cartesian_representation(22*meter, 13*meter, 19*meter);
 
         //create a object of affine_transformation class
-        affine_transformation<double,quantity<si::length>,quantity<si::length>,quantity<si::length>> at;
+        affine_transformation<double> at;
 
         //define affine_matrix
         matrix<double> affine(3,3);
@@ -66,6 +66,8 @@ BOOST_AUTO_TEST_SUITE(affine_transformation_check)
         BOOST_CHECK_EQUAL(ans.get_x().value(),151);
         BOOST_CHECK_EQUAL(ans.get_y().value(),198);
         BOOST_CHECK_EQUAL(ans.get_z().value(),187);
-
+        std::cout << ans.get_x().value() << std::endl;
+        std::cout << ans.get_y().value() << std::endl;
+        std::cout << ans.get_z().value() << std::endl;
     }
 BOOST_AUTO_TEST_SUITE_END()
