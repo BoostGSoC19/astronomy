@@ -1,7 +1,6 @@
 #ifndef AFFINE_TRANSFORMATION_HPP
 #define AFFINE_TRANSFORMATION_HPP
-
-#include <boost/static_assert.hpp>
+#include <type_traits>
 #include <boost/astronomy/coordinate/cartesian_representation.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
