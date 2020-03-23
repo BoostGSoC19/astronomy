@@ -4,8 +4,8 @@
 #include <boost/astronomy/coordinate/cartesian_representation.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/matrix_expression.hpp>
+
+
 #include <boost/units/io.hpp>
 #include <boost/units/systems/si/length.hpp>
 #include <boost/test/unit_test.hpp>
@@ -18,7 +18,6 @@ using namespace boost::units::si;
 namespace bnu = boost::numeric::ublas;
 
 namespace bac = boost::astronomy::coordinate;
-
 BOOST_AUTO_TEST_SUITE(affine_transformation_check)
 
     BOOST_AUTO_TEST_CASE(transformation){
@@ -31,7 +30,7 @@ BOOST_AUTO_TEST_SUITE(affine_transformation_check)
         affine_transformation<double,quantity<si::length>,quantity<si::length>,quantity<si::length>> at;
 
         //define affine_matrix
-        bnu::matrix<double> affine(3,3);
+        matrix<double> affine(3,3);
 
         //initialization of affine matrix
         //here affine is
@@ -63,12 +62,10 @@ BOOST_AUTO_TEST_SUITE(affine_transformation_check)
 
         cord_rep ans = at.get_transformed_representation(point);
 
-        std::cout << ans.get_x().value << std::endl;
-        std::cout << ans.get_y().value << std::endl;
-        std::cout << ans.get_z().value << std::endl;
-        BOOST_CHECK_EQUAL(ans.get_x().value(),160);
-        BOOST_CHECK_EQUAL(ans.get_y().value(),207);
-        BOOST_CHECK_EQUAL(ans.get_z().value(),160);
+
+        BOOST_CHECK_EQUAL(ans.get_x().value(),151);
+        BOOST_CHECK_EQUAL(ans.get_y().value(),198);
+        BOOST_CHECK_EQUAL(ans.get_z().value(),187);
 
     }
 BOOST_AUTO_TEST_SUITE_END()

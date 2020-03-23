@@ -52,7 +52,7 @@ public:
     //!set affine matrix of affine_transformation object
     void set_affine_matrix(bnu::matrix<elementType> const & affine){
         int size1 = affine.size1();
-        int size2 = affine.size();
+        int size2 = affine.size2();
         this->affine_matrix.resize(size1,size2);
         this->affine_matrix = affine;
     }
@@ -79,7 +79,7 @@ public:
         
         
         bnu::vector <elementType> transformed = prod(xyz,affine_matrix) + txtytz;
-        return cord_rep(XQuantity(transformed(0)),YQuantity(transformed(1)),ZQuantity(transformed(2)));
+        return make_cartesian_representation((transformed(0))*meter,(transformed(1))*meter,(transformed(2))*meter);
     }
 };
 }}}
