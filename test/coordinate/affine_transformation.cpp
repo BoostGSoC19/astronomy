@@ -2,8 +2,7 @@
 #include <iostream>
 #include <boost/astronomy/coordinate/affine_transformation.hpp>
 #include <boost/astronomy/coordinate/cartesian_representation.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/io.hpp>
+
 
 
 #include <boost/units/io.hpp>
@@ -15,7 +14,7 @@ using namespace std;
 using namespace boost::astronomy::coordinate;
 using namespace boost::units;
 using namespace boost::units::si;
-namespace bnu = boost::numeric::ublas;
+
 
 namespace bac = boost::astronomy::coordinate;
 BOOST_AUTO_TEST_SUITE(affine_transformation_check)
