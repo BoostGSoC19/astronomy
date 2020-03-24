@@ -1,13 +1,9 @@
 #define BOOST_TEST_MODULE affine_transformation_test
 #include <boost/astronomy/coordinate/affine_transformation.hpp>
 #include <boost/astronomy/coordinate/cartesian_representation.hpp>
-
-
-
 #include <boost/units/io.hpp>
 #include <boost/units/systems/si/length.hpp>
 #include <boost/test/unit_test.hpp>
-#include <tuple>
 
 using namespace std;
 using namespace boost::astronomy::coordinate;

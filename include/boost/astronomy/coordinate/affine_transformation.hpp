@@ -1,10 +1,8 @@
 #ifndef AFFINE_TRANSFORMATION_HPP
 #define AFFINE_TRANSFORMATION_HPP
 #define ROW_SIZE 3
-#include <type_traits>
 #include <boost/astronomy/coordinate/cartesian_representation.hpp>
 #include <boost/units/systems/si/length.hpp>
-#include <tuple>
 
 namespace boost { namespace astronomy { namespace coordinate {
 
@@ -12,12 +10,11 @@ namespace boost { namespace astronomy { namespace coordinate {
 namespace bac = boost::astronomy::coordinate;
 using namespace boost::units;
 using namespace boost::units::si;
-using namespace bac;
 template
 <
 typename elementType = double
 >
-struct affine_transformation
+class affine_transformation
 {
 
 public:
@@ -58,18 +55,17 @@ public:
     }
     cord_rep
     get_transformed_representation(cord_rep const &vec){
-        std::tuple<quantity<si::length>,quantity<si::length>,quantity<si::length>> x_y_z = vec.get_x_y_z();
-        std::tuple<quantity<si::length>,quantity<si::length>,quantity<si::length>> tx_ty_tz = translation_vec.get_x_y_z();
+
         elementType xyz[ROW_SIZE];
         elementType transformed[ROW_SIZE];
 
-        xyz[0] = get<0>(x_y_z).value();
-        xyz[1] = get<1>(x_y_z).value();
-        xyz[2] = get<2>(x_y_z).value();
+        xyz[0] = vec.get_x().value();
+        xyz[1] = vec.get_y().value();
+        xyz[2] = vec.get_z().value();
         
-        transformed[0] = get<0>(tx_ty_tz).value();
-        transformed[1] = get<1>(tx_ty_tz).value();
-        transformed[2] = get<2>(tx_ty_tz).value();
+        transformed[0] = translation_vec.get_x().value();
+        transformed[1] = translation_vec.get_y().value();
+        transformed[2] = translation_vec.get_z().value();
         
 
 
