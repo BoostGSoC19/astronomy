@@ -12,7 +12,7 @@ namespace boost { namespace astronomy { namespace coordinate {
 namespace bac = boost::astronomy::coordinate;
 using namespace boost::units;
 using namespace boost::units::si;
-
+using namespace bac;
 template
 <
 typename elementType = double
@@ -35,13 +35,13 @@ public:
     //! construct affine_transformation object with given affine_matrix
     explicit affine_transformation(elementType affine[][ROW_SIZE]){
         for(int i=0;i<ROW_SIZE;++i)
-            for(int j=0;j<ROW_SIZE;++j) this->affine_matrix[i][j] = (elementType)(i==j);
+            for(int j=0;j<ROW_SIZE;++j) this->affine_matrix[i][j] = affine[i][j];
     }
 
     //! construct affine_transformation object with given affine_matrix and translation coordinates
     affine_transformation(elementType affine[][ROW_SIZE],cord_rep const & trans){
         for(int i=0;i<ROW_SIZE;++i)
-            for(int j=0;j<ROW_SIZE;++j) this->affine_matrix[i][j] = (elementType)(i==j);
+            for(int j=0;j<ROW_SIZE;++j) this->affine_matrix[i][j] = affine[i][j];
         this->translation_vec = trans;
     }
 

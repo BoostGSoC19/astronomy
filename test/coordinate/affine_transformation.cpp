@@ -1,5 +1,4 @@
 #define BOOST_TEST_MODULE affine_transformation_test
-#include <iostream>
 #include <boost/astronomy/coordinate/affine_transformation.hpp>
 #include <boost/astronomy/coordinate/cartesian_representation.hpp>
 
@@ -15,8 +14,6 @@ using namespace boost::astronomy::coordinate;
 using namespace boost::units;
 using namespace boost::units::si;
 
-
-namespace bac = boost::astronomy::coordinate;
 BOOST_AUTO_TEST_SUITE(affine_transformation_check)
 
     BOOST_AUTO_TEST_CASE(transformation){
