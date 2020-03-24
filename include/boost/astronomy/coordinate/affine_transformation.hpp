@@ -30,7 +30,7 @@ public:
     };
 
     //! construct affine_transformation object with given affine_matrix
-    explicit affine_transformation(elementType affine[][ROW_SIZE]){
+    affine_transformation(elementType affine[][ROW_SIZE]){
         for(int i=0;i<ROW_SIZE;++i)
             for(int j=0;j<ROW_SIZE;++j) this->affine_matrix[i][j] = affine[i][j];
     }

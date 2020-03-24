@@ -85,7 +85,7 @@ stages:
           LLVM_REPO: llvm-toolchain-xenial-5.0
         Clang 4:
           B2_TOOLSET: clang
-          B2_CXXSTD: 14,17
+          B2_CXXSTD: 14
           CXX: clang++-4.0
           PACKAGES: clang-4.0
           LLVM_REPO: llvm-toolchain-xenial-4.0
