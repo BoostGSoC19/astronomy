@@ -19,7 +19,7 @@ private:
     std::string card_;
     
     //! Too much glued code but will be improved in future with parsing policy
-     mutable boost::variant<bool,long long, double, std::string > value_cache;
+     mutable boost::variant<bool,std::size_t,int,float,double,std::string > value_cache;
     //! This variable ensures that the cache value is still valid or not i.e if the value is changed
      mutable bool cache_valid;
     
