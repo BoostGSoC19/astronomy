@@ -34,8 +34,7 @@ public:
     //! it will read 80 char from provided pointer
     card(char const* c) : card()
     {
-        this->card_.assign(c, 80);
-        
+        this->card_.assign(c, 80);     
     }
 
     //!a string is expected with lenght no more than 80 chars 
@@ -47,8 +46,7 @@ public:
         {
             throw invalid_card_length_exception();
         }
-        this->card_ = str.append(80 - str.length(), ' ');
-        
+        this->card_ = str.append(80 - str.length(), ' ');       
     }
 
     //!key, value and optional comments are expected
@@ -136,8 +134,7 @@ public:
         else
         {
             create_card(key, std::string("F").insert(0, ' ', 19), comment);
-        }
-        
+        }      
     }
 
     //!create card with numeric value
@@ -149,8 +146,7 @@ public:
 
         std::string val = stream.str();
         val.insert(0, ' ', 20 - val.length());
-        create_card(key, val, comment);
-        
+        create_card(key, val, comment);     
     }
 
     //!create card for complex value
@@ -259,8 +255,7 @@ private:
         {
             return true;
         }
-        return false;
-        
+        return false;   
     }
 
 };
