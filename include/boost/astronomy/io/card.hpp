@@ -19,9 +19,9 @@ private:
     std::string card_;
     
     //! Too much glued code but will be improved in future with parsing policy
-    typedef boost::variant<bool,long long, double, std::string > value_cache;
+     mutable boost::variant<bool,long long, double, std::string > value_cache;
     //! This variable ensures that the cache value is still valid or not i.e if the value is changed
-    bool cache_valid;
+     mutable bool cache_valid;
     
  
 public:
