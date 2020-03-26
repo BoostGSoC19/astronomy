@@ -3,7 +3,7 @@
 
 #include <string>
 #include <sstream>
-
+#include <boost/variant.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/type.hpp>
@@ -17,17 +17,25 @@ struct card
 {
 private:
     std::string card_;
-
+    
+    //! Too much glued code but will be improved in future with parsing policy
+    typedef boost::variant<bool,long long, double, std::string > value_cache;
+    //! This variable ensures that the cache value is still valid or not i.e if the value is changed
+    bool cache_valid;
+    
+ 
 public:
     card()
     {
         this->card_.reserve(80);
+        cache_valid=false;
     }
     //! creating card from const char*
     //! it will read 80 char from provided pointer
     card(char const* c) : card()
     {
         this->card_.assign(c, 80);
+        
     }
 
     //!a string is expected with lenght no more than 80 chars 
@@ -40,6 +48,7 @@ public:
             throw invalid_card_length_exception();
         }
         this->card_ = str.append(80 - str.length(), ' ');
+        
     }
 
     //!key, value and optional comments are expected
@@ -76,6 +85,7 @@ public:
             this->card_ = std::string(key).append(8 - key.length(), ' ') + "= " +
                 std::string(value).append(70 - key.length(), ' ');
         }
+        cache_valid=false;
     }
 
     //!this overload supports date and string types
@@ -113,6 +123,7 @@ public:
             this->card_ = std::string(key).append(8 - key.length(), ' ') +
                 "= " + std::string(value).append(70 - key.length(), ' ');
         }
+        cache_valid=false;
     }
 
     //!create card with boolean value
@@ -126,6 +137,7 @@ public:
         {
             create_card(key, std::string("F").insert(0, ' ', 19), comment);
         }
+        
     }
 
     //!create card with numeric value
@@ -138,6 +150,7 @@ public:
         std::string val = stream.str();
         val.insert(0, ' ', 20 - val.length());
         create_card(key, val, comment);
+        
     }
 
     //!create card for complex value
@@ -173,11 +186,13 @@ public:
 
         this->card_ = std::string(key).append(8 - key.length(), ' ') +
             "  " + std::string(value).append(70 - key.length(), ' ');
+        cache_valid=false;
     }
 
     //!if whole value is set to true then string is returned with trailing spaces
     std::string key(bool whole = false) const
     {
+        // TODO : Return a string view as it optimizes the code if comparison is taking place
         if (whole)
         {
             return this->card_.substr(0, 8);
@@ -186,13 +201,23 @@ public:
     }
 
     /*!
-    return types can be int, float, double, bool, string
+    return types can be long long, double, bool, string
     (date and complex numbers are returned as string surrounded in single quotes or in brackets)
     */
     template <typename ReturnType>
     ReturnType value() const
     {
-        return value_imp(boost::type<ReturnType>());
+        if(cache_valid){
+            // Frequent calls have become optimized
+            return boost::get<ReturnType>(value_cache);
+        }
+        else{           
+            ReturnType parsed_value = value_imp(boost::type<ReturnType>());
+            value_cache=parsed_value;
+            // Its cached now ( Till someone changes the value the cache is valid )
+            cache_valid=true;
+            return parsed_value;
+        }
     }
 
     //!returns value portion of card with comment as std::string 
@@ -213,6 +238,7 @@ public:
             throw invalid_value_length_exception();
         }
         this->card_.append(70 - value.length(), ' ');
+        cache_valid=false;
     }
 
 private:
@@ -221,7 +247,7 @@ private:
     ReturnType value_imp(boost::type<ReturnType>) const
     {
         std::string val = boost::algorithm::trim_copy(
-            this->card_.substr(10, this->card_.find('/') - 10));
+        this->card_.substr(10, this->card_.find('/') - 10));        
         return boost::lexical_cast<ReturnType>(val);
     }
 
@@ -234,6 +260,7 @@ private:
             return true;
         }
         return false;
+        
     }
 
 };
