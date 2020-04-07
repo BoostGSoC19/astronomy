@@ -27,12 +27,12 @@ BOOST_AUTO_TEST_CASE(spherical_coslat_differential_default_constructor)
     quantity<si::velocity>> motion1;
     motion1.set_dlat_dlon_coslat_ddist(45.0 * bud::degrees, 18.0 * bud::degrees, 3.5 * meters/seconds);
     BOOST_CHECK_CLOSE(motion1.get_dlat().value(), 45.0, 0.001);
-    BOOST_CHECK_CLOSE(motion1.get_dlon_coslat.value(), 18.0, 0.001);
+    BOOST_CHECK_CLOSE(motion1.get_dlon_coslat().value(), 18.0, 0.001);
     BOOST_CHECK_CLOSE(motion1.get_ddist().value(), 3.5, 0.001);
 
     //checking whether quantity stored is as expected or not
     BOOST_TEST((std::is_same<decltype(motion1.get_dlat()), quantity<bud::plane_angle>>::value));
-    BOOST_TEST((std::is_same<decltype(motion1.get_dlon_coslat), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(motion1.get_dlon_coslat()), quantity<bud::plane_angle>>::value));
     BOOST_TEST((std::is_same<decltype(motion1.get_ddist()), quantity<si::velocity>>::value));
 }
 
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(spherical_coslat_differential_quantities_constructor)
     spherical_coslat_differential<double, quantity<bud::plane_angle>, quantity<bud::plane_angle>,
     quantity<si::velocity>> motion2(1.5 * bud::degrees, 9.0 * bud::degrees, 3.0 * meter/seconds);
     BOOST_CHECK_CLOSE(motion2.get_dlat().value(), 1.5, 0.001);
-    BOOST_CHECK_CLOSE(motion2.get_dlon_coslat.value(), 9.0, 0.001);
+    BOOST_CHECK_CLOSE(motion2.get_dlon_coslat().value(), 9.0, 0.001);
     BOOST_CHECK_CLOSE(motion2.get_ddist().value(), 3, 0.001);
 
     //checking whether quantity stored is as expected or not
@@ -81,12 +81,12 @@ BOOST_AUTO_TEST_CASE(spherical_coslat_differential_copy_constructor)
     //copy constructor
     auto motion2 = make_spherical_coslat_differential(motion1);
     BOOST_CHECK_CLOSE(motion1.get_dlat().value(), motion2.get_dlat().value(), 0.001);
-    BOOST_CHECK_CLOSE(motion1.get_dlon_coslat.value(), motion2.get_dlon_coslat().value(), 0.001);
+    BOOST_CHECK_CLOSE(motion1.get_dlon_coslat().value(), motion2.get_dlon_coslat().value(), 0.001);
     BOOST_CHECK_CLOSE(motion1.get_ddist().value(), motion2.get_ddist().value(), 0.001);
 
     //checking whether quantity stored is as expected or not
     BOOST_TEST((std::is_same<decltype(motion2.get_dlat()), quantity<bud::plane_angle>>::value));
-    BOOST_TEST((std::is_same<decltype(motion2.get_dlon_coslat), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(motion2.get_dlon_coslat()), quantity<bud::plane_angle>>::value));
     BOOST_TEST((std::is_same<decltype(motion2.get_ddist()),
         quantity<bu::divide_typeof_helper<decltype(si::centi*meters), si::time>::type>>::value));
 }
