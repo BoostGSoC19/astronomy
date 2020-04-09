@@ -13,6 +13,8 @@
 
 #include <boost/astronomy/coordinate/base_representation.hpp>
 #include <boost/astronomy/coordinate/cartesian_representation.hpp>
+#include <boost/astronomy/coordinate/representation.hpp>
+#include <boost/astronomy/coordinate/differential.hpp>
 
 
 namespace boost { namespace astronomy { namespace coordinate {
@@ -21,7 +23,223 @@ namespace bg = boost::geometry;
 namespace bu = boost::units;
 
 
-//!Returns the cross product of representation1 and representation2
+//!Returns the cross product of cartesian_representation(representation1) and representation2
+template
+<
+    template<typename ...> class Representation2,
+    typename ...Args1,
+    typename ...Args2
+>
+auto cross
+(
+    cartesian_representation<Args1...> const& representation1,
+    Representation2<Args2...> const& representation2
+)
+{
+    /*!both the coordinates/vector are first converted into
+    cartesian coordinate system then cross product of both cartesian
+    vectors is converted into cartesian system type and returned*/
+
+    /*checking types if it is not subclass of   
+    base_representaion then compile time erorr is generated*/
+    //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+    //    <
+    //        boost::astronomy::coordinate::base_representation,
+    //        Representation1<Args1...>
+    //    >::value),
+    //    "First argument type is expected to be a representation class");
+    //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+    //    <
+    //        boost::astronomy::coordinate::base_representation,
+    //        Representation2<Args2...>
+    //    >::value),
+    //    "Second argument type is expected to be a representation class");
+
+    /*converting both coordinates/vector into cartesian system*/
+
+    typedef cartesian_representation<Args1...> representation1_type;
+    typedef Representation2<Args2...> representation2_type;
+
+    bg::model::point
+    <
+        typename std::conditional
+        <
+            sizeof(typename representation2_type::type) >=
+                sizeof(typename representation1_type::type),
+            typename representation2_type::type,
+            typename representation1_type::type
+        >::type,
+        3,
+        bg::cs::cartesian
+    > tempPoint1, tempPoint2, result;
+
+    auto cartesian1 = make_cartesian_representation(representation1);
+    auto cartesian2 = make_cartesian_representation(representation2);
+
+    typedef decltype(cartesian1) cartesian1_type;
+    typedef decltype(cartesian2) cartesian2_type;
+    
+
+    bg::transform(representation1.get_point(), tempPoint1);
+    bg::transform(representation2.get_point(), tempPoint2);
+    
+
+    bg::set<0>(result, (bg::get<1>(tempPoint1)*bg::get<2>(tempPoint2)) -
+        ((bg::get<2>(tempPoint1)*
+        bu::conversion_factor(typename cartesian1_type::quantity3::unit_type(),
+        typename cartesian1_type::quantity2::unit_type()))*
+        (bg::get<1>(tempPoint2)*
+        bu::conversion_factor(typename cartesian2_type::quantity2::unit_type(),
+        typename cartesian2_type::quantity3::unit_type()))));
+
+    bg::set<1>(result, (bg::get<2>(tempPoint1)*bg::get<0>(tempPoint2)) -
+        ((bg::get<0>(tempPoint1)*
+        bu::conversion_factor(typename cartesian1_type::quantity1::unit_type(),
+        typename cartesian1_type::quantity3::unit_type()))*
+        (bg::get<2>(tempPoint2)*
+        bu::conversion_factor(typename cartesian2_type::quantity3::unit_type(),
+        typename cartesian2_type::quantity1::unit_type()))));
+
+    bg::set<2>(result, (bg::get<0>(tempPoint1)*bg::get<1>(tempPoint2)) -
+        ((bg::get<1>(tempPoint1)*
+        bu::conversion_factor(typename cartesian1_type::quantity2::unit_type(),
+        typename cartesian1_type::quantity1::unit_type()))*
+        (bg::get<0>(tempPoint2)*
+        bu::conversion_factor(typename cartesian2_type::quantity1::unit_type(),
+        typename cartesian2_type::quantity2::unit_type()))));
+
+
+    return 
+        cartesian_representation
+        <
+            typename cartesian1_type::type,
+            bu::quantity<typename bu::multiply_typeof_helper
+            <
+                typename cartesian1_type::quantity2::unit_type,
+                typename cartesian2_type::quantity3::unit_type>::type
+            >,
+            bu::quantity<typename bu::multiply_typeof_helper
+            <
+                typename cartesian1_type::quantity3::unit_type,
+                typename cartesian2_type::quantity1::unit_type>::type
+            >,
+            bu::quantity<typename bu::multiply_typeof_helper
+            <
+                typename cartesian1_type::quantity1::unit_type,
+                typename cartesian2_type::quantity2::unit_type>::type
+            >
+        >(result);
+}
+
+//!Returns the cross product of representation1(cartesian differential) and representation2
+template
+<
+    template<typename ...> class Representation2,
+    typename ...Args1,
+    typename ...Args2
+>
+auto cross
+(
+    cartesian_differential<Args1...> const& representation1,
+    Representation2<Args2...> const& representation2
+)
+{
+    /*!both the coordinates/vector are first converted into
+    cartesian coordinate system then cross product of both cartesian
+    vectors is converted into cartesian system type and returned*/
+
+    /*checking types if it is not subclass of   
+    base_representaion then compile time erorr is generated*/
+    //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+    //    <
+    //        boost::astronomy::coordinate::base_representation,
+    //        Representation1<Args1...>
+    //    >::value),
+    //    "First argument type is expected to be a representation class");
+    //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+    //    <
+    //        boost::astronomy::coordinate::base_representation,
+    //        Representation2<Args2...>
+    //    >::value),
+    //    "Second argument type is expected to be a representation class");
+
+    /*converting both coordinates/vector into cartesian system*/
+
+    typedef cartesian_differential<Args1...> representation1_type;
+    typedef Representation2<Args2...> representation2_type;
+
+    bg::model::point
+    <
+        typename std::conditional
+        <
+            sizeof(typename representation2_type::type) >=
+                sizeof(typename representation1_type::type),
+            typename representation2_type::type,
+            typename representation1_type::type
+        >::type,
+        3,
+        bg::cs::cartesian
+    > tempPoint1, tempPoint2, result;
+
+    auto cartesian1 = make_cartesian_differential(representation1);
+    auto cartesian2 = make_cartesian_differential(representation2);
+
+    typedef decltype(cartesian1) cartesian1_type;
+    typedef decltype(cartesian2) cartesian2_type;
+    
+
+    bg::transform(representation1.get_point(), tempPoint1);
+    bg::transform(representation2.get_point(), tempPoint2);
+    
+
+    bg::set<0>(result, (bg::get<1>(tempPoint1)*bg::get<2>(tempPoint2)) -
+        ((bg::get<2>(tempPoint1)*
+        bu::conversion_factor(typename cartesian1_type::quantity3::unit_type(),
+        typename cartesian1_type::quantity2::unit_type()))*
+        (bg::get<1>(tempPoint2)*
+        bu::conversion_factor(typename cartesian2_type::quantity2::unit_type(),
+        typename cartesian2_type::quantity3::unit_type()))));
+
+    bg::set<1>(result, (bg::get<2>(tempPoint1)*bg::get<0>(tempPoint2)) -
+        ((bg::get<0>(tempPoint1)*
+        bu::conversion_factor(typename cartesian1_type::quantity1::unit_type(),
+        typename cartesian1_type::quantity3::unit_type()))*
+        (bg::get<2>(tempPoint2)*
+        bu::conversion_factor(typename cartesian2_type::quantity3::unit_type(),
+        typename cartesian2_type::quantity1::unit_type()))));
+
+    bg::set<2>(result, (bg::get<0>(tempPoint1)*bg::get<1>(tempPoint2)) -
+        ((bg::get<1>(tempPoint1)*
+        bu::conversion_factor(typename cartesian1_type::quantity2::unit_type(),
+        typename cartesian1_type::quantity1::unit_type()))*
+        (bg::get<0>(tempPoint2)*
+        bu::conversion_factor(typename cartesian2_type::quantity1::unit_type(),
+        typename cartesian2_type::quantity2::unit_type()))));
+
+
+    return 
+        cartesian_differential
+        <
+            typename cartesian1_type::type,
+            bu::quantity<typename bu::multiply_typeof_helper
+            <
+                typename cartesian1_type::quantity2::unit_type,
+                typename cartesian2_type::quantity3::unit_type>::type
+            >,
+            bu::quantity<typename bu::multiply_typeof_helper
+            <
+                typename cartesian1_type::quantity3::unit_type,
+                typename cartesian2_type::quantity1::unit_type>::type
+            >,
+            bu::quantity<typename bu::multiply_typeof_helper
+            <
+                typename cartesian1_type::quantity1::unit_type,
+                typename cartesian2_type::quantity2::unit_type>::type
+            >
+        >(result);
+}
+
+//!Returns the cross product of representation1(other than cartesian form) and representation2
 template
 <
     template<typename ...> class Representation1,
@@ -37,7 +255,7 @@ auto cross
 {
     /*!both the coordinates/vector are first converted into
     cartesian coordinate system then cross product of both cartesian
-    vectors is converted into cartesian system type and returned*/
+    vectors is converted into requested system type and returned*/
 
     /*checking types if it is not subclass of   
     base_representaion then compile time erorr is generated*/
@@ -78,41 +296,49 @@ auto cross
     typedef decltype(cartesian1) cartesian1_type;
     typedef decltype(cartesian2) cartesian2_type;
     
-    bg::set<0>(tempPoint1, cartesian1.get_x().value());
-    bg::set<1>(tempPoint1,
-        static_cast<typename cartesian1_type::quantity1>(cartesian1.get_y()).value());
-    bg::set<2>(tempPoint1,
-        static_cast<typename cartesian1_type::quantity1>(cartesian1.get_z()).value());
 
-    bg::set<0>(tempPoint2, cartesian2.get_x().value());
-    bg::set<1>(tempPoint2,
-        static_cast<typename cartesian2_type::quantity1>(cartesian2.get_y()).value());
-    bg::set<2>(tempPoint2,
-        static_cast<typename cartesian2_type::quantity1>(cartesian2.get_z()).value());
+    bg::transform(representation1.get_point(), tempPoint1);
+    bg::transform(representation2.get_point(), tempPoint2);
     
-    result = bg::cross_product(tempPoint1,tempPoint2);
+    
+    bg::set<0>(result, (bg::get<1>(tempPoint1)*bg::get<2>(tempPoint2)) -
+        ((bg::get<2>(tempPoint1)*
+        bu::conversion_factor(typename cartesian1_type::quantity3::unit_type(),
+        typename cartesian1_type::quantity2::unit_type()))*
+        (bg::get<1>(tempPoint2)*
+        bu::conversion_factor(typename cartesian2_type::quantity2::unit_type(),
+        typename cartesian2_type::quantity1::unit_type()))));
 
+    bg::set<1>(result, (bg::get<2>(tempPoint1)*bg::get<0>(tempPoint2)) -
+        ((bg::get<0>(tempPoint1)*
+        bu::conversion_factor(typename cartesian1_type::quantity1::unit_type(),
+        typename cartesian1_type::quantity3::unit_type()))*
+        (bg::get<2>(tempPoint2)*
+        bu::conversion_factor(typename cartesian2_type::quantity3::unit_type(),
+        typename cartesian2_type::quantity1::unit_type()))));
 
-    return cartesian_representation
+    bg::set<2>(result, (bg::get<0>(tempPoint1)*bg::get<1>(tempPoint2)) -
+        ((bg::get<1>(tempPoint1)*
+        bu::conversion_factor(typename cartesian1_type::quantity2::unit_type(),
+        typename cartesian1_type::quantity1::unit_type()))*
+        (bg::get<0>(tempPoint2)*
+        bu::conversion_factor(typename cartesian2_type::quantity1::unit_type(),
+        typename cartesian2_type::quantity1::unit_type()))));
+    
+    return Representation1
         <
             typename representation1_type::type,
+            typename representation1_type::quantity1,
+            typename representation1_type::quantity2,
             bu::quantity<typename bu::multiply_typeof_helper
-            <
-                typename cartesian1_type::quantity1::unit_type,
-                typename cartesian2_type::quantity1::unit_type>::type
-            >,
-            bu::quantity<typename bu::multiply_typeof_helper
-            <
-                typename cartesian1_type::quantity1::unit_type,
-                typename cartesian2_type::quantity1::unit_type>::type
-            >,
-            bu::quantity<typename bu::multiply_typeof_helper
-            <
-                typename cartesian1_type::quantity1::unit_type,
-                typename cartesian2_type::quantity1::unit_type>::type
-            >
+                <
+                    typename cartesian1_type::quantity1::unit_type,
+                    typename cartesian2_type::quantity1::unit_type>::type
+                >
         >(result);
+
 }
+
 
 
 //! Returns dot product of representation1 and representation2

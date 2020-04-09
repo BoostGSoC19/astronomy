@@ -115,6 +115,17 @@ public:
     {
         return this->diff;
     }
+    //! returns the differential of calling object
+    bg::model::point
+    <
+        CoordinateType,
+        DimensionCount,
+        CoordinateSystem
+    >
+    get_point() const
+    {
+        return this->diff;
+    }
 
     template
     <
