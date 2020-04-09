@@ -203,15 +203,13 @@ BOOST_AUTO_TEST_CASE(spherical_equatorial_representation_cross_product)
 
     auto result = cross(point1, point2);
 
-    BOOST_CHECK_CLOSE(result.get_x().value(), -138.348, 0.001);
-    BOOST_CHECK_CLOSE(result.get_y().value(), 8.51644, 0.001);
-    BOOST_CHECK_CLOSE(result.get_z().value(), 115.555, 0.001);
+    BOOST_CHECK_CLOSE(result.get_lat().value(), 176.47742460814121, 0.001);
+    BOOST_CHECK_CLOSE(result.get_lon().value(), 39.816895281423861, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dist().value(), 180.459280550626, 0.001);
 
-    BOOST_TEST((std::is_same<decltype(result.get_x()), quantity
-        <bu::multiply_typeof_helper<si::length, si::length>::type>>::value));
-    BOOST_TEST((std::is_same<decltype(result.get_y()), quantity
-        <bu::multiply_typeof_helper<si::length, si::length>::type>>::value));
-    BOOST_TEST((std::is_same<decltype(result.get_z()), quantity
+    BOOST_TEST((std::is_same<decltype(result.get_lat()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_lon()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dist()), quantity
         <bu::multiply_typeof_helper<si::length, si::length>::type>>::value));
 }
 

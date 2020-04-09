@@ -198,22 +198,19 @@ BOOST_AUTO_TEST_SUITE(spherical_representation_arithmetic_functions)
 
 BOOST_AUTO_TEST_CASE(spherical_representation_cross_product)
 {
-    auto point1 = make_spherical_representation(3.0 * bud::degrees, 50.0 * bud::degrees, 40.0 * meters);
-    auto point2 = make_spherical_representation(30.0 * bud::degrees, 45.0 * bud::degrees, 14.0 * meters);
+    auto point1 = make_spherical_equatorial_representation(3.0 * bud::degrees, 50.0 * bud::degrees, 40.0 * meters);
+    auto point2 = make_spherical_equatorial_representation(30.0 * bud::degrees, 45.0 * bud::degrees, 14.0 * meters);
 
     auto result = cross(point1, point2);
 
-    BOOST_CHECK_CLOSE(result.get_x().value(), -111.39, 0.001);
-    BOOST_CHECK_CLOSE(result.get_y().value(), -82.4922, 0.001);
-    BOOST_CHECK_CLOSE(result.get_z().value(), 137.713, 0.001);
+    BOOST_CHECK_CLOSE(result.get_lat().value(), 176.47742460814121, 0.001);
+    BOOST_CHECK_CLOSE(result.get_lon().value(), 39.816895281423861, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dist().value(), 180.459280550626, 0.001);
 
-    //checking whether quantity stored is as expected or not
-    BOOST_TEST((std::is_same<decltype(result.get_x()), quantity
-        <bu::multiply_typeof_helper<si::length, si::length>::type>>::value));
-    BOOST_TEST((std::is_same<decltype(result.get_y()), quantity
-        <bu::multiply_typeof_helper<si::length, si::length>::type>>::value));
-    BOOST_TEST((std::is_same<decltype(result.get_z()), quantity
-        <bu::multiply_typeof_helper<si::length, si::length>::type>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_lat()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_lon()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dist()), quantity
+            <bu::multiply_typeof_helper<si::length, si::length>::type>>::value));
 }
 
 BOOST_AUTO_TEST_CASE(spherical_representation_dot_product)
