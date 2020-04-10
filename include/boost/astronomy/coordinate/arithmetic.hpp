@@ -292,39 +292,36 @@ auto cross
 
     auto cartesian1 = make_cartesian_representation(representation1);
     auto cartesian2 = make_cartesian_representation(representation2);
-
+    
     typedef decltype(cartesian1) cartesian1_type;
     typedef decltype(cartesian2) cartesian2_type;
     
 
-    bg::transform(representation1.get_point(), tempPoint1);
-    bg::transform(representation2.get_point(), tempPoint2);
+    bg::transform(cartesian1.get_point(), tempPoint1);
+    bg::transform(cartesian2.get_point(), tempPoint2);
     
     
-    bg::set<0>(result, (bg::get<1>(tempPoint1)*bg::get<2>(tempPoint2)) -
-        ((bg::get<2>(tempPoint1)*
-        bu::conversion_factor(typename cartesian1_type::quantity3::unit_type(),
-        typename cartesian1_type::quantity2::unit_type()))*
-        (bg::get<1>(tempPoint2)*
-        bu::conversion_factor(typename cartesian2_type::quantity2::unit_type(),
-        typename cartesian2_type::quantity1::unit_type()))));
-
-    bg::set<1>(result, (bg::get<2>(tempPoint1)*bg::get<0>(tempPoint2)) -
-        ((bg::get<0>(tempPoint1)*
-        bu::conversion_factor(typename cartesian1_type::quantity1::unit_type(),
-        typename cartesian1_type::quantity3::unit_type()))*
-        (bg::get<2>(tempPoint2)*
-        bu::conversion_factor(typename cartesian2_type::quantity3::unit_type(),
-        typename cartesian2_type::quantity1::unit_type()))));
-
-    bg::set<2>(result, (bg::get<0>(tempPoint1)*bg::get<1>(tempPoint2)) -
-        ((bg::get<1>(tempPoint1)*
-        bu::conversion_factor(typename cartesian1_type::quantity2::unit_type(),
-        typename cartesian1_type::quantity1::unit_type()))*
-        (bg::get<0>(tempPoint2)*
+    bg::set<0>(
+        tempPoint2,
+        bg::get<0>(tempPoint2)*
         bu::conversion_factor(typename cartesian2_type::quantity1::unit_type(),
-        typename cartesian2_type::quantity1::unit_type()))));
+        typename cartesian2_type::quantity1::unit_type())
+    );
+    bg::set<1>(
+        tempPoint2,
+        bg::get<1>(tempPoint2)*
+        bu::conversion_factor(typename cartesian2_type::quantity2::unit_type(),
+        typename cartesian2_type::quantity1::unit_type())
+    );
+    bg::set<2>(
+        tempPoint2,
+        bg::get<2>(tempPoint2)*
+        bu::conversion_factor(typename cartesian2_type::quantity3::unit_type(),
+        typename cartesian2_type::quantity1::unit_type())
+    );
     
+    result = bg::cross_product(tempPoint1,tempPoint2);
+
     return Representation1
         <
             typename representation1_type::type,
