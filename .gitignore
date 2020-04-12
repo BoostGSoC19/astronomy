@@ -48,6 +48,7 @@
 /astronomy.vcxproj.filters
 /astronomy.vcxproj
 /astronomy.sln
+*.project
 *.user
 /ClassDiagram.cd
 
