@@ -533,7 +533,7 @@ auto unit_vector(Coordinate const& vector)
 }
 
 
-//! Returns unit vector directing from representation1 to representation2
+//! Returns unit vector directing from representation2 to representation1
 template<typename Representation1, typename Representation2>
 Representation1 unit_vector
 (

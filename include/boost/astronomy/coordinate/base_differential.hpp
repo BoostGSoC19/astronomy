@@ -39,8 +39,6 @@ public:
     typedef CoordinateSystem system;
     typedef CoordinateType type;
 
-   
-
     //! converts current representation into specified representation
     template <typename ReturnType>
     ReturnType to_differential() const
