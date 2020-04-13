@@ -423,6 +423,45 @@ auto magnitude
 }
 
 
+//! Returns magnitude of the cartesian differential vector
+template
+<
+    typename CoordinateType,
+    typename XQuantity,
+    typename YQuantity,
+    typename ZQuantity
+>
+auto magnitude
+(
+    cartesian_differential
+    <
+        CoordinateType,
+        XQuantity,
+        YQuantity,
+        ZQuantity
+    > const& vector
+)
+{
+    CoordinateType result = 0;
+    bg::model::point
+    <
+        CoordinateType,
+        3,
+        bg::cs::cartesian
+    > tempPoint;
+
+    bg::set<0>(tempPoint, vector.get_dx().value());
+    bg::set<1>(tempPoint, static_cast<XQuantity>(vector.get_dy()).value());
+    bg::set<2>(tempPoint, static_cast<XQuantity>(vector.get_dz()).value());
+
+    result += std::pow(bg::get<0>(tempPoint), 2) +
+        std::pow(bg::get<1>(tempPoint), 2) +
+        std::pow(bg::get<2>(tempPoint), 2);
+
+    return std::sqrt(result) * typename XQuantity::unit_type();
+}
+
+
 //! Returns magnitude of the vector other than cartesian
 template <typename Coordinate>
 auto magnitude(Coordinate const& vector)
@@ -456,17 +495,41 @@ unit_vector(cartesian_representation<Args...> const& vector)
     return cartesian_representation<Args...>(tempPoint);
 }
 
+
+//! Returns the unit vector of vector given
+template <typename ...Args>
+cartesian_differential<Args...>
+unit_vector(cartesian_differential<Args...> const& vector)
+{
+    bg::model::point
+    <
+        typename cartesian_differential<Args...>::type,
+        3,
+        bg::cs::cartesian
+    > tempPoint;
+    auto mag = magnitude(vector); //magnitude of vector
+
+    //performing calculations to find unit vector
+    bg::set<0>(tempPoint, vector.get_dx().value() / mag.value());
+    bg::set<1>(tempPoint,
+        vector.get_dy().value() /
+        static_cast<typename cartesian_differential<Args...>::quantity2>(mag).value());
+    bg::set<2>(tempPoint,
+        vector.get_dz().value() /
+        static_cast<typename cartesian_differential<Args...>::quantity3>(mag).value());
+
+    return cartesian_differential<Args...>(tempPoint);
+}
+
+
+
 //! Returns unit vector of given vector other than Cartesian
 template <typename Coordinate>
 auto unit_vector(Coordinate const& vector)
 {
-    Coordinate tempVector;
-
-    tempVector.set_lat(vector.get_lat());
-    tempVector.set_lon(vector.get_lon());
-    tempVector.set_dist(1.0 * typename Coordinate::quantity3::unit_type());
-
-    return tempVector;
+    auto tempPoint = vector.get_point();
+    bg::set<2>(tempPoint,1.0);
+    return Coordinate(tempPoint);
 }
 
 
