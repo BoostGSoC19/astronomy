@@ -18,6 +18,8 @@
 #include <boost/astronomy/detail/is_base_template_of.hpp>
 #include <boost/astronomy/coordinate/base_differential.hpp>
 #include <boost/astronomy/coordinate/cartesian_differential.hpp>
+#include <boost/astronomy/coordinate/concepts/general.hpp>
+#include <boost/astronomy/coordinate/concepts/base_differential_concept.hpp>
 
 namespace boost { namespace astronomy { namespace coordinate {
 
@@ -37,16 +39,7 @@ template
 struct spherical_differential : public base_differential
     <3, bg::cs::spherical<radian>, CoordinateType>
 {
-    ///@cond INTERNAL
-    BOOST_STATIC_ASSERT_MSG(
-        ((std::is_same<typename bu::get_dimension<LatQuantity>::type,
-            bu::plane_angle_dimension>::value) &&
-            (std::is_same<typename bu::get_dimension<LonQuantity>::type,
-            bu::plane_angle_dimension>::value)),
-        "Latitude and Longitude must be of plane angle type");
-    BOOST_STATIC_ASSERT_MSG((std::is_floating_point<CoordinateType>::value),
-        "CoordinateType must be a floating-point type");
-    ///@endcond
+    BOOST_CONCEPT_ASSERT((concepts::Spherical_Components<LatQuantity,LonQuantity>));
 
 public:
     typedef LatQuantity quantity1;
@@ -84,6 +77,9 @@ public:
         > const& pointObject
     )
     {
+        BOOST_CONCEPT_ASSERT((
+            concepts::Point<OtherCoordinateType,OtherDimensionCount,OtherCoordinateSystem>));
+
         bg::model::point<OtherCoordinateType, 3, bg::cs::cartesian> temp;
         bg::transform(pointObject, temp);
         bg::transform(temp, this->diff);
@@ -108,9 +104,7 @@ public:
     template <typename Differential>
     spherical_differential(Differential const& other)
     {
-        BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-            <boost::astronomy::coordinate::base_differential, Differential>::value),
-            "No constructor found with given argument type");
+        BOOST_CONCEPT_ASSERT((concepts::Base_Differential<Differential>));
 
         auto temp = make_spherical_differential(other);
         bg::transform(temp.get_differential(), this->diff);

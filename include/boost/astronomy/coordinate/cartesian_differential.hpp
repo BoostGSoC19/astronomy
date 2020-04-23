@@ -15,6 +15,8 @@
 
 #include <boost/astronomy/detail/is_base_template_of.hpp>
 #include <boost/astronomy/coordinate/base_differential.hpp>
+#include <boost/astronomy/coordinate/concepts/general.hpp>
+#include <boost/astronomy/coordinate/concepts/base_differential_concept.hpp>
 
 namespace boost { namespace astronomy { namespace coordinate {
 
@@ -32,14 +34,7 @@ template
 >
 struct cartesian_differential: base_differential<3, bg::cs::cartesian, CoordinateType>
 {
-    ///@cond INTERNAL
-    BOOST_STATIC_ASSERT_MSG(
-        ((std::is_same<typename bu::get_dimension<XQuantity>::type,
-        typename bu::get_dimension<YQuantity>::type>::value) &&
-        (std::is_same<typename bu::get_dimension<YQuantity>::type,
-        typename bu::get_dimension<ZQuantity>::type>::value)),
-        "All components must have same dimensions");
-    ///@endcond
+    BOOST_CONCEPT_ASSERT((concepts::Cartesian_Components<XQuantity,YQuantity,ZQuantity>));
 
 public:
 
@@ -72,7 +67,10 @@ public:
             OtherCoordinateSystem
         > const& pointObject
     )
-    {
+    {   
+        BOOST_CONCEPT_ASSERT((
+            concepts::Point<OtherCoordinateType,OtherDimensionCount,OtherCoordinateSystem>));
+
         bg::transform(pointObject, this->diff);
     }
 
@@ -95,9 +93,7 @@ public:
     template <typename Differential>
     cartesian_differential(Differential const& other)
     {
-        BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-            <boost::astronomy::coordinate::base_differential, Differential>::value),
-            "No constructor found with given argument type");
+        BOOST_CONCEPT_ASSERT((concepts::Base_Differential<Differential>));
 
         bg::transform(other.get_differential(), this->diff);
     }

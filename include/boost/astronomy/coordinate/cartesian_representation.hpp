@@ -16,6 +16,8 @@
 
 #include <boost/astronomy/detail/is_base_template_of.hpp>
 #include <boost/astronomy/coordinate/base_representation.hpp>
+#include <boost/astronomy/coordinate/concepts/general.hpp>
+#include <boost/astronomy/coordinate/concepts/base_representation_concept.hpp>
 
 
 namespace boost { namespace astronomy { namespace coordinate {
@@ -34,14 +36,7 @@ template
 >
 struct cartesian_representation: base_representation<3, bg::cs::cartesian, CoordinateType>
 {
-    ///@cond INTERNAL
-    BOOST_STATIC_ASSERT_MSG(
-        ((std::is_same<typename bu::get_dimension<XQuantity>::type,
-        typename bu::get_dimension<YQuantity>::type>::value) &&
-        (std::is_same<typename bu::get_dimension<YQuantity>::type,
-        typename bu::get_dimension<ZQuantity>::type>::value)),
-        "All components must have same dimensions");
-    ///@endcond
+    BOOST_CONCEPT_ASSERT((concepts::Cartesian_Components<XQuantity,YQuantity,ZQuantity>));
 
 public:
 
@@ -51,7 +46,7 @@ public:
     //typename cartesian_representation
     //    <CoordinateType, XQuantity, YQuantity, ZQuantity> this_type;
 
-    //default constructoer no initialization
+    //default constructor no initialization
     cartesian_representation(){}
 
     //!Constructs object from provided quantities
@@ -79,8 +74,10 @@ public:
         > const& pointObject
     )
     {
-        bg::transform(pointObject, this->point);
+        BOOST_CONCEPT_ASSERT((
+            concepts::Point<OtherCoordinateType,OtherDimensionCount,OtherCoordinateSystem>));
 
+        bg::transform(pointObject, this->point);
     }
 
     //!Copy constructor
@@ -103,9 +100,7 @@ public:
     template <typename Representation>
     cartesian_representation(Representation const& other)
     {
-        BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-            <boost::astronomy::coordinate::base_representation, Representation>::value),
-            "No constructor found with given argument type");
+       BOOST_CONCEPT_ASSERT((concepts::Base_Representation<Representation>));
 
         bg::transform(other.get_point(), this->point);
     }
@@ -233,6 +228,7 @@ cartesian_representation
     ZQuantity<Unit3, CoordinateType> const& z
 )
 {
+
     return cartesian_representation
         <
             CoordinateType,
