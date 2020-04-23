@@ -208,18 +208,17 @@ BOOST_AUTO_TEST_CASE(cartesian_representation_cross_product)
 
     auto result = cross(point1, point2);
 
-    BOOST_CHECK_CLOSE(result.get_x().value(), -180.0, 0.001);
-    BOOST_CHECK_CLOSE(result.get_y().value(), 11.988, 0.001);
-    BOOST_CHECK_CLOSE(result.get_z().value(), -1485.0, 0.001);
+    BOOST_CHECK_CLOSE(result.get_x().value(), -1.8e+08, 0.001);
+    BOOST_CHECK_CLOSE(result.get_y().value(), 1.1988e+07, 0.001);
+    BOOST_CHECK_CLOSE(result.get_z().value(), -14850, 0.001);
 
     //checking whether quantity stored is as expected or not
     BOOST_TEST((std::is_same<decltype(result.get_x()), quantity
-        <bu::multiply_typeof_helper<decltype(si::kilo*meters), si::length>::type>>::value));
+        <bu::multiply_typeof_helper<si::length,decltype(si::milli*meters)>::type>>::value));
     BOOST_TEST((std::is_same<decltype(result.get_y()), quantity
-        <bu::multiply_typeof_helper<decltype(si::mega*meters),
-        decltype(si::milli*meters)>::type>>::value));
+        <bu::multiply_typeof_helper<si::length,decltype(si::milli*meters)>::type>>::value));
     BOOST_TEST((std::is_same<decltype(result.get_z()), quantity
-        <bu::multiply_typeof_helper<decltype(si::centi*meters), si::length>::type>>::value));
+        <bu::multiply_typeof_helper<si::length,decltype(si::milli*meters)>::type>>::value));
 }
 
 BOOST_AUTO_TEST_CASE(cartesian_representation_dot_product)

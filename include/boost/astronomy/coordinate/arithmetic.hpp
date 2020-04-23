@@ -12,7 +12,7 @@
 #include <boost/units/conversion.hpp>
 
 #include <boost/astronomy/coordinate/base_representation.hpp>
-#include <boost/astronomy/coordinate/cartesian_representation.hpp>
+#include <boost/astronomy/coordinate/representation.hpp>
 
 
 namespace boost { namespace astronomy { namespace coordinate {
@@ -21,43 +21,24 @@ namespace bg = boost::geometry;
 namespace bu = boost::units;
 
 
-//!Returns the cross product of representation1 and representation2
+//! Returns cross product of representations with Cartesian as first argument
 template
 <
-    template<typename ...> class Representation1,
-    template<typename ...> class Representation2,
-    typename ...Args1,
-    typename ...Args2
+    typename Other,
+    typename ...Args
 >
 auto cross
 (
-    Representation1<Args1...> const& representation1,
-    Representation2<Args2...> const& representation2
+    cartesian_representation<Args...> const& representation1,
+    Other const& vector
 )
 {
-    /*!both the coordinates/vector are first converted into
-    cartesian coordinate system then cross product of both cartesian
-    vectors is converted into requested type and returned*/
+  	
+	//The other vector is also converted to Cartesian and then cross is computed.
+    auto representation2 = make_cartesian_representation(vector);
 
-    /*checking types if it is not subclass of
-    base_representaion then compile time erorr is generated*/
-    //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-    //    <
-    //        boost::astronomy::coordinate::base_representation,
-    //        Representation1<Args1...>
-    //    >::value),
-    //    "First argument type is expected to be a representation class");
-    //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-    //    <
-    //        boost::astronomy::coordinate::base_representation,
-    //        Representation2<Args2...>
-    //    >::value),
-    //    "Second argument type is expected to be a representation class");
-
-    /*converting both coordinates/vector into cartesian system*/
-
-    typedef Representation1<Args1...> representation1_type;
-    typedef Representation2<Args2...> representation2_type;
+    typedef cartesian_representation<Args...> representation1_type;
+    typedef decltype(representation2) representation2_type;
 
     bg::model::point
     <
@@ -75,49 +56,90 @@ auto cross
     bg::transform(representation1.get_point(), tempPoint1);
     bg::transform(representation2.get_point(), tempPoint2);
 
-    bg::set<0>(result, (bg::get<1>(tempPoint1)*bg::get<2>(tempPoint2)) -
-        ((bg::get<2>(tempPoint1)*
-        bu::conversion_factor(typename representation1_type::quantity3::unit_type(),
-        typename representation1_type::quantity2::unit_type()))*
-        (bg::get<1>(tempPoint2)*
-        bu::conversion_factor(typename representation2_type::quantity2::unit_type(),
-        typename representation2_type::quantity3::unit_type()))));
-
-    bg::set<1>(result, (bg::get<2>(tempPoint1)*bg::get<0>(tempPoint2)) -
-        ((bg::get<0>(tempPoint1)*
-        bu::conversion_factor(typename representation1_type::quantity1::unit_type(),
-        typename representation1_type::quantity3::unit_type()))*
-        (bg::get<2>(tempPoint2)*
-        bu::conversion_factor(typename representation2_type::quantity3::unit_type(),
-        typename representation2_type::quantity1::unit_type()))));
-
-    bg::set<2>(result, (bg::get<0>(tempPoint1)*bg::get<1>(tempPoint2)) -
-        ((bg::get<1>(tempPoint1)*
+    bg::set<1>( tempPoint1, bg::get<1>(tempPoint1)*
         bu::conversion_factor(typename representation1_type::quantity2::unit_type(),
-        typename representation1_type::quantity1::unit_type()))*
-        (bg::get<0>(tempPoint2)*
-        bu::conversion_factor(typename representation2_type::quantity1::unit_type(),
-        typename representation2_type::quantity2::unit_type()))));
+        typename representation1_type::quantity1::unit_type()));
 
-    return Representation1
+    bg::set<2>( tempPoint1, bg::get<2>(tempPoint1)*
+        bu::conversion_factor(typename representation1_type::quantity3::unit_type(),
+        typename representation1_type::quantity1::unit_type()));
+
+    bg::set<1>( tempPoint2, bg::get<1>(tempPoint2)*
+        bu::conversion_factor(typename representation2_type::quantity2::unit_type(),
+        typename representation2_type::quantity1::unit_type()));
+
+    bg::set<2>( tempPoint2, bg::get<2>(tempPoint2)*
+        bu::conversion_factor(typename representation2_type::quantity3::unit_type(),
+        typename representation2_type::quantity1::unit_type()));
+
+    result = bg::cross_product(tempPoint1,tempPoint2);
+
+    return cartesian_representation
         <
             typename representation1_type::type,
             bu::quantity<typename bu::multiply_typeof_helper
             <
-                typename representation1_type::quantity2::unit_type,
-                typename representation2_type::quantity3::unit_type>::type
-            >,
-            bu::quantity<typename bu::multiply_typeof_helper
-            <
-                typename representation1_type::quantity3::unit_type,
+                typename representation1_type::quantity1::unit_type,
                 typename representation2_type::quantity1::unit_type>::type
             >,
             bu::quantity<typename bu::multiply_typeof_helper
             <
                 typename representation1_type::quantity1::unit_type,
-                typename representation2_type::quantity2::unit_type>::type
+                typename representation2_type::quantity1::unit_type>::type
+            >,
+            bu::quantity<typename bu::multiply_typeof_helper
+            <
+                typename representation1_type::quantity1::unit_type,
+                typename representation2_type::quantity1::unit_type>::type
             >
         >(result);
+}
+
+//!Returns the cross product with Spherical/Spherical Equatorial representation as first argument
+template
+<
+    template<typename ...> class Representation,
+    typename ...Args,
+    typename Other
+>
+auto cross
+(
+    Representation<Args...> const& vector1,
+    Other const& vector2
+)
+{
+    //First both the representations are converted to Cartesian and then cross is computed.
+
+    auto representation1 = make_cartesian_representation(vector1);
+    auto representation2 = make_cartesian_representation(vector2);
+
+    auto crossed = cross(representation1,representation2);
+
+    typedef decltype(representation1) representation1_type;
+    typedef decltype(representation2) representation2_type;
+    typedef decltype(crossed) cross_type;
+
+    Representation<
+        typename cross_type::type,
+        bu::quantity<bu::si::plane_angle>,
+        bu::quantity<bu::si::plane_angle>,
+        bu::quantity<typename bu::multiply_typeof_helper
+        <
+            typename representation1_type::quantity1::unit_type,
+            typename representation2_type::quantity1::unit_type>::type
+        >
+    > result(crossed);
+
+    typedef decltype(result) result_type;
+
+    auto factor = result.get_dist().value() * 
+        bu::conversion_factor(typename cross_type::quantity1::unit_type(),
+        typename result_type::quantity3::unit_type());
+
+    result.set_dist(static_cast<typename result_type::type>(factor) * 
+        typename result_type::quantity3::unit_type());
+
+    return result;
 }
 
 
@@ -127,7 +149,7 @@ auto dot(Representation1 const& representation1, Representation2 const& represen
 {
     /*!both the coordinates/vector are first converted into
     cartesian coordinate system then dot product of both cartesian
-    product is converted into requested type and returned*/
+    product is converted into requested type and returned
 
     /*converting both coordinates/vector into cartesian system*/
     bg::model::point

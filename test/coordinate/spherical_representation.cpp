@@ -196,25 +196,23 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(spherical_representation_arithmetic_functions)
 
-// BOOST_AUTO_TEST_CASE(spherical_representation_cross_product)
-// {
-//     auto point1 = make_spherical_representation(3.0 * bud::degrees, 50.0 * bud::degrees, 40.0 * meters);
-//     auto point2 = make_spherical_representation(30.0 * bud::degrees, 45.0 * bud::degrees, 14.0 * meters);
+BOOST_AUTO_TEST_CASE(spherical_representation_cross_product)
+{
+    auto point1 = make_spherical_representation(3.0 * bud::degrees, 50.0 * bud::degrees, 40.0 * meters);
+    auto point2 = make_spherical_representation(30.0 * bud::degrees, 45.0 * bud::degrees, 14.0 * meters);
 
-//     auto result = cross(point1, point2);
+    auto result = cross(point1, point2);
 
-//     BOOST_CHECK_CLOSE(result.get_lat().value(), -143.4774246228, 0.001);
-//     BOOST_CHECK_CLOSE(result.get_lon().value(), 45.186034054587, 0.001);
-//     BOOST_CHECK_CLOSE(result.get_dist().value(), 195.39050840581, 0.001);
+    BOOST_CHECK_CLOSE(result.get_lat().value(), -2.50415, 0.001);
+    BOOST_CHECK_CLOSE(result.get_lon().value(), 0.788645, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dist().value(), 195.391, 0.001);
 
-//     //checking whether quantity stored is as expected or not
-//     BOOST_TEST((std::is_same<decltype(result.get_lat()), quantity
-//         <bu::multiply_typeof_helper<si::length, si::length>::type>>::value));
-//     BOOST_TEST((std::is_same<decltype(result.get_lon()), quantity
-//         <bu::multiply_typeof_helper<si::length, si::length>::type>>::value));
-//     BOOST_TEST((std::is_same<decltype(result.get_dist()), quantity
-//         <bu::multiply_typeof_helper<si::length, si::length>::type>>::value));
-// }
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_lat()), quantity<bu::si::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_lon()), quantity<bu::si::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dist()), quantity
+        <bu::multiply_typeof_helper<si::length, si::length>::type>>::value));
+}
 
 BOOST_AUTO_TEST_CASE(spherical_representation_dot_product)
 {
