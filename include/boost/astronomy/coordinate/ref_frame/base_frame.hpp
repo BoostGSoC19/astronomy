@@ -18,8 +18,8 @@
 #include <boost/geometry/algorithms/equals.hpp>
 #include <boost/static_assert.hpp>
 
-#include <boost/astronomy/coordinate/representation.hpp>
-#include <boost/astronomy/coordinate/differential.hpp>
+#include <boost/astronomy/coordinate/rep/representation.hpp>
+#include <boost/astronomy/coordinate/diff/differential.hpp>
 #include <boost/astronomy/detail/is_base_template_of.hpp>
 #include <boost/astronomy/coordinate/arithmetic.hpp>
 

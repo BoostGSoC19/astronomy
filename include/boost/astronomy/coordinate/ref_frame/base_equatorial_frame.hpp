@@ -12,9 +12,9 @@
 #define BOOST_ASTRONOMY_COORDINATE_BASE_EQUATORIAL_FRAME_HPP
 
 #include <type_traits>
-#include <boost/astronomy/coordinate/base_frame.hpp>
-#include <boost/astronomy/coordinate/spherical_representation.hpp>
-#include <boost/astronomy/coordinate/spherical_coslat_differential.hpp>
+#include <boost/astronomy/coordinate/ref_frame/base_frame.hpp>
+#include <boost/astronomy/coordinate/rep/spherical_representation.hpp>
+#include <boost/astronomy/coordinate/diff/spherical_coslat_differential.hpp>
 
 namespace boost { namespace astronomy { namespace coordinate {
 

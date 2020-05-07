@@ -22,11 +22,10 @@
 #include <boost/geometry/core/cs.hpp>
 #include <boost/units/conversion.hpp>
 
-#include <boost/astronomy/coordinate/base_representation.hpp>
-#include <boost/astronomy/coordinate/cartesian_representation.hpp>
-#include <boost/astronomy/coordinate/representation.hpp>
-#include <boost/astronomy/coordinate/differential.hpp>
-
+#include <boost/astronomy/coordinate/rep/base_representation.hpp>
+#include <boost/astronomy/coordinate/rep/cartesian_representation.hpp>
+#include <boost/astronomy/coordinate/rep/representation.hpp>
+#include <boost/astronomy/coordinate/diff/differential.hpp>
 
 namespace boost { namespace astronomy { namespace coordinate {
 

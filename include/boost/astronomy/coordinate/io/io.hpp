@@ -17,9 +17,9 @@
 #include <boost/units/quantity.hpp>
 #include <boost/units/io.hpp>
 
-#include <boost/astronomy/coordinate/cartesian_representation.hpp>
-#include <boost/astronomy/coordinate/spherical_representation.hpp>
-#include <boost/astronomy/coordinate/spherical_equatorial_representation.hpp>
+#include <boost/astronomy/coordinate/rep/cartesian_representation.hpp>
+#include <boost/astronomy/coordinate/rep/spherical_representation.hpp>
+#include <boost/astronomy/coordinate/rep/spherical_equatorial_representation.hpp>
 
 namespace boost { namespace astronomy { namespace coordinate {
 

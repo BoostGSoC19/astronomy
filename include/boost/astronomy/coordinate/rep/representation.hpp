@@ -6,13 +6,12 @@
   file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
+#ifndef BOOST_ASTRONOMY_COORDINATE_REPRESENTATION_HPP
+#define BOOST_ASTRONOMY_COORDINATE_REPRESENTATION_HPP
 
-#ifndef BOOST_ASTRONOMY_COORDINATE_HPP
-#define BOOST_ASTRONOMY_COORDINATE_HPP
+#include <boost/astronomy/coordinate/rep/cartesian_representation.hpp>
+#include <boost/astronomy/coordinate/rep/spherical_equatorial_representation.hpp>
+#include <boost/astronomy/coordinate/rep/spherical_representation.hpp>
 
-#include <boost/astronomy/coordinate/representation.hpp>
-#include <boost/astronomy/coordinate/differential.hpp>
-#include <boost/astronomy/coordinate/frame.hpp>
-
-#endif // !BOOST_ASTRONOMY_COORDINATE_HPP
+#endif // !BOOST_ASTRONOMY_COORDINATE_REPRESENTATION_HPP
 

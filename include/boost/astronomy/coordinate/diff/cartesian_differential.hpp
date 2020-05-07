@@ -23,7 +23,7 @@
 #include <boost/units/systems/si/dimensionless.hpp>
 
 #include <boost/astronomy/detail/is_base_template_of.hpp>
-#include <boost/astronomy/coordinate/base_differential.hpp>
+#include <boost/astronomy/coordinate/diff/base_differential.hpp>
 
 namespace boost { namespace astronomy { namespace coordinate {
 

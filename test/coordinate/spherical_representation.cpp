@@ -16,7 +16,7 @@
 #include <boost/units/systems/si/length.hpp>
 #include <boost/units/systems/angle/degrees.hpp>
 #include <boost/astronomy/coordinate/arithmetic.hpp>
-#include <boost/astronomy/coordinate/representation.hpp>
+#include <boost/astronomy/coordinate/rep/representation.hpp>
 
 using namespace std;
 using namespace boost::astronomy::coordinate;

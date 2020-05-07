@@ -17,7 +17,7 @@
 #include <boost/units/systems/si/time.hpp>
 #include <boost/units/systems/angle/degrees.hpp>
 #include <boost/astronomy/coordinate/arithmetic.hpp>
-#include <boost/astronomy/coordinate/differential.hpp>
+#include <boost/astronomy/coordinate/diff/differential.hpp>
 
 using namespace std;
 using namespace boost::astronomy::coordinate;

@@ -7,13 +7,13 @@
   file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
-#ifndef BOOST_ASTRONOMY_COORDINATE_SPHERICAL_EQUATORIAL_REPRESENTATION_HPP
-#define BOOST_ASTRONOMY_COORDINATE_SPHERICAL_EQUATORIAL_REPRESENTATION_HPP
+#ifndef BOOST_ASTRONOMY_COORDINATE_SPHERICAL_REPRESENTATION_HPP
+#define BOOST_ASTRONOMY_COORDINATE_SPHERICAL_REPRESENTATION_HPP
+
 
 #include <tuple>
 #include <cstddef>
 
-#include <boost/geometry/strategies/strategy_transform.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/geometries/point.hpp>
@@ -21,12 +21,11 @@
 #include <boost/geometry/algorithms/equals.hpp>
 #include <boost/units/physical_dimensions/plane_angle.hpp>
 #include <boost/units/systems/si/plane_angle.hpp>
-#include <boost/units/get_dimension.hpp>
 #include <boost/units/systems/si/dimensionless.hpp>
 
 #include <boost/astronomy/detail/is_base_template_of.hpp>
-#include <boost/astronomy/coordinate/base_representation.hpp>
-#include <boost/astronomy/coordinate/cartesian_representation.hpp>
+#include <boost/astronomy/coordinate/rep/base_representation.hpp>
+#include <boost/astronomy/coordinate/rep/cartesian_representation.hpp>
 
 
 namespace boost { namespace astronomy { namespace coordinate {
@@ -35,14 +34,22 @@ namespace bu = boost::units;
 namespace bg = boost::geometry;
 
 
-//!Represents the coordinate in spherical equatorial representation
+//!Represents the coordinate in spherical representation
 //!Uses three components to represent a point/vector (latitude, longitude, distance)
 /*!
-\brief Spherical equatorial coordinate system, in degree or in radian
-\details This one resembles the geographic coordinate system, and has latitude
-    up from zero at the equator, to 90 at the pole
-    (opposite to the spherical(polar) coordinate system).
-    Used in astronomy and in GIS (but there is also the geographic)
+\brief Spherical (polar) coordinate system, in degree or in radian
+\details Defines the spherical coordinate system where points are
+    defined in two angles
+    and an optional radius usually known as r, theta, phi
+\par Coordinates:
+- coordinate 0:
+    0 <= phi < 2pi is the angle between the positive x-axis and the
+        line from the origin to the P projected onto the xy-plane.
+- coordinate 1:
+    0 <= theta <= pi is the angle between the positive z-axis and the
+        line formed between the origin and P.
+- coordinate 2 (if specified):
+    r >= 0 is the distance from the origin to a given point P.
 
 \see http://en.wikipedia.org/wiki/Spherical_coordinates
 \ingroup cs
@@ -54,8 +61,8 @@ template
     typename LonQuantity = bu::quantity<bu::si::plane_angle, CoordinateType>,
     typename DistQuantity = bu::quantity<bu::si::dimensionless, CoordinateType>
 >
-struct spherical_equatorial_representation : public base_representation
-    <3, bg::cs::spherical_equatorial<radian>, CoordinateType>
+struct spherical_representation : public base_representation
+    <3, bg::cs::spherical<radian>, CoordinateType>
 {
     ///@cond INTERNAL
     BOOST_STATIC_ASSERT_MSG(
@@ -74,10 +81,10 @@ public:
     typedef DistQuantity quantity3;
 
     //default constructor no initialization
-    spherical_equatorial_representation(){}
+    spherical_representation() {}
 
     //!constructs object from provided value of coordinates (latitude, longitude, distance)
-    spherical_equatorial_representation
+    spherical_representation
     (
         LatQuantity const& lat,
         LonQuantity const& lon,
@@ -94,7 +101,7 @@ public:
         typename OtherCoordinateSystem,
         typename OtherCoordinateType
     >
-    spherical_equatorial_representation
+    spherical_representation
     (
         bg::model::point
         <
@@ -110,23 +117,22 @@ public:
     }
 
     //copy constructor
-    spherical_equatorial_representation
+    spherical_representation
     (
-        spherical_equatorial_representation
+        spherical_representation
         <
             CoordinateType,
             LatQuantity,
             LonQuantity,
             DistQuantity
-        > const& object
-    )
+        > const& other)
     {
-        this->point = object.get_point();
+        this->point = other.get_point();
     }
 
     //!constructs object from any type of representation
     template <typename Representation>
-    spherical_equatorial_representation(Representation const& other)
+    spherical_representation(Representation const& other)
     {
         BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
             <boost::astronomy::coordinate::base_representation, Representation>::value),
@@ -137,7 +143,7 @@ public:
         typename bu::get_dimension<typename Representation::quantity3>::type>::value)),
         "Two representations must have same dimensions");
 
-        auto tempRep = make_spherical_equatorial_representation(other);
+        auto tempRep = make_spherical_representation(other);
         bg::model::point
         <
             typename std::conditional
@@ -147,7 +153,7 @@ public:
                 typename Representation::type
             >::type,
             3,
-            bg::cs::spherical_equatorial<radian>
+            bg::cs::spherical<radian>
         > tempPoint;
         
         bg::set<0>(tempPoint,
@@ -162,8 +168,8 @@ public:
             static_cast<DistQuantity>(tempRep.get_dist()).value());
 
         this->point = tempPoint;
-
     }
+
     //! returns the (lat, lon, distance) in the form of tuple
     std::tuple<LatQuantity, LonQuantity, DistQuantity> get_lat_lon_dist() const
     {
@@ -235,9 +241,8 @@ public:
         bg::set<2>(this->point, distance.value());
     }
 
-    //!operator for addition of representation
     template<typename Addend>
-    spherical_equatorial_representation
+    spherical_representation
     <
         CoordinateType,
         LatQuantity,
@@ -247,24 +252,25 @@ public:
     operator +(Addend const& addend) const
     {
 
+
         auto cartesian1 = make_cartesian_representation
             <CoordinateType, DistQuantity, DistQuantity, DistQuantity>(this->point);
         auto cartesian2 = make_cartesian_representation(addend);
 
         auto temp = cartesian1 + cartesian2;
 
-        spherical_equatorial_representation
+        spherical_representation
         <
             CoordinateType,
             LatQuantity,
             LonQuantity,
             DistQuantity
-        > result = make_spherical_equatorial_representation(temp);
+        > result = make_spherical_representation(temp);
 
         return result;
     }
 
-}; //spherical_equatorial_representation
+}; //spherical_representation
 
 
 //!Constructs object from provided quantities
@@ -279,21 +285,20 @@ template
     typename Unit2,
     typename Unit3
 >
-spherical_equatorial_representation
+spherical_representation
 <
     CoordinateType,
     LatQuantity<Unit1, CoordinateType>,
     LonQuantity<Unit2, CoordinateType>,
     DistQuantity<Unit3, CoordinateType>
->
-make_spherical_equatorial_representation
+> make_spherical_representation
 (
     LatQuantity<Unit1, CoordinateType> const& lat,
     LonQuantity<Unit2, CoordinateType> const& lon,
     DistQuantity<Unit3, CoordinateType> const& dist
 )
 {
-    return spherical_equatorial_representation
+    return spherical_representation
         <
             CoordinateType,
             LatQuantity<Unit1, CoordinateType>,
@@ -302,7 +307,7 @@ make_spherical_equatorial_representation
         >(lat, lon, dist);
 }
 
-//!constructs object from provided components of representation with different units
+//!Convert current quantities of spherical_representation to new quantities. 
 template
 <
     typename ReturnCoordinateType,
@@ -314,16 +319,16 @@ template
     typename LonQuantity,
     typename DistQuantity
 >
-spherical_equatorial_representation
+spherical_representation
 <
     ReturnCoordinateType,
     ReturnLatQuantity,
     ReturnLonQuantity,
     ReturnDistQuantity
 >
-make_spherical_equatorial_representation
+make_spherical_representation
 (
-    spherical_equatorial_representation
+    spherical_representation
     <
         CoordinateType,
         LatQuantity,
@@ -332,14 +337,14 @@ make_spherical_equatorial_representation
     > const& other
 )
 {
-    return make_spherical_equatorial_representation(
+    return make_spherical_representation(
         static_cast<ReturnLatQuantity>(other.get_lat()),
         static_cast<ReturnLonQuantity>(other.get_lon()),
         static_cast<ReturnDistQuantity>(other.get_dist())
     );
 }
 
-//!constructs object from provided representation
+//!Create copy of spherical_representation
 template
 <
     typename CoordinateType,
@@ -347,16 +352,10 @@ template
     typename LonQuantity,
     typename DistQuantity
 >
-spherical_equatorial_representation
-<
-    CoordinateType,
-    LatQuantity,
-    LonQuantity,
-    DistQuantity
->
-make_spherical_equatorial_representation
+spherical_representation<CoordinateType, LatQuantity, LonQuantity, DistQuantity>
+make_spherical_representation
 (
-    spherical_equatorial_representation
+    spherical_representation
     <
         CoordinateType,
         LatQuantity,
@@ -365,19 +364,21 @@ make_spherical_equatorial_representation
     > const& other
 )
 {
-    return spherical_equatorial_representation
+    return spherical_representation
         <
-            CoordinateType,
-            LatQuantity,
-            LonQuantity,
-            DistQuantity
+        CoordinateType,
+        LatQuantity,
+        LonQuantity,
+        DistQuantity
         >(other);
 }
 
-//!constructs object from boost::geometry::model::point object
+//!Create spherical_representation from boost::geometry::point
+//!Quantity types are to be specifed explicitly or angle is considered to be in radians
+//!distance is taken dimensionless by default if not specified 
 template
 <
-    typename CoordinateType = double,
+    typename CoordinateType=double,
     typename LatQuantity = bu::quantity<bu::si::plane_angle, CoordinateType>,
     typename LonQuantity = bu::quantity<bu::si::plane_angle, CoordinateType>,
     typename DistQuantity = bu::quantity<bu::si::dimensionless, CoordinateType>,
@@ -385,38 +386,31 @@ template
     typename OtherCoordinateSystem,
     typename OtherCoordinateType
 >
-spherical_equatorial_representation
-<
-    CoordinateType,
-    LatQuantity,
-    LonQuantity,
-    DistQuantity
->
-make_spherical_equatorial_representation
+spherical_representation<CoordinateType, LatQuantity, LonQuantity, DistQuantity>
+make_spherical_representation
 (
     bg::model::point
     <
-        OtherCoordinateType,
-        OtherDimensionCount,
-        OtherCoordinateSystem
-    > const& pointObject
-)
+    OtherCoordinateType,
+    OtherDimensionCount,
+    OtherCoordinateSystem
+    > const& pointObject)
 {
-    return spherical_equatorial_representation
+    return spherical_representation
         <
-            CoordinateType,
-            LatQuantity,
-            LonQuantity,
-            DistQuantity
+        CoordinateType,
+        LatQuantity,
+        LonQuantity,
+        DistQuantity
         >(pointObject);
 }
 
-//!constructs object from any type of representation
-template 
+//!Create cartesian_representation from other type of rep
+template
 <
     typename OtherRepresentation
 >
-auto make_spherical_equatorial_representation
+auto make_spherical_representation
 (
     OtherRepresentation const& other
 )
@@ -424,24 +418,26 @@ auto make_spherical_equatorial_representation
     auto temp = make_cartesian_representation(other);
     typedef decltype(temp) cartesian_type;
 
-    bg::model::point
-        <
-            typename cartesian_type::type,
-            3,
-            bg::cs::cartesian
-        > tempPoint;
+    bg::model::point<typename cartesian_type::type, 3, bg::cs::cartesian> tempPoint;
+    bg::model::point<typename cartesian_type::type, 3, bg::cs::spherical<radian>> result;
 
     bg::set<0>(tempPoint, temp.get_x().value());
-    bg::set<1>(tempPoint, static_cast<typename cartesian_type::quantity1>
-        (temp.get_y()).value());
-    bg::set<2>(tempPoint, static_cast<typename cartesian_type::quantity1>
-        (temp.get_z()).value());
+    bg::set<1>
+    (
+        tempPoint,
+        static_cast<typename cartesian_type::quantity1>
+        (temp.get_y()).value()
+    );
+    bg::set<2>
+    (
+        tempPoint,
+        static_cast<typename cartesian_type::quantity1>
+        (temp.get_z()).value()
+    );
 
-    bg::model::point<typename cartesian_type::type, 3, bg::cs::spherical_equatorial
-        <radian>> result;
     bg::transform(tempPoint, result);
 
-    return spherical_equatorial_representation
+    return spherical_representation
         <
             typename cartesian_type::type,
             bu::quantity<bu::si::plane_angle, typename cartesian_type::type>,
@@ -449,8 +445,7 @@ auto make_spherical_equatorial_representation
             typename cartesian_type::quantity1
         >(result);
 }
-        
+
 }}} //namespace boost::astronomy::coordinate
 
-#endif // !BOOST_ASTRONOMY_COORDINATE_SPHERICAL_EQUATORIAL__REPRESENTATION_HPP
-
+#endif // !BOOST_ASTRONOMY_COORDINATE_SPHERICAL_REPRESENTATION_HPP

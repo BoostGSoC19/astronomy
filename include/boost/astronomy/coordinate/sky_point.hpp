@@ -17,7 +17,7 @@
 #include <boost/units/io.hpp>
 #include <boost/static_assert.hpp>
 
-#include <boost/astronomy/coordinate/frame.hpp>
+#include <boost/astronomy/coordinate/ref_frame/frame.hpp>
 #include <boost/astronomy/detail/is_base_template_of.hpp>
 
 namespace boost { namespace astronomy { namespace coordinate {

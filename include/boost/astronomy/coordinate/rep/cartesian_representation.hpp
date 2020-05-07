@@ -24,7 +24,7 @@
 #include <boost/units/systems/si/dimensionless.hpp>
 
 #include <boost/astronomy/detail/is_base_template_of.hpp>
-#include <boost/astronomy/coordinate/base_representation.hpp>
+#include <boost/astronomy/coordinate/rep/base_representation.hpp>
 
 
 namespace boost { namespace astronomy { namespace coordinate {
@@ -357,7 +357,7 @@ make_cartesian_representation
 }
 
 
-//!Create cartesian_representation from other type of representations
+//!Create cartesian_representation from other type of rep
 template <typename OtherRepresentation>
 cartesian_representation
 <
