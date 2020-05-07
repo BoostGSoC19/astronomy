@@ -142,3 +142,14 @@ enable_testing()
 if(BOOST_ASTRONOMY_BUILD_TEST)
 	add_subdirectory(test)
 endif()
+
+#-----------------------------------------------------------------------------
+# SOFA
+#-----------------------------------------------------------------------------
+set(sofa_library /Users/alihasan/Documents/GSOC/sofa/20190722/c/src)
+
+add_library(sofa SHARED IMPORTED GLOBAL helper.hpp)
+set_property(TARGET sofa PROPERTY IMPORTED_LOCATION ${sofa_library}/libsofa_c.a)
+target_include_directories(sofa BEFORE INTERFACE ${sofa_library})
+
+target_link_libraries(astronomy_dependencies INTERFACE sofa)
