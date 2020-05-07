@@ -1,3 +1,12 @@
+
+/*=============================================================================
+  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
+  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
+
+  Distributed under the Boost Software License, Version 1.0. (See accompanying
+  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+=============================================================================*/
+
 #ifndef BOOST_ASTRONOMY_COORDINATE_HELIOCENTRIC_HPP
 #define BOOST_ASTRONOMY_COORDINATE_HELIOCENTRIC_HPP
 

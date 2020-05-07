@@ -1,3 +1,12 @@
+
+/*=============================================================================
+  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
+  Copyright 2019-2020 blisterz009
+
+  Distributed under the Boost Software License, Version 1.0. (See accompanying
+  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+=============================================================================*/
+
 #ifndef BOOST_ASTRONOMY_EXCEPTION_FITS_EXCEPTION_HPP
 #define BOOST_ASTRONOMY_EXCEPTION_FITS_EXCEPTION_HPP
 

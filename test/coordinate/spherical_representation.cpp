@@ -1,3 +1,12 @@
+
+/*=============================================================================
+  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
+  Copyright 2020-2020 Nitin Konidala  < nitink25 - konidalanitin@gmail.com >
+
+  Distributed under the Boost Software License, Version 1.0. (See accompanying
+  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+=============================================================================*/
+
 #define BOOST_TEST_MODULE spherical_representation_test
 
 #include <boost/test/unit_test.hpp>
