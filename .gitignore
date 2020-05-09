@@ -45,7 +45,6 @@
 /CMakeSettings.json
 
 # Project files
-/include/boost/astronomy/coordinate/Source.cpp
 /testing
 /Debug
 /astronomy.vcxproj.user
