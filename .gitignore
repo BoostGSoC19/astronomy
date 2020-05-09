@@ -41,8 +41,8 @@
 /x64/Debug
 /out
 
-# Visual Studio Specific CMake Settings
-CMakeSettings.json
+# CMakeSettings File
+/CMakeSettings.json
 
 # Project files
 /include/boost/astronomy/coordinate/Source.cpp
