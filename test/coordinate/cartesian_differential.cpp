@@ -258,3 +258,116 @@ BOOST_AUTO_TEST_CASE(cartesian_differential_multiplication_operator)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(cartesian_differential_arithmetic_function)
+
+BOOST_AUTO_TEST_CASE(cartesian_differential_cross_product)
+{
+    auto motion1 = make_cartesian_differential
+        (3.0*meters/second,9.0*si::kilo*meters/second,18.0*si::centi*meters/second);
+    auto motion2 = make_cartesian_differential
+        (2.0*si::kilo*meters/second,29.0*meters/second,38.0*si::kilo*meters/second);
+
+    auto result = boost::astronomy::coordinate::cross(motion1,motion2);
+
+    BOOST_CHECK_CLOSE(result.get_dx().value(), 342, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dy().value(), -11364, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dz().value(), -1.79999e+07, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_dx()), quantity
+        <bu::multiply_typeof_helper<decltype(si::kilo*meters/second),
+        decltype(si::kilo*meters/second)>::type>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dy()), quantity
+        <bu::multiply_typeof_helper<decltype(si::centi*meters/second),
+        decltype(si::kilo*meters/second)>::type>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dz()), quantity
+        <bu::multiply_typeof_helper<decltype(si::meters/second),
+        decltype(si::meters/second)>::type>>::value));
+    
+}
+
+BOOST_AUTO_TEST_CASE(cartesian_differential_dot_product)
+{
+    auto motion1 = make_cartesian_differential
+        (3.0 * meters/second, 5.0 * si::kilo *meters/second, 4.0 * si::mega * meters/second);
+    auto motion2 = make_cartesian_differential
+        (3.0 * si::milli * meters/second, 5.0 * si::centi * meters/second, 4.0 * meters/second);
+
+    auto result = dot(motion1, motion2);
+
+    BOOST_CHECK_CLOSE(result.value(), 16000250009.0, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result), quantity
+        <bu::multiply_typeof_helper<decltype(si::milli*meters/second),
+        decltype(si::meters/second)>::type>>::value));
+}
+
+BOOST_AUTO_TEST_CASE(cartesian_differential_unit_vector)
+{
+    auto motion1 = make_cartesian_differential
+        (25.0*meter/second, 36.0*meter/second, 90.0*meter/second);
+
+    auto result = boost::astronomy::coordinate::unit_vector(motion1);
+
+    BOOST_CHECK_CLOSE(result.get_dx().value(), 0.2497379127153113, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dy().value(), 0.3596225943100483, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dz().value(), 0.8990564857751207, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_dx()), quantity<si::velocity>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dy()), quantity<si::velocity>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dz()), quantity<si::velocity>>::value));
+}
+
+BOOST_AUTO_TEST_CASE(cartesian_differential_magnitude)
+{
+    auto motion1 = make_cartesian_differential
+        (25.0 * meter/second, 3600.0 * si::centi*meter/second, 90.0 * meter/second);
+
+    auto result = boost::astronomy::coordinate::magnitude(motion1);
+
+    BOOST_CHECK_CLOSE(result.value(), 100.1049449328054, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result), quantity<si::velocity>>::value));
+}
+
+BOOST_AUTO_TEST_CASE(cartesian_differential_sum)
+{
+    auto motion1 = make_cartesian_differential
+        (10.0 * meter/second, 20.0 * si::kilo * meters/second, 30.0 * meter/second);
+    auto motion2 = make_cartesian_differential
+        (50.0 * si::centi * meter/second, 60.0 * meter/second, 30.0 * meter/second);
+
+    auto result = boost::astronomy::coordinate::sum(motion1, motion2);
+
+    BOOST_CHECK_CLOSE(result.get_dx().value(), 10.5, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dy().value(), 20.06, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dz().value(), 60, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_dx()), quantity<si::velocity>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dy()), quantity<decltype(si::kilo*meter/second)>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dz()), quantity<si::velocity>>::value));
+}
+
+BOOST_AUTO_TEST_CASE(cartesian_differential_mean)
+{
+    auto motion1 = make_cartesian_differential
+        (10.0 * meter/second, 20.0 * si::kilo * meters/second, 30.0 * meter/second);
+    auto motion2 = make_cartesian_differential
+        (50.0 * si::centi * meter/second, 60.0 * meter/second, 30.0 * meter/second);
+
+    auto result = boost::astronomy::coordinate::mean(motion1, motion2);
+
+    BOOST_CHECK_CLOSE(result.get_dx().value(), 5.25, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dy().value(), 10.03, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dz().value(), 30.0, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_dx()), quantity<si::velocity>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dy()), quantity<decltype(si::kilo*meter/second)>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dz()), quantity<si::velocity>>::value));
+}
+BOOST_AUTO_TEST_SUITE_END()

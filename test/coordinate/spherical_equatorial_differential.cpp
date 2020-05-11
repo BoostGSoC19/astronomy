@@ -242,3 +242,113 @@ BOOST_AUTO_TEST_CASE(spherical_equatorial_differential_multiplication_operator)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(spherical_equatorial_differential_arithmetic_functions)
+
+BOOST_AUTO_TEST_CASE(spherical_equatorial_differential_cross_product)
+{
+    auto motion1 = make_spherical_equatorial_differential
+        (3.0 * bud::degrees, 50.0 * bud::degrees, 40.0 * meters/second);
+    auto motion2 = make_spherical_equatorial_differential
+        (30.0 * bud::degrees, 45.0 * bud::degrees, 14.0 * meters/second);
+
+    auto result = cross(motion1, motion2);
+
+    BOOST_CHECK_CLOSE(result.get_dlat().value(), 176.47742460814121, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dlon().value(), 39.816895281423861, 0.001);
+    BOOST_CHECK_CLOSE(result.get_ddist().value(), 180.459280550626, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_dlat()), quantity
+        <bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dlon()), quantity
+        <bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_ddist()), quantity
+        <bu::multiply_typeof_helper<si::velocity, si::velocity>::type>>::value));
+}
+
+BOOST_AUTO_TEST_CASE(spherical_equatorial_differential_dot_product)
+{
+    auto motion1 = make_spherical_equatorial_differential
+        (3.0 * bud::degrees, 50.0 * bud::degrees, 40.0 * meters/second);
+    auto motion2 = make_spherical_equatorial_differential
+        (30.0 * bud::degrees, 45.0 * bud::degrees, 14.0 * meters/second);
+
+    auto result = dot(motion1, motion2);
+
+    BOOST_CHECK_CLOSE(result.value(), 530.12682262186127, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result), quantity
+        <bu::multiply_typeof_helper<si::velocity, si::velocity>::type>>::value));
+}
+
+BOOST_AUTO_TEST_CASE(spherical_equatorial_differential_unit_vector)
+{
+    auto motion1 = make_spherical_equatorial_differential
+        (25.0 * bud::degrees, 30.0 * bud::degrees, 90.0*meter/second);
+
+    auto result = boost::astronomy::coordinate::unit_vector(motion1);
+
+    BOOST_CHECK_CLOSE(result.get_dlat().value(), 25.0, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dlon().value(), 30.0, 0.001);
+    BOOST_CHECK_CLOSE(result.get_ddist().value(), 1, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_dlat()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dlon()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_ddist()), quantity<si::velocity>>::value));
+}
+
+BOOST_AUTO_TEST_CASE(spherical_equatorial_differential_magnitude)
+{
+    auto motion1 = make_spherical_equatorial_differential
+        (25.0 * bud::degrees, 36.0 * bud::degrees, 9.0 * meters/second);
+
+    auto result = boost::astronomy::coordinate::magnitude(motion1);
+
+    BOOST_CHECK_CLOSE(result.value(), 9, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result), quantity<si::velocity>>::value));
+
+}
+
+BOOST_AUTO_TEST_CASE(spherical_equatorial_differential_sum)
+{
+    auto motion1 = make_spherical_equatorial_differential
+        (15.0 * bud::degrees, 30.0 * bud::degrees, 10.0 * meters/second);
+    auto motion2 = make_spherical_equatorial_differential
+        (30.0 * bud::degrees, 45.0 * bud::degrees, 20.0 * meters/second);
+
+    auto result = boost::astronomy::coordinate::sum(motion1, motion2);
+
+    BOOST_CHECK_CLOSE(result.get_dlat().value(), 24.312825776474799, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dlon().value(), 40.241218583331623, 0.001);
+    BOOST_CHECK_CLOSE(result.get_ddist().value(), 29.631468013173954, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_dlat()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dlon()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_ddist()), quantity<si::velocity>>::value));
+}
+
+BOOST_AUTO_TEST_CASE(spherical_equatorial_differential_mean)
+{
+    auto motion1 = make_spherical_equatorial_differential
+        (15.0 * bud::degrees, 30.0 * bud::degrees, 10.0 * meter/second);
+    auto motion2 = make_spherical_equatorial_differential
+        (30.0 * bud::degrees, 45.0 * bud::degrees, 20.0 * meter/second);
+
+    auto result = boost::astronomy::coordinate::mean(motion1, motion2);
+
+    BOOST_CHECK_CLOSE(result.get_dlat().value(), 24.312825776474799, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dlon().value(), 40.241218583331623, 0.001);
+    BOOST_CHECK_CLOSE(result.get_ddist().value(), 14.815734006586977, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_dlat()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dlon()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_ddist()), quantity<si::velocity>>::value));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
