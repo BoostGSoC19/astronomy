@@ -20,6 +20,7 @@
 #include <boost/astronomy/coordinate/cartesian_representation.hpp>
 #include <boost/astronomy/coordinate/spherical_representation.hpp>
 #include <boost/astronomy/coordinate/spherical_equatorial_representation.hpp>
+#include <boost/astronomy/coordinate/differential.hpp>
 
 namespace boost { namespace astronomy { namespace coordinate {
 
@@ -80,5 +81,80 @@ std::ostream& operator<< (std::ostream &out, spherical_representation
     return out;
 }
 
+//!"<<" operator overload to print details of a Cartesian differential point
+template
+<
+    typename CoordinateType,
+    class XQuantity,
+    class YQuantity,
+    class ZQuantity
+>
+std::ostream& operator<< (std::ostream &out, cartesian_differential
+	<CoordinateType, XQuantity, YQuantity, ZQuantity> const& point)
+{
+    out << "Cartesian differential ( " 
+    	<< point.get_dx() << " , " 
+        << point.get_dy() << " , " 
+        << point.get_dz() << " )";
+
+    return out;
+}
+
+//!"<<" operator overload to print details of a Spherical Equatorial differential Point
+template
+<
+    typename CoordinateType,
+    class LatQuantity,
+    class LonQuantity,
+    class DistQuantity
+>
+std::ostream& operator<< (std::ostream &out, spherical_equatorial_differential
+	<CoordinateType, LatQuantity, LonQuantity, DistQuantity> const& point)
+{
+    out << "Spherical Equatorial differential ( " 
+    	<< point.get_dlat() << " , " 
+        << point.get_dlon() << " , " 
+        << point.get_ddist() << " )";
+
+    return out;
+}
+
+//!"<<" operator overload to print details of a Spherical differential point
+template
+<
+    typename CoordinateType,
+    class LatQuantity,
+    class LonQuantity,
+    class DistQuantity
+>
+std::ostream& operator<< (std::ostream &out, spherical_differential
+	<CoordinateType, LatQuantity, LonQuantity, DistQuantity> const& point)
+{
+    out << "Spherical differential ( " 
+    	<< point.get_dlat() << " , " 
+        << point.get_dlon() << " , " 
+        << point.get_ddist() << " )";
+
+    return out;
+}
+
+//!"<<" operator overload to print details of a spherical_coslat_differential point
+template
+<
+    typename CoordinateType,
+    class LatQuantity,
+    class LonQuantity,
+    class DistQuantity
+>
+std::ostream& operator<< (std::ostream &out, spherical_coslat_differential
+	<CoordinateType, LatQuantity, LonQuantity, DistQuantity> const& point)
+{
+    out << "Spherical Coslat Differential ( " 
+    	<< point.get_dlat() << " , " 
+        << point.get_dlon_coslat() << " , " 
+        << point.get_ddist() << " )";
+
+    return out;
+}
 }}} //namespace boost::astronomy::coordinate
 #endif // !BOOST_ASTRONOMY_COORDINATE_IO_HPP
