@@ -17,6 +17,12 @@
 
 #include <boost/astronomy/io/column.hpp>
 
+/**
+ * @file    column_data.hpp
+ * @author  Pranam Lashkari
+ * @details
+ */
+
 namespace boost { namespace astronomy { namespace io {
 
 template <typename Type>

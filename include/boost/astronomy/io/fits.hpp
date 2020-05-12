@@ -21,17 +21,43 @@
 #include <boost/astronomy/io/ascii_table.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
 
+/**
+ * @file    fits.hpp
+ * @author  Pranam Lashkari
+ * @author  Sarthak Singhal
+ * @details
+ */
+
 namespace boost { namespace astronomy { namespace io {
 
-struct fits 
+/**
+ * @brief   API through which the user can access and manage the data of FITS file
+ * @details This structure includes the utility methods for access and manipulation of FITS data
+ *          Currently it only supports reading primary_hdu and image_extention and ascii table
+ * @author  Pranam Lashkari
+ * @author  Sarthak Singhal
+ * @todo    Provide a convinient interface to the user for working with FITS files. As of now users
+            can only read fits files and not access or manipulate it.This API requires a substantial
+ *          amount of change.
+ */
+struct fits
 {
 protected:
-    std::fstream fits_file; //!FITS to be processed
-    std::vector<std::shared_ptr<hdu>> hdu_; //!Stores all th HDU in file
+    std::fstream fits_file; //!FITS file to be processed
+    std::vector<std::shared_ptr<hdu>> hdu_; //!Stores all the HDU in file
 
 public:
+    /**
+     * @brief   Default constructor to create a standalone object of FITS structure
+    */
     fits() {}
 
+    /**
+     * @brief       Constructs a FITS object based on the given file
+     * @details     This function initializes the fits object based on file_path
+     *              and as of now reads the primary hdu as well
+     * @param[in]   file_path File path where the FITS file resides
+    */
     fits
     (
         std::string file_path,
@@ -43,6 +69,11 @@ public:
         //read_extensions();
     }
 
+    /**
+     * @brief       Reads the primary Header Data Unit From FITS file
+     * @details     This method reads the primary header information along with data of an HDU
+     * @see         primary_hdu.hpp
+    */
     void read_primary_hdu()
     {
         hdu_.emplace_back(std::make_shared<hdu>(fits_file));
@@ -69,6 +100,11 @@ public:
         }
     }
 
+    /**
+     * @brief Reads all the extentions HDU information from a FITS file
+     * @todo  As of now only the image extention, ascii table are being read
+     *        support for binary table needs to be added as well
+    */
     void read_extensions()
     {
         //if no extension then return

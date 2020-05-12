@@ -24,6 +24,12 @@
 #include <boost/astronomy/io/column.hpp>
 #include <boost/astronomy/io/column_data.hpp>
 
+/**
+ * @file    binary_table.hpp
+ * @author  Pranam Lashkari
+ * @details 
+ */
+
 namespace boost { namespace astronomy { namespace io {
 
 struct binary_table_extension : table_extension

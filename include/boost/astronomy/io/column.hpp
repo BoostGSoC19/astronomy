@@ -14,6 +14,11 @@
 
 #include <boost/static_assert.hpp>
 
+/**
+ * @file    column.hpp
+ * @author  Pranam Lashkari
+ * @details
+ */
 
 namespace boost { namespace astronomy { namespace io {
 

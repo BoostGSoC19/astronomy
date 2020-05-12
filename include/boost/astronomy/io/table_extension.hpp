@@ -15,6 +15,12 @@
 #include <boost/astronomy/io/extension_hdu.hpp>
 #include <boost/astronomy/io/column.hpp>
 
+/**
+ * @file    table_extension.hpp
+ * @author  Pranam Lashkari
+ * @details
+ */
+
 namespace boost { namespace astronomy { namespace io {
 
 

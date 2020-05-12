@@ -25,6 +25,11 @@
 
 #include <boost/astronomy/io/bitpix.hpp>
 
+/**
+ * @file    image.hpp
+ * @author  Pranam Lashkari
+ * @details
+ */
 
 namespace boost { namespace astronomy { namespace io {
 

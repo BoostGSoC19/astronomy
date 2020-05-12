@@ -19,6 +19,12 @@
 #include <boost/astronomy/io/hdu.hpp>
 #include <boost/astronomy/io/image.hpp>
 
+/**
+ * @file    primary_hdu.hpp
+ * @author  Pranam Lashkari
+ * @details
+ */
+
 namespace boost { namespace astronomy { namespace io {
 
 template <bitpix DataType>

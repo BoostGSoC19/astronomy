@@ -25,10 +25,25 @@
 #include <boost/astronomy/io/card.hpp>
 #include <boost/astronomy/io/column.hpp>
 
+/**
+ * @file    hdu.hpp
+ * @author  Pranam Lashkari
+ * @details Contains definition for structure <strong>hdu</strong>
+ */
 namespace boost { namespace astronomy { namespace io {
 
 struct column;
 
+/**
+ * @brief   Used to store Header Related Information of FITS HDU ( Header Data Unit ) 
+ * @details This structure also provides additional methods for querying some of the common but important keyword values
+ *          along with a general function ( value_of ) for querying the value associated with any  keyword in an HDU
+ * @author  Pranam Lashkari
+ * @author  Sarthak Singhal
+ * @note    To learn more about HDU please refer
+ *          <a href="http://archive.stsci.edu/fits/users_guide/node5.html#SECTION00320000000000000000">FITS</a>
+ * @todo    Define a virtual destructor to avoid leaking memory for all subclasses
+ */
 struct hdu
 {
 protected:
@@ -42,8 +57,19 @@ protected:
     std::unordered_map<std::string, std::size_t> key_index; 
 
 public:
+
+    /**
+     * @brief       Default constructor used to generate a standalone object of HDU
+    */
     hdu() {}
 
+    /**
+     * @brief       Constructs an hdu object from the given file
+     * @details     This method takes a filename as argument and constructs an hdu object
+     *              by  reading the header information associated with the first HDU
+     * @param[in]   file_name Path to the FITS file
+     * @see         read_header(std::fstream &file)
+    */
     hdu(std::string const& file_name)
     {
         std::fstream file(file_name, std::ios_base::in | std::ios_base::binary);
@@ -51,6 +77,13 @@ public:
         file.close();
     }
 
+    /**
+     * @brief       Constructs an HDU object by reading the header information from the specified position
+     *              of the given FITS file
+     * @param[in]   file_name Path to the FITS file
+     * @param[in]   pos Position from which the header information should be read
+     * @note        Please make sure to set the file position to the beginning of an Header Data Unit
+    */
     hdu(std::string const& file_name, std::streampos pos)
     {
         std::fstream file(file_name, std::ios_base::in | std::ios_base::binary);
@@ -58,17 +91,40 @@ public:
         file.close();
     }
 
+    /**
+     * @brief        Constructs an HDU object from a filestream passed as an argument to the method
+     * @param[in,out] file filestream set to open mode for reading
+     * @note        As a side effect the file pointer associated with the stream gets set to the end
+     *              of the current HDU unit
+    */
     hdu(std::fstream &file)
     {
         read_header(file);
     }
 
+
+    /**
+     * @brief       Constructs an HDU object by reading the header information from the specified position
+     *              in the given file stream
+     * @param[in]   file filestream set to open mode for reading
+     * @param[in]   pos Position from which the header information should be read
+     * @note        Please make sure to set the file position to the beginning of an Header Data Unit
+    */
     hdu(std::fstream &file, std::streampos pos)
     {
         read_header(file, pos);
     }
 
-    //!Starts reading the header from current streampos of file
+    /**
+     * @brief       Reads the header information of a Header Data Unit ( HDU  )
+     * @details     This method takes a stream as argument and reads the header
+     *              information ( cards of 80byte each )of an HDU from the current position
+     *              until the card with <strong>END</strong> keyword is encountered
+     * @param[in,out] file filestream set to open mode for reading
+     * @note        As a side effect the file pointer gets set to the end of HDU
+     * @throws      fits_exception() If <strong>bitpix</strong> has an invalid value
+     * @throws      boost::bad_lexical_cast If the conversion of value to the specific type was not successul
+    */
     void read_header(std::fstream &file)
     {
         cards.reserve(36); //reserves the space of atleast 1 HDU unit 
@@ -127,38 +183,62 @@ public:
         }
     }
 
-    //!starts reading file from the position specified
+    /**
+     * @brief      Reads the header information of an HDU from specified position in stream 
+     * @param[in]  pos position from the header should be read
+     * @param[in,out] file filestream set to open mode for reading
+     * @see        read_header(std::fstream &file)
+    */
     void read_header(std::fstream &file, std::streampos pos)
     {
         file.seekg(pos);
         read_header(file);
     }
 
-    //!returns the value of bitpix
+    /**
+     * @brief       Gets the bitpix value associated with the HDU
+     * @return      io::bitpix
+    */
     io::bitpix bitpix() const
     {
         return this->bitpix_value;
     }
 
-    //!returns the value of all naxis (NAXIS, NAXIS1, NAXIS2...)
+    /**
+     * @brief       Gets the value(number of elements) of all dimensions associated with the HDU data
+     * @return      Returns a vector<size_t> containing the number of elements for each  dimension 
+    */
     std::vector<std::size_t> all_naxis() const
     {
         return this->naxis_;
     }
 
-    //!returns the value of particular naxis
+    /**
+     * @brief       Gets the number of elements for a perticular dimension in HDU data
+     * @return      Returns a std::size_t containing the number of elements in a perticular dimension
+    */
     std::size_t naxis(std::size_t n = 0) const
     {
         return this->naxis_[n];
     }
 
-    //!returns the value of perticular key 
+    /**
+     * @brief       Gets the value associated with a perticular keyword
+     * @param[in]   key Keyword whose value is to be queried
+     * @tparam      ReturnType The type in which the value associated with the keyword needs to be obtained
+     * @return      Returns the value associated with keyword in the required type
+     * @throws      boost::bad_lexical_cast If the conversion of value to the specific type was not successul
+    */
     template <typename ReturnType>
     ReturnType value_of(std::string const& key)// const
     {
         return this->cards[key_index.at(key)].value<ReturnType>();
     }
 
+    /**
+     * @brief       Sets the file_pointer/cursor to the end of current HDU unit
+     * @param[out] file filestream whose position needs to be set to current HDU boundary
+    */
     void set_unit_end(std::fstream &file) const
     {
         //set cursor to the end of the HDU unit

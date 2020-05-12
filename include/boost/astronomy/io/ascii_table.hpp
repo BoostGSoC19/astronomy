@@ -25,6 +25,11 @@
 #include <boost/endian/conversion.hpp>
 #include <boost/cstdfloat.hpp>
 
+/**
+ * @file    ascii_table.hpp
+ * @author  Sarthak Singhal
+ * @details
+ */
 
 namespace boost { namespace astronomy {  namespace io {
 

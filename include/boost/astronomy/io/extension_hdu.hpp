@@ -16,6 +16,12 @@
 
 #include <boost/astronomy/io/hdu.hpp>
 
+/**
+ * @file    extension_hdu.hpp
+ * @author  Pranam Lashkari
+ * @details
+ */
+
 namespace boost { namespace astronomy { namespace io {
 
 struct extension_hdu : public boost::astronomy::io::hdu
