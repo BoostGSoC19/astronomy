@@ -23,6 +23,8 @@
 #include <boost/units/systems/si/plane_angle.hpp>
 #include <boost/units/systems/si/dimensionless.hpp>
 
+#include <boost/test/tools/floating_point_comparison.hpp>
+
 #include <boost/astronomy/detail/is_base_template_of.hpp>
 #include <boost/astronomy/coordinate/base_representation.hpp>
 #include <boost/astronomy/coordinate/cartesian_representation.hpp>
@@ -241,6 +243,7 @@ public:
         bg::set<2>(this->point, distance.value());
     }
 
+    //!"+" operator to add any other representations
     template<typename Addend>
     spherical_representation
     <
@@ -270,6 +273,29 @@ public:
         return result;
     }
 
+    //!"==" operator to compare with other representations
+    template
+    <typename Representation>
+    bool operator ==(Representation const& other) const
+    {
+        auto tempRep1 = make_spherical_representation(other);
+        
+        return 
+        boost::math::fpc::close_at_tolerance<CoordinateType>
+            (boost::math::fpc::percent_tolerance(1e-10),boost::math::fpc::FPC_STRONG)
+            (static_cast<LatQuantity>(tempRep1.get_lat()).value(),
+            this->get_lat().value())
+        &&
+        boost::math::fpc::close_at_tolerance<CoordinateType>
+            (boost::math::fpc::percent_tolerance(1e-10),boost::math::fpc::FPC_STRONG)
+            (static_cast<LonQuantity>(tempRep1.get_lon()).value(),
+            this->get_lon().value())
+        &&
+        boost::math::fpc::close_at_tolerance<CoordinateType>
+            (boost::math::fpc::percent_tolerance(1e-10),boost::math::fpc::FPC_STRONG)
+            (static_cast<DistQuantity>(tempRep1.get_dist()).value(),
+            this->get_dist().value());
+    }
 }; //spherical_representation
 
 

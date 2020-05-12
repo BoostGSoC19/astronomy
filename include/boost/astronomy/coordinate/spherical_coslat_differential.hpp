@@ -25,6 +25,8 @@
 #include <boost/units/systems/si/dimensionless.hpp>
 #include <boost/units/systems/si/plane_angle.hpp>
 
+#include <boost/test/tools/floating_point_comparison.hpp>
+
 #include <boost/astronomy/detail/is_base_template_of.hpp>
 #include <boost/astronomy/coordinate/base_differential.hpp>
 #include <boost/astronomy/coordinate/cartesian_differential.hpp>
@@ -290,6 +292,28 @@ public:
         );
 
         return product;
+    }
+
+    //!"==" operator to compare with other differentials
+    template
+    <typename Differential>
+    bool operator ==(Differential const& other) const
+    {
+        auto tempRep1 = make_spherical_coslat_differential(other);
+        
+        return 
+        boost::math::fpc::close_at_tolerance<CoordinateType>
+            (boost::math::fpc::percent_tolerance(1e-10),boost::math::fpc::FPC_STRONG)
+            (static_cast<LatQuantity>(tempRep1.get_dlat()).value(),this->get_dlat().value())
+        &&
+        boost::math::fpc::close_at_tolerance<CoordinateType>
+            (boost::math::fpc::percent_tolerance(1e-10),boost::math::fpc::FPC_STRONG)
+            (static_cast<LonQuantity>(tempRep1.get_dlon_coslat()).value(),
+            this->get_dlon_coslat().value())
+        &&
+        boost::math::fpc::close_at_tolerance<CoordinateType>
+            (boost::math::fpc::percent_tolerance(1e-10),boost::math::fpc::FPC_STRONG)
+            (static_cast<DistQuantity>(tempRep1.get_ddist()).value(),this->get_ddist().value());
     }
 }; //spherical_coslat_differential
 

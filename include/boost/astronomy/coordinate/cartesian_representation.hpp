@@ -23,6 +23,8 @@
 #include <boost/units/get_dimension.hpp>
 #include <boost/units/systems/si/dimensionless.hpp>
 
+#include <boost/test/tools/floating_point_comparison.hpp>
+
 #include <boost/astronomy/detail/is_base_template_of.hpp>
 #include <boost/astronomy/coordinate/base_representation.hpp>
 
@@ -236,6 +238,29 @@ public:
         >(result);
     }
 
+    //!"==" operator to compare with other representations
+    template
+    <typename Representation>
+    bool operator ==(Representation const& other) const
+    {
+        auto tempRep1 = make_cartesian_representation(other);
+        
+        return 
+        boost::math::fpc::close_at_tolerance<CoordinateType>
+            (boost::math::fpc::percent_tolerance(1e-10),boost::math::fpc::FPC_STRONG)
+            (static_cast<XQuantity>(tempRep1.get_x()).value(),
+            this->get_x().value())
+        &&
+        boost::math::fpc::close_at_tolerance<CoordinateType>
+            (boost::math::fpc::percent_tolerance(1e-10),boost::math::fpc::FPC_STRONG)
+            (static_cast<YQuantity>(tempRep1.get_y()).value(),
+            this->get_y().value())
+        &&
+        boost::math::fpc::close_at_tolerance<CoordinateType>
+            (boost::math::fpc::percent_tolerance(1e-10),boost::math::fpc::FPC_STRONG)
+            (static_cast<ZQuantity>(tempRep1.get_z()).value(),
+            this->get_z().value());
+    }
 }; //cartesian_representation
 
 
