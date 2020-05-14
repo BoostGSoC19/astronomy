@@ -72,9 +72,9 @@ public:
      * @param[in]   str String that contains the key-value-comment data
      * @pre         The string provided as an argument must not be more than 80 characters in length
                     and should follow the FITS standard requirements for ( key,value,comments)
-     * @todo        This constructor also requires some validation features to make things simpler for user
      * @throws      invalid_card_length_exception If the length of string is more than 80 characters
      * @throws      std::bad_alloc If the request of 80bytes of memory allocation fails.
+     * @todo        This constructor also requires some validation features to make things simpler for user
     */
     card(std::string str) : card()
     {

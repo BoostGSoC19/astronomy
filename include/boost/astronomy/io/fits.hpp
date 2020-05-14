@@ -25,7 +25,7 @@
  * @file    fits.hpp
  * @author  Pranam Lashkari
  * @author  Sarthak Singhal
- * @details
+ * @details Contains definition for external FITS API through which the users will interact with FITS data.
  */
 
 namespace boost { namespace astronomy { namespace io {

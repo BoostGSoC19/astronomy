@@ -20,11 +20,15 @@
 /**
  * @file    column_data.hpp
  * @author  Pranam Lashkari
- * @details
+ * @details Contains definition for column_data structure
  */
 
 namespace boost { namespace astronomy { namespace io {
-
+/**
+ * @brief
+ * @details
+ * @tparam
+*/
 template <typename Type>
 struct column_data: public column
 {
@@ -32,11 +36,22 @@ private:
     std::vector<Type> column_data_;
 
 public:
+    /**
+     * @brief
+     * @details
+     * @return
+     * @todo    Ask from sir why this function returns by value 
+    */
     std::vector<Type> get_data() const
     {
         return column_data_;
     }
 
+    /**
+     * @brief
+     * @details
+     * @return
+    */
     std::vector<Type>& get_data()
     {
         return column_data_;
