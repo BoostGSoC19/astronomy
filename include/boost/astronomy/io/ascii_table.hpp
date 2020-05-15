@@ -28,14 +28,30 @@
 /**
  * @file    ascii_table.hpp
  * @author  Sarthak Singhal
- * @details
+ * @details This file contains definition for ascii_table structure 
  */
 
 namespace boost { namespace astronomy {  namespace io {
 
+/**
+ * @brief           Stores the header information and data of ASCII_Table extension HDU
+ * @details         This class provides a set of methods for creating,querying, and manipulation of ASCII_table extension HDU
+ *                  For more information on Ascii_Table extension visit
+ *                  <A href="http://archive.stsci.edu/fits/users_guide/node37.html#SECTION00540000000000000000">ASCII_TABLE</A>
+ * @author          Sarthak Singhal
+*/
+
 struct ascii_table : public table_extension
 {
 public:
+    /**
+     * @brief       Constructs an ascii_table object from the given filestream
+     * @details     This constructor constructs an ASCII_table object by reading the
+     *              header information,data from the filestream and populates the field
+     *              information that can be used for easy access to table data
+     * @param[in,out] file filestream set to open mode for reading
+     * @note        After the reading the file pointer/cursor will be set to the end of logical HDU unit
+    */
     ascii_table(std::fstream &file) : table_extension(file)
     {
         populate_column_data();
@@ -43,6 +59,14 @@ public:
         set_unit_end(file);
     }
 
+    /**
+     * @brief       Constructs an ascii_table object from the given filestream and hdu object
+     * @details     Constructs an  ascii_table object by reading the data from filestream
+     *              and header information from hdu object passed as an argument
+     * @param[in,out] file filestream set to open mode for reading
+     * @param[in]   other hdu object containing the header information of the current extension HDU
+     * @note        After the reading the file pointer/cursor will be set to the end of logical HDU unit
+    */
     ascii_table(std::fstream &file, hdu const& other) : table_extension(file, other)
     {
         populate_column_data();
@@ -50,6 +74,14 @@ public:
         set_unit_end(file);
     }
 
+    /**
+     * @brief       Constructs an ascii_table object from the given position in filestream
+     * @details     Constructs an ascii_table object by reading the HDU information from the
+     *              given  filestream, starting at pos
+     * @param[in,out] file filestream set to open mode for reading
+     * @param[in] pos File Pointer/cursor position from where the header information is to be read
+     * @note        After the reading the file pointer/cursor will be set to the end of logical HDU unit
+    */
     ascii_table(std::fstream &file, std::streampos pos) : table_extension(file, pos)
     {
         populate_column_data();
@@ -57,6 +89,11 @@ public:
         set_unit_end(file);
     }
 
+    /**
+     * @brief    Populates the metadata information for all fields of ASCII_Table extension
+     * @details  This method populates the metadata information for all fields in a table
+     *           for easy access to the data of ASCII table extention extension
+    */
     void populate_column_data()
     {
         for (std::size_t i = 0; i < this->tfields; i++)
@@ -105,12 +142,25 @@ public:
         }
     }
 
+    /**
+     * @brief       Reads the data associated with ASCII_Table extension HDU from the filestream
+     * @param[in,out] file filestream set to open mode for reading
+     * @note        After the reading the file pointer/cursor will be set to the end of logical HDU unit
+    */
     void read_data(std::fstream &file)
     {
         file.read(&data[0], naxis(1)*naxis(2));
         set_unit_end(file);
     }
 
+    /**
+     * @brief       Gets the metadata along with value(field_value) for every row of specified field
+     * @details     This methods takes a field name as argument and returns the metadata information
+     *              of the field along with the field value for all the rows in the table.
+     * @param[in]   name Name of the field
+     * @return      Returns the metadata along with value for every row of specified field
+     * @todo        From what i feel so far this function provides returns empty column
+    */
     std::unique_ptr<column> get_column(std::string name) const
     {
         for (auto col : col_metadata)
@@ -186,6 +236,11 @@ public:
         std::unique_ptr<column>(nullptr);
     }
 
+    /**
+     * @brief     Returns the field width based on the specified format  
+     * @param[in] format Field format
+     * @return    Returns the width of the field 
+    */
     std::size_t column_size(std::string format) const
     {
         std::string form = boost::trim_copy_if(format, [](char c) -> bool {
@@ -204,6 +259,11 @@ public:
         return boost::lexical_cast<std::size_t>(form.substr(1, decimal - 1));
     }
 
+    /**
+     * @brief       Gets the type of value stored in field based on the format specified
+     * @param[in]   format  Format of field
+     * @return      Type of value stored
+    */
     char get_type(std::string format) const
     {
         std::string form = boost::trim_copy_if(format, [](char c) -> bool {
@@ -214,6 +274,15 @@ public:
     }
 
 private:
+
+    /**
+     * @brief         Populates the container of given type with field_value for every row of specified field
+     * @param[in,out] column_container Container that stores the field value for every row of specified field
+     * @param[in]     start Position where column begins for the field
+     * @param[in]     column_size Total size of the field
+     * @param[in]     lambda Lambda function for fetching the field data from data buffer 
+     * @todo        Why is column size present there
+    */
     template<typename VectorType, typename Lambda>
     void fill_column 
     (
