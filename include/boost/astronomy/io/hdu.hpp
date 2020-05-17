@@ -245,6 +245,10 @@ public:
         file.seekg((file.tellg() + (2880 - (file.tellg() % 2880))));    
     }
 
+    /**
+     * @brief       Virtual destructor allowing hdu to be a polymorphic base for derived classes
+    */
+    virtual ~hdu() {}
     virtual std::unique_ptr<column> get_column(std::string name) const
     {
         throw wrong_extension_type();
