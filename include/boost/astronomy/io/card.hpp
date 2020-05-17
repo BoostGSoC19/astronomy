@@ -97,7 +97,6 @@ public:
      * @throws      invalid_key_length_exception If keyword length > 8
      * @throws      invalid_value_length_exception If value+comment length >68 or  value length >70 ( No comments)
      * @throws      std::bad_alloc If the request of 80bytes of memory allocation fails.
-     * @todo        Replace comment.length() >0 with !comment.empty and comment.length() with comment.empty()    
     */
     card
     (
@@ -106,38 +105,13 @@ public:
         std::string const& comment = ""
     )
     {
-        if (key.length() > 8)
-        {
-            throw invalid_key_length_exception();
-        }
-        if ((comment.length() > 0) && (value.length() + comment.length() > 68))
-        {
-            throw invalid_value_length_exception();
-        }
-        else if (value.length() > 70)
-        {
-            throw invalid_value_length_exception();
-        }
-
-        if (comment.length())
-        {
-            this->card_ = std::string(key).append(8 - key.length(), ' ') +
-                "= " + value + " /" + comment +
-                std::string("").append(68 - value.length() + comment.length(), ' ');
-        }
-        else
-        {
-            this->card_ = std::string(key).append(8 - key.length(), ' ') + "= " +
-                std::string(value).append(70 - key.length(), ' ');
-        }
+        create_card(key, value, comment);
     }
 
     
     /**
      * @brief Constructs a card from key,value,comment(optional) supplied as the argument to the function
      * @see   card (std::string const& key,std::string const& value,std::string const& comment = "")
-     * @todo  Refactor the code by implementing move assignment operator
-              and call the constructor above and assign the value to *this
     */
     void create_card
     (
@@ -150,7 +124,7 @@ public:
         {
             throw invalid_key_length_exception();
         }
-        if ((comment.length() > 0) && (value.length() + comment.length() > 68))
+        if (!comment.empty() && (value.length() + comment.length() > 68))
         {
             throw invalid_value_length_exception();
         }
@@ -159,7 +133,7 @@ public:
             throw invalid_value_length_exception();
         }
 
-        if (comment.length())
+        if (!comment.empty())
         {
             this->card_ = std::string(key).append(8 - key.length(), ' ') +
                 "= " + value + " /" + comment +
@@ -176,18 +150,17 @@ public:
      * @brief    Creates/Initializes the card object with a boolean value               
      * @see      create_card(std::string const& key,std::string const& value,std::string const& comment = "")
      *           for more information on exception specification
-     * @todo     I think string.insert has been passed with wrong arguments
     */
     void create_card(std::string const& key, bool value, std::string const& comment = "")
     {
         //Feels ambigious
         if (value)
         {
-            create_card(key, std::string("T").insert(0, ' ', 19), comment);
+            create_card(key, std::string("T").insert(0, 30, ' '), comment);
         }
         else
         {
-            create_card(key, std::string("F").insert(0, ' ', 19), comment);
+            create_card(key, std::string("F").insert(0, 30, ' '), comment);
         }
     }
 
@@ -199,17 +172,12 @@ public:
      * @param[in]   comment Optional comment that describes the content of card
      * @see         create_card(std::string const& key,std::string const& value,std::string const& comment = "")
      *              for more information on exception specification
-     * @todo        std::tostring is 4 times faster than ostringstream. Please use that
      
     */
     template <typename Value>
     void create_card(std::string const& key, Value value, std::string const& comment = "")
     {
-        //TODO: Very heavy operation. Use an alternative after benchmarking
-        std::ostringstream stream;
-        stream << value;
-
-        std::string val = stream.str();
+        std::string val = std::to_string(value);
         val.insert(0, ' ', 20 - val.length());
         create_card(key, val, comment);
     }
@@ -223,7 +191,6 @@ public:
      * @param[in]   real Real part of complex number
      * @param[in]   imaginary Imaginary part of complex number
      * @param[in]   comment Represents an optional comment that describes the FITS card
-     * @todo        std::tostring is 4 times faster than std::ostringstream. Kindly prefer that
      * @see         create_card(std::string const& key,std::string const& value,std::string const& comment = "")
      *              for more information on exception specification
     */
@@ -237,11 +204,7 @@ public:
         std::string const& comment = ""
     )
     {
-        //TODO : Very heavy operation. Use an alternative after benchmarking
-        std::ostringstream stream;
-        stream << real << ", " << imaginary;
-
-        std::string value = "(" + stream.str() + ")";
+       std::string value = "(" + std::to_string(real)+','+std::to_string(imaginary) + ")";
 
         create_card(key, value, comment);
     }
