@@ -51,10 +51,11 @@ public:
     */
     binary_table_extension(std::fstream &file) : table_extension(file)
     {
-        populate_column_data();
-        std::copy_n(std::istream_iterator<char>(file), naxis(1)*naxis(2), std::back_inserter(data));
+        set_binary_table_info(file);
         set_unit_end(file);
     }
+
+    
 
     /**
      * @brief       Constructs an binary_table_extension object from the given filestream and hdu object
@@ -66,8 +67,7 @@ public:
     */
     binary_table_extension(std::fstream &file, hdu const& other) : table_extension(file, other)
     {
-        populate_column_data();
-        std::copy_n(std::istream_iterator<char>(file), naxis(1)*naxis(2), std::back_inserter(data));
+        set_binary_table_info(file);
         set_unit_end(file);
     }
 
@@ -81,8 +81,7 @@ public:
     */
     binary_table_extension(std::fstream &file, std::streampos pos) : table_extension(file, pos)
     {
-        populate_column_data();
-        std::copy_n(std::istream_iterator<char>(file), naxis(1)*naxis(2), std::back_inserter(data));
+        set_binary_table_info(file);
         set_unit_end(file);
     }
 
@@ -661,6 +660,14 @@ private:
             column_container.emplace_back(lambda(this->data.data() + (i * naxis(1) + start)));
         }
     }
+private:
+    void set_binary_table_info(std::fstream& file)
+    {
+        populate_column_data();
+        std::copy_n(std::istream_iterator<char>(file), naxis(1) * naxis(2), std::back_inserter(data));
+
+    }
+
 };
 
 }}} //namespace boost::astronomy::io
