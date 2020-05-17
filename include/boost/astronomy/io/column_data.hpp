@@ -40,9 +40,8 @@ public:
     /**
      * @brief   Returns the collection of current field value for every row in the table
      * @return  A vector<Type> containing the field value for all rows
-     * @todo    Ask from sir why this function returns by value 
     */
-    std::vector<Type> get_data() const
+    const std::vector<Type>& get_data() const
     {
         return column_data_;
     }
