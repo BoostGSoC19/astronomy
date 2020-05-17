@@ -28,7 +28,6 @@ namespace boost { namespace astronomy { namespace io {
  * @brief   Used to store header information of an extension Header Data Unit
  * @details In addition to hdu filling all the header information, this structure is only involved
  *          with setting the value of variables - extname, gcount,pcount
- * @todo    Too much repetitive code for all constructors. Refactor them into a method
  * @see     boost::astronomy::io::hdu
 */
 struct extension_hdu : public boost::astronomy::io::hdu
@@ -53,9 +52,7 @@ public:
     */
     extension_hdu(std::fstream &file) : hdu(file) 
     {
-        gcount = this->value_of<int>("GCOUNT");
-        pcount = this->value_of<int>("PCOUNT");
-        extname = this->value_of<std::string>("EXTNAME");
+        set_extension_info();
     }
 
     /**
@@ -68,9 +65,7 @@ public:
     */
     extension_hdu(std::fstream &file, hdu const& other) : hdu(other)
     {
-        gcount = this->value_of<int>("GCOUNT");
-        pcount = this->value_of<int>("PCOUNT");
-        extname = this->value_of<std::string>("EXTNAME");
+        set_extension_info();
     }
 
     /**
@@ -83,6 +78,13 @@ public:
     */
     extension_hdu(std::fstream &file, std::streampos pos) : hdu(file, pos)
     {
+        set_extension_info();
+    }
+private:
+    /**
+     * @brief       Sets the extension_hdu's info from the header
+    */
+    void set_extension_info() {
         gcount = this->value_of<int>("GCOUNT");
         pcount = this->value_of<int>("PCOUNT");
         extname = this->value_of<std::string>("EXTNAME");
