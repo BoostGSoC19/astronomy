@@ -249,6 +249,11 @@ public:
     {
         dimension = tdim;
     }
+
+    /**
+     * @brief       Allows column to acts as a polymorphic base for other class ( column_data)
+    */
+    virtual ~column() {}
 };
 
 }}}
