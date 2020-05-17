@@ -54,8 +54,7 @@ public:
     */
     ascii_table(std::fstream &file) : table_extension(file)
     {
-        populate_column_data();
-        std::copy_n(std::istream_iterator<char>(file), naxis(1)*naxis(2), std::back_inserter(data));
+        set_ascii_table_info(file);
         set_unit_end(file);
     }
 
@@ -69,8 +68,7 @@ public:
     */
     ascii_table(std::fstream &file, hdu const& other) : table_extension(file, other)
     {
-        populate_column_data();
-        std::copy_n(std::istream_iterator<char>(file), naxis(1)*naxis(2), std::back_inserter(data));
+        set_ascii_table_info(file);
         set_unit_end(file);
     }
 
@@ -84,8 +82,7 @@ public:
     */
     ascii_table(std::fstream &file, std::streampos pos) : table_extension(file, pos)
     {
-        populate_column_data();
-        std::copy_n(std::istream_iterator<char>(file), naxis(1)*naxis(2), std::back_inserter(data));
+        set_ascii_table_info(file);
         set_unit_end(file);
     }
 
@@ -163,7 +160,7 @@ public:
     */
     std::unique_ptr<column> get_column(std::string name) const
     {
-        for (auto col : col_metadata)
+        for (auto& col : col_metadata)
         {
             if (col.TTYPE() == name)
             {
@@ -171,7 +168,7 @@ public:
                 {
                 case 'A':
                 {
-                    auto result = std::make_unique<column_data<char>>();
+                    auto result = std::make_unique<column_data<char>>(col);
                     fill_column(result->get_data(), col.TBCOL(), column_size(col.TFORM()),
                         [](char const* element) -> char {
                             return *element;
@@ -181,7 +178,7 @@ public:
                 }
                 case 'I':
                 {
-                    auto result = std::make_unique<column_data<std::int32_t>>();
+                    auto result = std::make_unique<column_data<std::int32_t>>(col);
                     fill_column(result->get_data(), col.TBCOL(), column_size(col.TFORM()),
                         [](char const* element) -> std::int32_t {
                             return boost::endian::big_to_native(*reinterpret_cast<const std::int32_t*>(element));
@@ -191,7 +188,7 @@ public:
                 }
                 case 'F':
                 {
-                    auto result = std::make_unique<column_data<float>>();
+                    auto result = std::make_unique<column_data<float>>(col);
                     fill_column(result->get_data(), col.TBCOL(), column_size(col.TFORM()),
                         [](char const* element) -> float {
                             float result = (element[3] << 0) | (element[2] << 8) |
@@ -203,7 +200,7 @@ public:
                 }
                 case 'E':
                 {
-                    auto result = std::make_unique<column_data<float>>();
+                    auto result = std::make_unique<column_data<float>>(col);
                     fill_column(result->get_data(), col.TBCOL(), column_size(col.TFORM()),
                         [](char const* element) -> float {
                             float result = (element[3] << 0) | (element[2] << 8) |
@@ -215,7 +212,7 @@ public:
                 }
                 case 'D':
                 {
-                    auto result = std::make_unique<column_data<double>>();
+                    auto result = std::make_unique<column_data<double>>(col);
                     fill_column(result->get_data(), col.TBCOL(), column_size(col.TFORM()),
                         [](char const* element) -> double {
                             double result = (element[7] << 0) | (element[6] << 8) |
@@ -233,7 +230,7 @@ public:
             }
         }
 
-        std::unique_ptr<column>(nullptr);
+        return std::unique_ptr<column>(nullptr);
     }
 
     /**
@@ -281,7 +278,7 @@ private:
      * @param[in]     start Position where column begins for the field
      * @param[in]     column_size Total size of the field
      * @param[in]     lambda Lambda function for fetching the field data from data buffer 
-     * @todo        Why is column size present there
+     * @todo          Why is column size present there
     */
     template<typename VectorType, typename Lambda>
     void fill_column 
@@ -298,6 +295,18 @@ private:
             column_container.emplace_back(lambda(this->data.data() + (i * naxis(1) + start)));
         }
     }
+
+private:
+    /**
+     * @brief  Initializes the current object with  column metadata and table data
+    */
+    void set_ascii_table_info(std::fstream& file)
+    {
+        populate_column_data();
+        std::copy_n(std::istream_iterator<char>(file), naxis(1) * naxis(2), std::back_inserter(data));
+        
+    }
+
 
 };
 

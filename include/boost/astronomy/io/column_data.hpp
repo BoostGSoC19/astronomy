@@ -37,6 +37,23 @@ private:
     std::vector<Type> column_data_;
 
 public:
+
+    /**
+     * @brief   Creates a standalone object of column_data
+    */
+    column_data() {}
+    /**
+     * @brief   Copy Constructor for  initializing column metadata and column_data
+     * @param   other column_data object from where the metadata and column data are copied 
+    */
+    column_data(const column_data& other) : column(other), column_data_(other.column_data_) {}
+
+    /**
+     * @brief  Creates a column_data object by copying column metadata from the given argument
+     * @param  other column object that contains column metadata
+    */
+    column_data(const column& other) : column(other) {}
+
     /**
      * @brief   Returns the collection of current field value for every row in the table
      * @return  A vector<Type> containing the field value for all rows
