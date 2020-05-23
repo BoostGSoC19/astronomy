@@ -153,14 +153,13 @@ public:
     */
     void create_card(std::string const& key, bool value, std::string const& comment = "")
     {
-        //Feels ambigious
         if (value)
         {
-            create_card(key, std::string("T").insert(0, 30, ' '), comment);
+            create_card(key, std::string("T").insert(0, 19, ' '), comment);
         }
         else
         {
-            create_card(key, std::string("F").insert(0, 30, ' '), comment);
+            create_card(key, std::string("F").insert(0, 19, ' '), comment);
         }
     }
 
