@@ -1,12 +1,10 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2019 Sarthak Singhal <singhalsarthak2007@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
-
 
 #ifndef BOOST_ASTRONOMY_COORDINATE_BASE_DIFFERENTIAL_HPP
 #define BOOST_ASTRONOMY_COORDINATE_BASE_DIFFERENTIAL_HPP
@@ -28,7 +26,7 @@ typedef bg::degree degree;
 typedef bg::radian radian;
 
 
-//! structure which is the base for all the representation 
+//! structure which is the base for all the representation
 template
 <
     std::size_t DimensionCount,
@@ -64,9 +62,9 @@ public:
 
         bg::model::point<CoordinateType, 3, bg::cs::cartesian> tempPoint;
         double mag = this->magnitude(); //magnitude of vector stored in current object
-        
+
         //converting coordinate/vector into cartesian
-        bg::transform(this->diff, tempPoint); 
+        bg::transform(this->diff, tempPoint);
 
         //performing calculations to find unit vector
         bg::set<0>(tempPoint, (bg::get<0>(tempPoint) / mag));
@@ -91,7 +89,7 @@ public:
             break;
         case 3:
             result += std::pow(bg::get<0>(tempPoint), 2);
-            result += std::pow(bg::get<1>(tempPoint), 2);  
+            result += std::pow(bg::get<1>(tempPoint), 2);
             result += std::pow(bg::get<2>(tempPoint), 2);
             break;
         default:

@@ -1,11 +1,9 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
-=============================================================================*/
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
 
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+=============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_IO_CARD_HPP
 #define BOOST_ASTRONOMY_IO_CARD_HPP
@@ -29,7 +27,7 @@
 namespace boost { namespace astronomy { namespace io {
 
 /**
- * @brief   Represents the concept of <strong>card</strong> associated with the FITS standard. 
+ * @brief   Represents the concept of <strong>card</strong> associated with the FITS standard.
  * @details This structure provides functions for storage, manipulation and access of FITS cards.
  * @author  Pranam Lashkari
  */
@@ -64,7 +62,7 @@ public:
         this->card_.assign(c, 80);
     }
 
-    
+
     /**
      * @brief       Takes a string as argument and creates a card object based on that string.
      * @details     This function accepts a string as an argument and stores it internally provided
@@ -108,7 +106,7 @@ public:
         create_card(key, value, comment);
     }
 
-    
+
     /**
      * @brief Constructs a card from key,value,comment(optional) supplied as the argument to the function
      * @see   card (std::string const& key,std::string const& value,std::string const& comment = "")
@@ -147,7 +145,7 @@ public:
     }
 
     /**
-     * @brief    Creates/Initializes the card object with a boolean value               
+     * @brief    Creates/Initializes the card object with a boolean value
      * @see      create_card(std::string const& key,std::string const& value,std::string const& comment = "")
      *           for more information on exception specification
     */
@@ -171,7 +169,6 @@ public:
      * @param[in]   comment Optional comment that describes the content of card
      * @see         create_card(std::string const& key,std::string const& value,std::string const& comment = "")
      *              for more information on exception specification
-     
     */
     template <typename Value>
     void create_card(std::string const& key, Value value, std::string const& comment = "")
@@ -181,7 +178,7 @@ public:
         create_card(key, val, comment);
     }
 
-   
+
     /**
      * @brief       Creates/Initializes the card object with a complex value
      * @tparam      Real Any Numeric type representing <strong>real</strong> part of complex number
@@ -221,7 +218,7 @@ public:
     */
     void create_commentary_card(std::string const& key, std::string const& value)
     {
-        
+
         if (key.length() > 8)
         {
             throw invalid_key_length_exception();
@@ -310,7 +307,7 @@ private:
 
     /**
      * @brief   Returns the value associated with the card in logical type
-     * @return  boolean value 
+     * @return  boolean value
     */
     bool value_imp(boost::type<bool>) const
     {

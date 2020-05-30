@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2019-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Copyright 2019 Pranam Lashkari <plashkari628@gmail.com>
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_IO_COLUMN_DATA_HPP
@@ -65,7 +64,7 @@ public:
 
     /**
      * @brief   Returns the collection of current field value for every row in the table
-     * @return  A vector<Type> containing the field value for all rows  
+     * @return  A vector<Type> containing the field value for all rows
     */
     std::vector<Type>& get_data()
     {

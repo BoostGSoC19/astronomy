@@ -1,10 +1,9 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2019 Sarthak Singhal <singhalsarthak2007@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_COORDINATE_SKY_POINT_HPP
@@ -34,14 +33,14 @@ struct sky_point
             <boost::astronomy::coordinate::base_frame, CoordinateSystem>::value),
             "Template argument is expected to be a frame class");
     ///@endcond
-    
+
 protected:
     CoordinateSystem point;
 
 public:
     typedef CoordinateSystem system;
-    
-    //constructors  
+
+    //constructors
 
     //!default constructor
     sky_point() {}
@@ -105,7 +104,7 @@ public:
     sky_point<CoordinateSystem> from_name(std::string const& name);
 
     //!angular separation between two coordinates in radians
-    bu::quantity<bu::si::plane_angle> separation(sky_point<CoordinateSystem> const& 
+    bu::quantity<bu::si::plane_angle> separation(sky_point<CoordinateSystem> const&
         object) const
     {
         return this->point.get_angular_separation(object.get_point());
@@ -129,7 +128,7 @@ public:
 
         double coslat = std::cos(temp_p2);
 
-        double x = std::sin(temp_p2) * std::cos(temp_p1) - 
+        double x = std::sin(temp_p2) * std::cos(temp_p1) -
             coslat * std::sin(temp_p1) * std::cos(temp_diff);
         double y = std::sin(temp_diff) * coslat;
 

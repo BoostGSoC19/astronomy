@@ -1,10 +1,10 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2019 Sarthak Singhal <singhalsarthak2007@gmail.com>
+Copyright 2020 Rohit Ranjan    <rohitrjn629@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_COORDINATE_CARTESIAN_DIFFERENTIAL_HPP
@@ -193,7 +193,7 @@ public:
         XQuantity,
         YQuantity,
         ZQuantity
-    > 
+    >
     operator +(Addend const& addend) const
     {
         bg::model::point

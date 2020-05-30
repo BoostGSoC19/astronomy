@@ -1,10 +1,10 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2019 Sarthak Singhal <singhalsarthak2007@gmail.com>
+Copyright 2020 Rohit Ranjan    <rohitrjn629@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_COORDINATE_SPHERICAL_REPRESENTATION_HPP
@@ -155,7 +155,7 @@ public:
             3,
             bg::cs::spherical<radian>
         > tempPoint;
-        
+
         bg::set<0>(tempPoint,
             static_cast<
             bu::quantity<bu::si::plane_angle, CoordinateType>
@@ -248,7 +248,7 @@ public:
         LatQuantity,
         LonQuantity,
         DistQuantity
-    > 
+    >
     operator +(Addend const& addend) const
     {
 
@@ -307,7 +307,7 @@ spherical_representation
         >(lat, lon, dist);
 }
 
-//!Convert current quantities of spherical_representation to new quantities. 
+//!Convert current quantities of spherical_representation to new quantities.
 template
 <
     typename ReturnCoordinateType,
@@ -375,7 +375,7 @@ make_spherical_representation
 
 //!Create spherical_representation from boost::geometry::point
 //!Quantity types are to be specifed explicitly or angle is considered to be in radians
-//!distance is taken dimensionless by default if not specified 
+//!distance is taken dimensionless by default if not specified
 template
 <
     typename CoordinateType=double,

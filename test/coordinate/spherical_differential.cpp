@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
+Copyright 2019 Sarthak Singhal <singhalsarthak2007@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #define BOOST_TEST_MODULE spherical_differential_test
@@ -152,10 +151,10 @@ BOOST_AUTO_TEST_CASE(spherical_differential_geometry_point_constructor)
     BOOST_TEST((std::is_same<decltype(motion2.get_dlat()), quantity<bud::plane_angle>>::value));
     BOOST_TEST((std::is_same<decltype(motion2.get_dlon()), quantity<bud::plane_angle>>::value));
     BOOST_TEST((std::is_same<decltype(motion2.get_ddist()), quantity<si::velocity>>::value));
-} 
-    
+}
+
 BOOST_AUTO_TEST_CASE(spherical_differential_conversion_from_cartesian_differential)
-{   
+{
     //constructing from spherical differential
     auto cartesian_motion = make_cartesian_differential(20.0 * meters/seconds,
         60.0 * meters/seconds, 1.0 * meter/seconds);
@@ -171,7 +170,7 @@ BOOST_AUTO_TEST_CASE(spherical_differential_conversion_from_cartesian_differenti
 }
 
 BOOST_AUTO_TEST_CASE(spherical_differential_conversion_from_spherical_equatorial_differential)
-{   
+{
     //constructing from spherical_equitorial differential
     auto spherical_equatorial_motion = make_spherical_equatorial_differential
     (0.523599 * si::radian, 60.0 * bud::degrees, 1.0 * meter/seconds);

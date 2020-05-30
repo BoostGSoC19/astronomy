@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
+Copyright 2019 Sarthak Singhal <singhalsarthak2007@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_IO_ASCII_TABLE_HPP
@@ -28,7 +27,7 @@
 /**
  * @file    ascii_table.hpp
  * @author  Sarthak Singhal
- * @details This file contains definition for ascii_table structure 
+ * @details This file contains definition for ascii_table structure
  */
 
 namespace boost { namespace astronomy {  namespace io {
@@ -234,9 +233,9 @@ public:
     }
 
     /**
-     * @brief     Returns the field width based on the specified format  
+     * @brief     Returns the field width based on the specified format
      * @param[in] format Field format
-     * @return    Returns the width of the field 
+     * @return    Returns the width of the field
     */
     std::size_t column_size(std::string format) const
     {
@@ -245,7 +244,7 @@ public:
                         });
         int decimal = form.length();
         for(int i = 0; i < form.length(); i++)
-        {	
+        {
         	if(form[i] == '.')
         	{
         		decimal = i;
@@ -281,7 +280,7 @@ private:
      * @todo          Why is column size present there
     */
     template<typename VectorType, typename Lambda>
-    void fill_column 
+    void fill_column
     (
         std::vector<VectorType> &column_container,
         std::size_t start,

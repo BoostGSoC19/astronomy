@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2019-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Copyright 2019 Pranam Lashkari <plashkari628@gmail.com>
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_IO_COLUMN_HPP
@@ -175,7 +174,7 @@ public:
      * @details      Returns the floating point number representing the coefficient of the linear term
      *               in the equation <strong>physical_value= TZERO+TSCAL which must be used to compute
      *               the true physical value of field
-     * @return       Scaling coefficient of field 
+     * @return       Scaling coefficient of field
     */
     double TSCAL() const
     {
@@ -196,7 +195,7 @@ public:
 
     /**
      * @details      Gets the floating point number representing
-     *               the true physical value corresponding to a value of zero in current field of the FITS file 
+     *               the true physical value corresponding to a value of zero in current field of the FITS file
      * @return       floating point number representing true physical value corresponding to a value of zero
     */
     double TZERO() const
@@ -206,7 +205,7 @@ public:
 
     /**
      * @details       Gets the floating point number representing
-     *                the true physical value corresponding to a value of zero in current field of the FITS file 
+     *                the true physical value corresponding to a value of zero in current field of the FITS file
      * @param[in]     tzero floating point number representing true physical value corresponding to a value of zero
     */
     void TZERO(double tzero)
@@ -225,7 +224,7 @@ public:
 
     /**
      * @brief       Sets a string describing the format recommended for the display of the contents of current field
-     * @param[in]   tdisp String describing the format recommended for the display of the contents of current field   
+     * @param[in]   tdisp String describing the format recommended for the display of the contents of current field
     */
     void TDISP(std::string tdisp)
     {

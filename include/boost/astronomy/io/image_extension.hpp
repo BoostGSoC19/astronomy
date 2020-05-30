@@ -1,11 +1,9 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
-=============================================================================*/
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
 
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+=============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_IO_IMAGE_EXTENSION_HDU_HPP
 #define BOOST_ASTRONOMY_IO_IMAGE_EXTENSION_HDU_HPP
@@ -30,7 +28,7 @@ namespace boost { namespace astronomy { namespace io {
 /**
  * @brief       Stores the header information and data of image_extension
  * @details     For more information on Ascii_Table extension visit
- *              <A href="http://archive.stsci.edu/fits/users_guide/node41.html#SECTION00550000000000000000"> IMAGE_EXTENSION</A> 
+ *              <A href="http://archive.stsci.edu/fits/users_guide/node41.html#SECTION00550000000000000000"> IMAGE_EXTENSION</A>
  * @author      Pranam Lashkari
  * @tparam      DataType Specifies the number of bits that represents a data value in image.
 */
@@ -68,7 +66,7 @@ public:
     }
 
     /**
-     * @brief       Constructs an image_extension by reading information from specified position in filestream 
+     * @brief       Constructs an image_extension by reading information from specified position in filestream
      * @details     Constructs an image_extension object by reading the header information and data from specified
      *              position in filestream
      * @param[in,out] file filestream set to open mode for reading

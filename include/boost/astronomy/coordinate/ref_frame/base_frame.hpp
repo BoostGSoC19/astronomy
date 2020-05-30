@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_COORDINATE_BASE_COORDINATE_SYSTEM_HPP
@@ -72,7 +71,7 @@ public:
         return Differential::quantity3::from_value(bg::get<2>(motion.get_differential()));
     }
 
-    /*!returns differential data in form of boost::geometry::model::point 
+    /*!returns differential data in form of boost::geometry::model::point
     having components (pm_lat, pm_lon, radial_velocity) including cos(lat) component*/
     Differential get_differential() const
     {
@@ -97,7 +96,7 @@ public:
     //ReturnType represent_as() const
     //{
     //    BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
-    //        <boost::astronomy::coordinate::base_representation, ReturnType>::value), 
+    //        <boost::astronomy::coordinate::base_representation, ReturnType>::value),
     //        "return type is expected to be a representation class");
 
     //    return ReturnType(data);
@@ -107,11 +106,11 @@ public:
     bu::quantity<bu::si::plane_angle> get_angular_separation(base_frame const& other) const
     {
         return bu::quantity<bu::si::plane_angle>::from_value(
-            std::acos((dot(this->data, other.get_data()) / 
+            std::acos((dot(this->data, other.get_data()) /
                 (magnitude(this->data) * magnitude(other.get_data()))).value())
         );
     }
-                
+
 };
 }}} //namespace boost::astronomy::coordinate
 #endif  // !BOOST_ASTRONOMY_COORDINATE_BASE_COORDINATE_SYSTEM_HPP

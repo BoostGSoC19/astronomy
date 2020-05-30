@@ -1,10 +1,10 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2019 Sarthak Singhal <singhalsarthak2007@gmail.com>
+Copyright 2020 Rohit Ranjan    <rohitrjn629@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_COORDINATE_SPHERICAL_DIFFERENTIAL_HPP
@@ -36,12 +36,12 @@ namespace bg = boost::geometry;
 //!Represents the differential in spherical representation
 //!Uses three components to represent a differential (dlatitude, dlongitude, ddistance)
 
-template 
+template
 <
     typename CoordinateType = double,
     typename LatQuantity = bu::quantity<bu::si::plane_angle, CoordinateType>,
     typename LonQuantity = bu::quantity<bu::si::plane_angle, CoordinateType>,
-    typename DistQuantity = bu::quantity<bu::si::dimensionless, CoordinateType>    
+    typename DistQuantity = bu::quantity<bu::si::dimensionless, CoordinateType>
 >
 struct spherical_differential : public base_differential
     <3, bg::cs::spherical<radian>, CoordinateType>
@@ -138,7 +138,7 @@ public:
             3,
             bg::cs::spherical<radian>
         > tempPoint;
-        
+
         bg::set<0>(tempPoint,
             static_cast<
             bu::quantity<bu::si::plane_angle, CoordinateType>
@@ -235,7 +235,7 @@ public:
         LatQuantity,
         LonQuantity,
         DistQuantity
-    > 
+    >
     operator +(Addend const& addend) const
     {
         auto cartesian1 = make_cartesian_differential
@@ -433,7 +433,7 @@ make_spherical_differential
 }
 
 //!constructs object from any type of differential
-template 
+template
 <
     typename OtherDifferential
 >
@@ -441,7 +441,7 @@ auto make_spherical_differential
 (
     OtherDifferential const& other
 )
-{   
+{
     auto temp = make_cartesian_differential(other);
     typedef decltype(temp) cartesian_type;
 

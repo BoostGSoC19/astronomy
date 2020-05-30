@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_COORDINATE_ALT_AZ_HPP
@@ -303,7 +302,7 @@ public:
     }
 
     //!get all the perameters of current frame object
-    std::tuple<                
+    std::tuple<
         spherical_equatorial_representation
         <
             double,
@@ -375,13 +374,13 @@ public:
         this->temperature = temperature;
     }
 
-    //!get observation time 
+    //!get observation time
     boost::posix_time::ptime get_obs_time() const
     {
         return this->obs_time;
     }
 
-    //!set observation time 
+    //!set observation time
     void set_obs_time(boost::posix_time::ptime const& time)
     {
         this->obs_time = time;
