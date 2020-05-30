@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_COORDINATE_SUPERGALACTIC_HPP
@@ -72,7 +71,7 @@ public:
 
     //!creates coordinate with motion from given values
     //!sgb -> latitude, sgl -> longitude
-    //!pm_sgb -> proper motion in sgb, pm_sgl_cossgb -> proper motion in sgl including cos(sgb) 
+    //!pm_sgb -> proper motion in sgb, pm_sgl_cossgb -> proper motion in sgl including cos(sgb)
     supergalactic
     (
         typename Representation::quantity1 const& sgb,
@@ -214,7 +213,7 @@ public:
         this->data.set_dist(distance);
     }
 
-    //!sets value of all component of the coordinate 
+    //!sets value of all component of the coordinate
     void set_sgb_sgl_dist
     (
         typename Representation::quantity1 const& sgb,

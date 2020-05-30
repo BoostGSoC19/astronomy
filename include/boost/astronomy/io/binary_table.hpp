@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2019-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Copyright 2019 Pranam Lashkari <plashkari628@gmail.com>
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_IO_BINARY_TABLE_HPP
@@ -27,7 +26,7 @@
 /**
  * @file    binary_table.hpp
  * @author  Pranam Lashkari
- * @details This file contains definition for binary_table_extension structure 
+ * @details This file contains definition for binary_table_extension structure
  */
 
 namespace boost { namespace astronomy { namespace io {
@@ -367,7 +366,7 @@ public:
                         fill_column(result->get_data(), col.TBCOL(), column_size(col.TFORM()),
                             [num_of_element](char const* element) -> std::vector<std::uint8_t> {
                                 return std::vector<std::uint8_t>(
-                                    reinterpret_cast<const std::uint8_t*>(element), 
+                                    reinterpret_cast<const std::uint8_t*>(element),
                                     reinterpret_cast<const std::uint8_t*>(element)+ num_of_element
                                     );
                             }
@@ -430,14 +429,14 @@ public:
                         fill_column(result->get_data(), col.TBCOL(), column_size(col.TFORM()),
                             [num_of_element](char const* element) -> std::vector<float> {
                                 std::vector<float> values(
-                                    reinterpret_cast<const float*>(element), 
+                                    reinterpret_cast<const float*>(element),
                                     reinterpret_cast<const float*>(element) + num_of_element
                                 );
 
                                 std::transform(
-                                    values.begin(), 
-                                    values.end(), 
-                                    values.begin(), 
+                                    values.begin(),
+                                    values.end(),
+                                    values.begin(),
                                     [](float var) -> float{
                                         char *native = reinterpret_cast<char*>(&var);
                                         return (native[3] << 0) | (native[2] << 8) |
@@ -454,14 +453,14 @@ public:
                         fill_column(result->get_data(), col.TBCOL(), column_size(col.TFORM()),
                             [num_of_element](char const* element) -> std::vector<double> {
                                 std::vector<double> values(
-                                    reinterpret_cast<const double*>(element), 
+                                    reinterpret_cast<const double*>(element),
                                     reinterpret_cast<const double*>(element) + num_of_element
                                 );
 
                                 std::transform(
-                                    values.begin(), 
-                                    values.end(), 
-                                    values.begin(), 
+                                    values.begin(),
+                                    values.end(),
+                                    values.begin(),
                                     [](double var) -> float{
                                         char *native = reinterpret_cast<char*>(&var);
                                         return (native[7] << 0) | (native[6] << 8) |
@@ -486,7 +485,7 @@ public:
                                     char const* char_ptr = reinterpret_cast<const char*>(i);
                                     float real = (char_ptr[3] << 0) | (char_ptr[2] << 8) |
                                                 (char_ptr[1] << 16) | (char_ptr[0] << 24);
-                                    
+
                                     char_ptr += 4;
                                     float img = (char_ptr[3] << 0) | (char_ptr[2] << 8) |
                                                 (char_ptr[1] << 16) | (char_ptr[0] << 24);
@@ -510,7 +509,7 @@ public:
                                     char const* char_ptr = reinterpret_cast<const char*>(i);
                                     double real = (char_ptr[3] << 0) | (char_ptr[2] << 8) |
                                                 (char_ptr[1] << 16) | (char_ptr[0] << 24);
-                                    
+
                                     char_ptr += 4;
                                     double img = (char_ptr[3] << 0) | (char_ptr[2] << 8) |
                                                 (char_ptr[1] << 16) | (char_ptr[0] << 24);
@@ -647,7 +646,7 @@ private:
      * @todo        Why is column size present there
     */
     template<typename VectorType, typename Lambda>
-    void fill_column 
+    void fill_column
     (
         std::vector<VectorType> &column_container,
         std::size_t start,

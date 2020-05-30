@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_IO_HDU_HPP
@@ -35,7 +34,7 @@ namespace boost { namespace astronomy { namespace io {
 struct column;
 
 /**
- * @brief   Used to store Header Related Information of FITS HDU ( Header Data Unit ) 
+ * @brief   Used to store Header Related Information of FITS HDU ( Header Data Unit )
  * @details This structure also provides additional methods for querying some of the common but important keyword values
  *          along with a general function ( value_of ) for querying the value associated with any  keyword in an HDU
  * @author  Pranam Lashkari
@@ -54,7 +53,7 @@ protected:
     std::vector<card> cards;
 
     //! stores the card-key index (used for faster searching)
-    std::unordered_map<std::string, std::size_t> key_index; 
+    std::unordered_map<std::string, std::size_t> key_index;
 
 public:
 
@@ -127,7 +126,7 @@ public:
     */
     void read_header(std::fstream &file)
     {
-        cards.reserve(36); //reserves the space of atleast 1 HDU unit 
+        cards.reserve(36); //reserves the space of atleast 1 HDU unit
         char _80_char_from_file[80]; //used as buffer to read a card consisting of 80 char
 
         //reading file card by card until END card is found
@@ -149,7 +148,7 @@ public:
         set_unit_end(file);    //set cursor to the end of the HDU unit
 
         //finding and storing bitpix value
-                    
+
         switch (cards[key_index["BITPIX"]].value<int>())
         {
         case 8:
@@ -171,11 +170,11 @@ public:
             throw fits_exception();
             break;
         }
-                    
+
         //setting naxis values
         naxis_.emplace_back(cards[key_index["NAXIS"]].value<std::size_t>());
         naxis_.reserve(naxis_[0]);
-                    
+
         for (std::size_t i = 1; i <= naxis_[0]; i++)
         {
             naxis_.emplace_back(cards[key_index["NAXIS" +
@@ -184,7 +183,7 @@ public:
     }
 
     /**
-     * @brief      Reads the header information of an HDU from specified position in stream 
+     * @brief      Reads the header information of an HDU from specified position in stream
      * @param[in]  pos position from the header should be read
      * @param[in,out] file filestream set to open mode for reading
      * @see        read_header(std::fstream &file)
@@ -206,7 +205,7 @@ public:
 
     /**
      * @brief       Gets the value(number of elements) of all dimensions associated with the HDU data
-     * @return      Returns a vector<size_t> containing the number of elements for each  dimension 
+     * @return      Returns a vector<size_t> containing the number of elements for each  dimension
     */
     std::vector<std::size_t> all_naxis() const
     {
@@ -242,7 +241,7 @@ public:
     void set_unit_end(std::fstream &file) const
     {
         //set cursor to the end of the HDU unit
-        file.seekg((file.tellg() + (2880 - (file.tellg() % 2880))));    
+        file.seekg((file.tellg() + (2880 - (file.tellg() % 2880))));
     }
 
     virtual std::unique_ptr<column> get_column(std::string name) const

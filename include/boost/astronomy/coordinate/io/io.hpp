@@ -1,10 +1,8 @@
-
 /*=============================================================================
-  
-  Copyright 2019-2020 Nitin Konidala  < nitink25 - konidalanitin@gmail.com >
+Copyright 2020 Nitin Konidala  <konidalanitin@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_COORDINATE_IO_HPP
@@ -34,9 +32,9 @@ template
 std::ostream& operator<< (std::ostream &out, cartesian_representation
 	<CoordinateType, XQuantity, YQuantity, ZQuantity> const& point)
 {
-    out << "Cartesian Representation ( " 
-    	<< point.get_x() << " , " 
-        << point.get_y() << " , " 
+    out << "Cartesian Representation ( "
+    	<< point.get_x() << " , "
+        << point.get_y() << " , "
         << point.get_z() << " )";
 
     return out;
@@ -53,9 +51,9 @@ template
 std::ostream& operator<< (std::ostream &out, spherical_equatorial_representation
 	<CoordinateType, LatQuantity, LonQuantity, DistQuantity> const& point)
 {
-    out << "Spherical Equatorial Representation ( " 
-    	<< point.get_lat() << " , " 
-        << point.get_lon() << " , " 
+    out << "Spherical Equatorial Representation ( "
+    	<< point.get_lat() << " , "
+        << point.get_lon() << " , "
         << point.get_dist() << " )";
 
     return out;
@@ -72,9 +70,9 @@ template
 std::ostream& operator<< (std::ostream &out, spherical_representation
 	<CoordinateType, LatQuantity, LonQuantity, DistQuantity> const& point)
 {
-    out << "Spherical Representation ( " 
-    	<< point.get_lat() << " , " 
-        << point.get_lon() << " , " 
+    out << "Spherical Representation ( "
+    	<< point.get_lat() << " , "
+        << point.get_lon() << " , "
         << point.get_dist() << " )";
 
     return out;

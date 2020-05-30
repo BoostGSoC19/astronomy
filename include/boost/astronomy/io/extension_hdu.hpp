@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_IO_EXTENSION_HDU_HPP
@@ -19,7 +18,7 @@
 /**
  * @file    extension_hdu.hpp
  * @author  Pranam Lashkari
- * @details Contains the definition for extension_hdu 
+ * @details Contains the definition for extension_hdu
 */
 
 namespace boost { namespace astronomy { namespace io {
@@ -51,7 +50,7 @@ public:
      * @param[in,out] file filestream set to open mode for reading
      * @note    After the reading the file pointer/cursor will be set to the end of logical HDU unit
     */
-    extension_hdu(std::fstream &file) : hdu(file) 
+    extension_hdu(std::fstream &file) : hdu(file)
     {
         gcount = this->value_of<int>("GCOUNT");
         pcount = this->value_of<int>("PCOUNT");

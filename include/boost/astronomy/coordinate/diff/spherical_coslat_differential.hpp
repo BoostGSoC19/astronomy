@@ -1,10 +1,10 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2019 Sarthak Singhal <singhalsarthak2007@gmail.com>
+Copyright 2020 Rohit Ranjan    <rohitrjn629@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_COORDINATE_SPHERICAL_COSLAT_DIFFERENTIAL_HPP
@@ -141,7 +141,7 @@ public:
             3,
             bg::cs::spherical<radian>
         > tempPoint;
-        
+
         bg::set<0>(tempPoint,
             static_cast<
             bu::quantity<bu::si::plane_angle, CoordinateType>
@@ -267,7 +267,7 @@ public:
     >
     auto operator *(OtherQuantity const& dt) const
     {
-        
+
         spherical_coslat_differential
             <CoordinateType, LatQuantity, LonQuantity, DistQuantity> temp(this->diff);
 
@@ -437,7 +437,7 @@ make_spherical_coslat_differential
 }
 
 //!constructs object from any type of differential
-template 
+template
 <
     typename OtherDifferential
 >
@@ -445,13 +445,13 @@ auto make_spherical_coslat_differential
 (
     OtherDifferential const& other
 )
-{   
+{
     auto temp = make_spherical_differential(other);
     typedef decltype(temp) spherical_type;
 
     temp.set_dlon(temp.get_dlon() * cos(static_cast<bu::quantity
         <bu::si::plane_angle, typename spherical_type::type>>(temp.get_dlat()).value()));
-    
+
     return spherical_coslat_differential
         <
             typename spherical_type::type,

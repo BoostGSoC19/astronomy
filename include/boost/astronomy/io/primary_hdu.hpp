@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_IO_PRIMARY_HDU_HPP
@@ -35,7 +34,7 @@ namespace boost { namespace astronomy { namespace io {
  * @tparam  DataType    Specifies the number of bits that represents a data value in image.
  * @note    For more information on primary_hdu visit
  *          <a href="http://archive.stsci.edu/fits/users_guide/node19.html#SECTION00511000000000000000">Primary_HDU</a>
- * @todo    Consider renaming <strong>DataType</strong> to <strong>FieldSize</strong> 
+ * @todo    Consider renaming <strong>DataType</strong> to <strong>FieldSize</strong>
  */
 template <bitpix DataType>
 struct primary_hdu : public boost::astronomy::io::hdu
@@ -44,7 +43,7 @@ protected:
     bool simple; //!Stores the value of SIMPLE
     bool extend; //!Stores the value of EXTEND
     image<DataType> data; //!stores the image of primary HDU if any
-                
+
 public:
     /**
      * @brief   Default Constructor used to create a standalone object of primary_hdu
@@ -118,7 +117,7 @@ public:
         set_unit_end(file);    //set cursor to the end of the HDU unit
     }
 
-    
+
     /**
      * @brief   Gets the image data associated with the primary HDU
      * @see     image.hpp

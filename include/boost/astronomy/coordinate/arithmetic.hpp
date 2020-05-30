@@ -1,13 +1,12 @@
-
 /*=============================================================================
-  Copyright 2019-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
-  Copyright 2020-2020 Nitin Konidala  < nitink25 - konidalanitin@gmail.com >
+Copyright 2019 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2019 Sarthak Singhal <singhalsarthak2007@gmail.com>
+Copyright 2020 Nitin K         <konidalanitin@gmail.com>
+Copyright 2020 Rohit Ranjan    <rohitrjn629@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
-
 
 #ifndef BOOST_ASTRONOMY_COORDINATE_ARITHMETIC_HPP
 #define BOOST_ASTRONOMY_COORDINATE_ARITHMETIC_HPP
@@ -49,7 +48,7 @@ auto cross
     cartesian coordinate system then cross product of both cartesian
     vectors is converted into cartesian system type and returned*/
 
-    /*checking types if it is not subclass of   
+    /*checking types if it is not subclass of
     base_representaion then compile time erorr is generated*/
     //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
     //    <
@@ -87,11 +86,11 @@ auto cross
 
     typedef decltype(cartesian1) cartesian1_type;
     typedef decltype(cartesian2) cartesian2_type;
-    
+
 
     bg::transform(representation1.get_point(), tempPoint1);
     bg::transform(representation2.get_point(), tempPoint2);
-    
+
 
     bg::set<0>(result, (bg::get<1>(tempPoint1)*bg::get<2>(tempPoint2)) -
         ((bg::get<2>(tempPoint1)*
@@ -118,7 +117,7 @@ auto cross
         typename cartesian2_type::quantity2::unit_type()))));
 
 
-    return 
+    return
         cartesian_representation
         <
             typename cartesian1_type::type,
@@ -158,7 +157,7 @@ auto cross
     cartesian coordinate system then cross product of both cartesian
     vectors is converted into requested system type and returned*/
 
-    /*checking types if it is not subclass of   
+    /*checking types if it is not subclass of
     base_representaion then compile time erorr is generated*/
     //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
     //    <
@@ -193,15 +192,15 @@ auto cross
 
     auto cartesian1 = make_cartesian_representation(representation1);
     auto cartesian2 = make_cartesian_representation(representation2);
-    
+
     typedef decltype(cartesian1) cartesian1_type;
     typedef decltype(cartesian2) cartesian2_type;
-    
+
 
     bg::transform(cartesian1.get_point(), tempPoint1);
     bg::transform(cartesian2.get_point(), tempPoint2);
-    
-    
+
+
     bg::set<0>(
         tempPoint2,
         bg::get<0>(tempPoint2)*
@@ -220,7 +219,7 @@ auto cross
         bu::conversion_factor(typename cartesian2_type::quantity3::unit_type(),
         typename cartesian2_type::quantity1::unit_type())
     );
-    
+
     result = bg::cross_product(tempPoint1,tempPoint2);
 
     return Representation1
@@ -370,7 +369,7 @@ auto unit_vector(Coordinate const& vector)
 }
 
 
-//! Returns sum of representation1 and representation2 
+//! Returns sum of representation1 and representation2
 template<typename Representation1, typename Representation2>
 Representation1 sum
 (

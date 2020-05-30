@@ -1,11 +1,9 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
-=============================================================================*/
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
 
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+=============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_IO_CARD_HPP
 #define BOOST_ASTRONOMY_IO_CARD_HPP
@@ -29,7 +27,7 @@
 namespace boost { namespace astronomy { namespace io {
 
 /**
- * @brief   Represents the concept of <strong>card</strong> associated with the FITS standard. 
+ * @brief   Represents the concept of <strong>card</strong> associated with the FITS standard.
  * @details This structure provides functions for storage, manipulation and access of FITS cards.
  * @author  Pranam Lashkari
  */
@@ -64,7 +62,7 @@ public:
         this->card_.assign(c, 80);
     }
 
-    
+
     /**
      * @brief       Takes a string as argument and creates a card object based on that string.
      * @details     This function accepts a string as an argument and stores it internally provided
@@ -97,7 +95,7 @@ public:
      * @throws      invalid_key_length_exception If keyword length > 8
      * @throws      invalid_value_length_exception If value+comment length >68 or  value length >70 ( No comments)
      * @throws      std::bad_alloc If the request of 80bytes of memory allocation fails.
-     * @todo        Replace comment.length() >0 with !comment.empty and comment.length() with comment.empty()    
+     * @todo        Replace comment.length() >0 with !comment.empty and comment.length() with comment.empty()
     */
     card
     (
@@ -132,7 +130,7 @@ public:
         }
     }
 
-    
+
     /**
      * @brief Constructs a card from key,value,comment(optional) supplied as the argument to the function
      * @see   card (std::string const& key,std::string const& value,std::string const& comment = "")
@@ -173,7 +171,7 @@ public:
     }
 
     /**
-     * @brief    Creates/Initializes the card object with a boolean value               
+     * @brief    Creates/Initializes the card object with a boolean value
      * @see      create_card(std::string const& key,std::string const& value,std::string const& comment = "")
      *           for more information on exception specification
      * @todo     I think string.insert has been passed with wrong arguments
@@ -200,7 +198,7 @@ public:
      * @see         create_card(std::string const& key,std::string const& value,std::string const& comment = "")
      *              for more information on exception specification
      * @todo        std::tostring is 4 times faster than ostringstream. Please use that
-     
+
     */
     template <typename Value>
     void create_card(std::string const& key, Value value, std::string const& comment = "")
@@ -214,7 +212,7 @@ public:
         create_card(key, val, comment);
     }
 
-   
+
     /**
      * @brief       Creates/Initializes the card object with a complex value
      * @tparam      Real Any Numeric type representing <strong>real</strong> part of complex number
@@ -259,7 +257,7 @@ public:
     */
     void create_commentary_card(std::string const& key, std::string const& value)
     {
-        
+
         if (key.length() > 8)
         {
             throw invalid_key_length_exception();
@@ -348,7 +346,7 @@ private:
 
     /**
      * @brief   Returns the value associated with the card in logical type
-     * @return  boolean value 
+     * @return  boolean value
     */
     bool value_imp(boost::type<bool>) const
     {

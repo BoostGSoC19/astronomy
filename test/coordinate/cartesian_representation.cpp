@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
+Copyright 2019 Sarthak Singhal <singhalsarthak2007@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #define BOOST_TEST_MODULE cartesian_representation_test
@@ -146,10 +145,10 @@ BOOST_AUTO_TEST_CASE(cartesian_representation_geometry_point_constructor)
     BOOST_TEST((std::is_same<decltype(point2.get_x()), quantity<si::length>>::value));
     BOOST_TEST((std::is_same<decltype(point2.get_y()), quantity<si::length>>::value));
     BOOST_TEST((std::is_same<decltype(point2.get_z()), quantity<si::length>>::value));
-} 
-    
+}
+
 BOOST_AUTO_TEST_CASE(cartesian_representation_conversion_from_spherical_representation)
-{   
+{
     //constructing from spherical representation
     auto spherical_point = make_spherical_representation
     (0.523599 * si::radian, 60.0 * bud::degrees, 1.0 * meter);
@@ -165,7 +164,7 @@ BOOST_AUTO_TEST_CASE(cartesian_representation_conversion_from_spherical_represen
 }
 
 BOOST_AUTO_TEST_CASE(cartesian_representation_conversion_from_spherical_equatorial_representation)
-{   
+{
     //constructing from spherical_equitorial representation
     auto spherical_equatorial_point = make_spherical_equatorial_representation
     (0.523599 * si::radian, 60.0 * bud::degrees, 1.0 * meter);

@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2018-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
-  
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #ifndef BOOST_ASTRONOMY_IO_IMAGE_HPP
@@ -42,7 +41,7 @@ struct image_buffer
 {
 protected:
     std::valarray<PixelType> data; //! stores the image
-    std::size_t width; //! width of image 
+    std::size_t width; //! width of image
     std::size_t height; //! height of image
     //std::fstream image_file; //! image file
 
@@ -95,7 +94,7 @@ public:
         return this->data.min();
     }
 
-   
+
     /**
      * @brief   Gets the mean value of all the pixels in the image
      * @return  mean value of pixels in the image
@@ -112,7 +111,7 @@ public:
     }
 
     /**
-     * @brief   Gets the median of all the pixel values in the image 
+     * @brief   Gets the median of all the pixel values in the image
      * @note    This method uses additional space of order O(n) where n is the number of total pixels
      * @return  median of all the pixel values in the image
     */
@@ -144,7 +143,7 @@ public:
         {
             diff[i] = this->data[i] - avg;
         }
-                    
+
         diff *= diff;
         return std::sqrt(diff.sum() / (diff.size() - 1));
     }
@@ -194,7 +193,7 @@ public:
     */
     image(std::string const& file, std::size_t width, std::size_t height, std::streamoff start) :
         image_buffer<std::uint8_t>(width, height)
-    {   
+    {
         std::fstream image_file(file);
         image_file.seekg(start);
         read_image_logic(image_file);

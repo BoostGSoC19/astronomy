@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2019-2020 Pranam Lashkari < lpranam - plashkari628@gmail.com >
+Copyright 2019 Pranam Lashkari <plashkari628@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #define BOOST_TEST_MODULE unit_length_test

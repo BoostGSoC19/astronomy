@@ -1,9 +1,8 @@
-
 /*=============================================================================
-  Copyright 2019-2020 Sarthak Singhal < sarthak2007 - singhalsarthak2007@gmail.com >
+Copyright 2019 Sarthak Singhal <singhalsarthak2007@gmail.com>
 
-  Distributed under the Boost Software License, Version 1.0. (See accompanying
-  file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 
 #define BOOST_TEST_MODULE cartesian_differential_test
@@ -58,7 +57,7 @@ BOOST_AUTO_TEST_CASE(cartesian_differential_quantities_constructor)
     BOOST_TEST((std::is_same<decltype(motion1.get_dy()),
         quantity<bu::divide_typeof_helper<decltype(si::kilo*meters), si::time>::type>>::value));
     BOOST_TEST((std::is_same<decltype(motion1.get_dz()), quantity<si::velocity>>::value));
-    
+
     cartesian_differential<double, quantity<si::velocity>, quantity<si::velocity>, quantity<si::velocity>>
         motion2(1.5*meters/seconds, 9.0*meters/seconds, 3.0*meters/seconds);
     BOOST_CHECK_CLOSE(motion2.get_dx().value(), 1.5, 0.001);
@@ -137,7 +136,7 @@ BOOST_AUTO_TEST_CASE(cartesian_differential_copy_constructor_with_different_unit
     //checking whether quantity stored is as expected or not
     BOOST_TEST((std::is_same<decltype(motion2.get_dx()), quantity<si::velocity>>::value));
     BOOST_TEST((std::is_same<decltype(motion2.get_dy()), quantity<si::velocity>>::value));
-    BOOST_TEST((std::is_same<decltype(motion2.get_dz()), quantity<si::velocity>>::value));  
+    BOOST_TEST((std::is_same<decltype(motion2.get_dz()), quantity<si::velocity>>::value));
 }
 
 BOOST_AUTO_TEST_CASE(cartesian_differential_geometry_point_constructor)
