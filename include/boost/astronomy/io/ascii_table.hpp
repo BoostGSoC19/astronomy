@@ -191,19 +191,19 @@ namespace boost {
                                 return std::move(result);
                             }
                             case 'I': {
-                                auto result = std::make_unique<column_data<std::int32_t>>(col);
-                                fill_column<std::int32_t>(result->get_data(), col);
+                                auto result = std::make_unique<column_data<boost::int32_t>>(col);
+                                fill_column<boost::int32_t>(result->get_data(), col);
                                 return std::move(result);
                             }
                             case 'F':  // Floating Point only hence fallthrough
                             case 'E': {
-                                auto result = std::make_unique<column_data<std::float_t>>(col);
-                                fill_column<std::float_t>(result->get_data(), col);
+                                auto result = std::make_unique<column_data<boost::float32_t>>(col);
+                                fill_column<boost::float32_t>(result->get_data(), col);
                                 return std::move(result);
                             }
                             case 'D': {
-                                auto result = std::make_unique<column_data<std::double_t>>(col);
-                                fill_column<std::double_t>(result->get_data(), col);
+                                auto result = std::make_unique<column_data<boost::float64_t>>(col);
+                                fill_column<boost::float64_t>(result->get_data(), col);
                                 return std::move(result);
                             }
                             }

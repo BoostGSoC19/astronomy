@@ -120,14 +120,21 @@ BOOST_FIXTURE_TEST_CASE(
     ascii_table_get_column,
     ascii_table_fixture /*,*boost::unit_test::disabled()*/) {
     ascii_table ascii_hdu1(get_ascii_sample1());
-    std::float_t mean_c200_data[] = { 0.3115222f, 0.6534808f, 0.7027547f, 0.9687142f };
+    boost::float32_t mean_c200_data[] = { 0.3115222, 0.6534808, 0.7027547, 0.9687142 };
 
-    auto mean_c200_col = boost::dynamic_pointer_cast<column_data<std::float_t>>(
+    auto mean_c200_col = boost::dynamic_pointer_cast<column_data<boost::float32_t>>(
         ascii_hdu1.get_column("MEANC200"));
 
-    BOOST_REQUIRE_EQUAL_COLLECTIONS(mean_c200_col->get_data().begin(),
-        mean_c200_col->get_data().end(),
-        mean_c200_data, mean_c200_data + 4);
+    for (std::size_t i = 0; i < mean_c200_col->get_data().size(); i++) {
+
+        BOOST_CHECK_CLOSE(mean_c200_col->get_data()[i], mean_c200_data[i], 0.001);
+
+    }
+
+    // Problem in GCC7.4
+    //BOOST_REQUIRE_EQUAL_COLLECTIONS(mean_c200_col->get_data().begin(),
+    //    mean_c200_col->get_data().end(),
+    //    mean_c200_data, mean_c200_data + 4);
 
     ascii_table ascii_hdu2(get_ascii_sample2());
 

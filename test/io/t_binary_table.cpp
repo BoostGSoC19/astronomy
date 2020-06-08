@@ -99,7 +99,7 @@ BOOST_FIXTURE_TEST_CASE(binary_table_get_column, binary_table_fixture) {
     binary_table_extension binary_table1(get_binary_table_sample1());
 
     auto column_info =
-        binary_table1.get_column<std::vector<std::float_t>>("DEL_TIME");
+        binary_table1.get_column<std::vector<boost::float32_t>>("DEL_TIME");
 
     BOOST_REQUIRE_CLOSE(column_info->get_data()[0][119], 595.0, 0.001);
 }
