@@ -37,6 +37,15 @@ private:
     std::string card_;
 
 public:
+
+    enum value_type {
+        logical_val,
+        string_val,
+        numeric_val,
+        complex_val
+    };
+
+
     /**
      * @brief   Default Constructor to create a standalone object of <strong>card</strong>
      * @throws  std::bad_alloc If the request of 80 bytes of memory fails.
@@ -111,37 +120,44 @@ public:
      * @brief Constructs a card from key,value,comment(optional) supplied as the argument to the function
      * @see   card (std::string const& key,std::string const& value,std::string const& comment = "")
     */
-    void create_card
-    (
-        std::string const& key,
-        std::string const& value,
-        std::string const& comment = ""
-    )
-    {
-        if (key.length() > 8)
-        {
+    void create_card(std::string const& key, std::string const& value,
+        std::string const& comment = "", value_type v_type = value_type::string_val) {
+
+        if (key.length() > 8) {
             throw invalid_key_length_exception();
         }
-        if (!comment.empty() && (value.length() + comment.length() > 68))
-        {
+        if (!comment.empty() && (value.length() + comment.length() > 68)) {
             throw invalid_value_length_exception();
         }
-        else if (value.length() > 70)
-        {
+        else if (value.length() > 70) {
             throw invalid_value_length_exception();
         }
 
-        if (!comment.empty())
-        {
-            this->card_ = std::string(key).append(8 - key.length(), ' ') +
-                "= " + value + " /" + comment +
-                std::string("").append(68 - value.length() + comment.length(), ' ');
+        std::string content_string;
+
+        if (v_type == value_type::string_val) {
+            if (!comment.empty()) {
+                content_string = std::string(key).append(8 - key.length(), ' ') + "= " +
+                    '\'' + value + '\'' + " /" + comment;
+            }
+            else {
+                content_string = std::string(key).append(8 - key.length(), ' ') + "= " +
+                    '\'' + std::string(value) + '\'';
+            }
         }
-        else
-        {
-            this->card_ = std::string(key).append(8 - key.length(), ' ') +
-                "= " + std::string(value).append(70 - key.length(), ' ');
+        else {
+            if (!comment.empty()) {
+                content_string = std::string(key).append(8 - key.length(), ' ') + "= " +
+                    value + " /" + comment;
+            }
+            else {
+                content_string = std::string(key).append(8 - key.length(), ' ') + "= " +
+                    std::string(value);
+            }
         }
+
+
+        this->card_ = content_string + std::string(80 - content_string.length(), ' ');
     }
 
     /**
@@ -153,7 +169,7 @@ public:
     {
         if (value)
         {
-            create_card(key, std::string("T").insert(0, 19, ' '), comment);
+            create_card(key, std::string("T").insert(0, 19, ' '), comment, value_type::logical_val);
         }
         else
         {
@@ -173,9 +189,27 @@ public:
     template <typename Value>
     void create_card(std::string const& key, Value value, std::string const& comment = "")
     {
-        std::string val = std::to_string(value);
-        val.insert(0, ' ', 20 - val.length());
-        create_card(key, val, comment);
+        std::string val;
+
+        std::stringstream value_stream;
+        value_stream << value;
+        val = value_stream.str();
+
+        // TODO: Macro to run this code in C++14 :). Average performance improvement 4 times
+        /*boost::hana::eval_if(
+            boost::is_same<double, Value>::value,
+            [&val, &value](void) { val = std::to_string(value); },
+            [&val, &value](void) {
+              std::stringstream value_stream;
+              value_stream << std::scientific << value;
+              val = value_stream.str();
+            }
+
+        );*/
+
+        val.insert(0, 20 - val.length(), ' ');
+        create_card(key, val, comment, value_type::numeric_val);
+
     }
 
 
@@ -202,7 +236,7 @@ public:
     {
        std::string value = "(" + std::to_string(real)+','+std::to_string(imaginary) + ")";
 
-        create_card(key, value, comment);
+       create_card(key, value, comment, value_type::complex_val);
     }
 
     /**
@@ -228,8 +262,8 @@ public:
             throw invalid_value_length_exception();
         }
 
-        this->card_ = std::string(key).append(8 - key.length(), ' ') +
-            "  " + std::string(value).append(70 - key.length(), ' ');
+        this->card_ = std::string(key).append(8 - key.length(), ' ') + " " +
+            std::string(value).append(70 - value.length(), ' ');
     }
 
     /**
@@ -266,7 +300,7 @@ public:
     */
     std::string value_with_comment() const
     {
-        return this->card_.substr(10);
+        return boost::algorithm::trim_copy(this->card_.substr(10));
     }
 
     /**
@@ -289,6 +323,11 @@ public:
         this->card_.append(70 - value.length(), ' ');
     }
 
+    /**
+     * @brief   Returns the complete card as string
+    */
+    const std::string& raw_card() { return card_; }
+
 private:
 
     /**
@@ -301,8 +340,24 @@ private:
     ReturnType value_imp(boost::type<ReturnType>) const
     {
         std::string val = boost::algorithm::trim_copy(
-            this->card_.substr(10, this->card_.find('/') - 10));
+            this->card_.substr(9, this->card_.find('/') - 10));
         return boost::lexical_cast<ReturnType>(val);
+    }
+
+
+    /**
+     * @brief   Returns the value associated with the card in string type
+     * @return  string value
+    */
+    std::string value_imp(boost::type<std::string>) const {
+        std::string val = boost::algorithm::trim_copy(
+            this->card_.substr(9, this->card_.find('/') - 10));
+        if (val[0] == '\'') {
+            return boost::algorithm::trim_copy(std::string(val.begin() + 1, val.end() - 1));
+        }
+        else {
+            return val;
+        }
     }
 
     /**
@@ -312,7 +367,7 @@ private:
     bool value_imp(boost::type<bool>) const
     {
         std::string val = boost::algorithm::trim_copy(
-            this->card_.substr(10, this->card_.find('/') - 10));
+            this->card_.substr(9, this->card_.find('/') - 10));
         if (val == "T")
         {
             return true;

@@ -36,7 +36,7 @@ template <bitpix DataType>
 struct image_extension : public boost::astronomy::io::extension_hdu
 {
 protected:
-    image<DataType> data;
+    image<DataType> data_;
 
 public:
 
@@ -59,7 +59,7 @@ public:
      * @param[in]   other HDU object from where the header information is read
      * @note        After the reading the file pointer/cursor will be set to the end of logical HDU unit
     */
-    image_extension(std::fstream &file, hdu const& other) : extension_hdu(file, other)
+    image_extension(std::fstream &file, hdu const& other) : extension_hdu(other)
     {
         set_image_data(file);
         set_unit_end(file);
@@ -86,14 +86,15 @@ private:
         case 0:
             break;
         case 1:
-            data.read_image(file, this->naxis(1), 1);
+            data_.read_image(file, this->naxis(1), 1);
             break;
         case 2:
-            data.read_image(file, this->naxis(1), this->naxis(2));
+            data_.read_image(file, this->naxis(1), this->naxis(2));
             break;
         default:
-            data.read_image(file, this->naxis(1), std::accumulate(this->naxis_.begin() + 1,
+            data_.read_image(file, this->naxis(1), std::accumulate(this->naxis_.begin() + 1,
                 this->naxis_.end(), 1, std::multiplies<std::size_t>()));
+            break;
             break;
         }
     }

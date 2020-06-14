@@ -31,6 +31,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
  */
 namespace boost { namespace astronomy { namespace io {
 
+// Does this indicate a design flaw ? Prefer composition over generalization of header part
 struct column;
 
 /**
@@ -171,10 +172,10 @@ public:
         }
 
         //setting naxis values
-        naxis_.emplace_back(cards[key_index["NAXIS"]].value<std::size_t>());
-        naxis_.reserve(naxis_[0]);
+        std::size_t total_dimensions = cards[key_index["NAXIS"]].value<std::size_t>();
+        naxis_.reserve(total_dimensions);
 
-        for (std::size_t i = 1; i <= naxis_[0]; i++)
+        for (std::size_t i = 1; i <= total_dimensions; i++)
         {
             naxis_.emplace_back(cards[key_index["NAXIS" +
                 boost::lexical_cast<std::string>(i)]].value<std::size_t>());
@@ -217,8 +218,13 @@ public:
     */
     std::size_t naxis(std::size_t n = 0) const
     {
-        return this->naxis_[n];
+        return this->naxis_[n - 1]; // 1 Based indexing
     }
+
+    /**
+     * @brief       Returns the total number of dimensions of an HDU data
+    */
+    std::size_t total_dimensions() const { return all_naxis().size(); }
 
     /**
      * @brief       Gets the value associated with a perticular keyword
@@ -233,6 +239,7 @@ public:
         return this->cards[key_index.at(key)].value<ReturnType>();
     }
 
+
     /**
      * @brief       Sets the file_pointer/cursor to the end of current HDU unit
      * @param[out] file filestream whose position needs to be set to current HDU boundary
@@ -244,10 +251,19 @@ public:
     }
 
     /**
+     * @brief      Gets the number of cards in HDU header
+     * @return     total number of cards in HDU header
+    */
+    std::size_t card_count() {
+        return cards.size() - 1; // Last one is END Card ( It will not be counted )
+
+    }
+
+    /**
      * @brief       Virtual destructor allowing hdu to be a polymorphic base for derived classes
     */
     virtual ~hdu() {}
-    virtual std::unique_ptr<column> get_column(std::string name) const
+    virtual std::unique_ptr<column> get_column(std::string) const
     {
         throw wrong_extension_type();
     }

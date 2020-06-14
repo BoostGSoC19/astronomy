@@ -40,9 +40,9 @@ template <typename PixelType>
 struct image_buffer
 {
 protected:
-    std::valarray<PixelType> data; //! stores the image
-    std::size_t width; //! width of image
-    std::size_t height; //! height of image
+    std::valarray<PixelType> data_; //! stores the image
+    std::size_t width_; //! width of image
+    std::size_t height_; //! height of image
     //std::fstream image_file; //! image file
 
     /**
@@ -66,9 +66,9 @@ public:
      * @param[in]   width Width of Image
      * @param[in]   height  Height of Image
     */
-    image_buffer(std::size_t width, std::size_t height) : width(width), height(height)
+    image_buffer(std::size_t width, std::size_t height) : width_(width), height_(height)
     {
-        this->data.resize(width*height);
+        this->data_.resize(width*height);
     }
 
     /**
@@ -82,7 +82,7 @@ public:
     */
     PixelType max() const
     {
-        return this->data.max();
+        return this->data_.max();
     }
 
     /**
@@ -91,7 +91,7 @@ public:
     */
     PixelType min() const
     {
-        return this->data.min();
+        return this->data_.min();
     }
 
 
@@ -101,13 +101,13 @@ public:
     */
     double mean() const
     {
-        if (this->data.size() == 0)
+        if (this->data_.size() == 0)
         {
             return 0;
         }
 
-        return (std::accumulate(std::begin(this->data),
-            std::end(this->data), 0.0) / this->data.size());
+        return (std::accumulate(std::begin(this->data_),
+            std::end(this->data_), 0.0) / this->data_.size());
     }
 
     /**
@@ -117,11 +117,11 @@ public:
     */
     PixelType median() const
     {
-        std::valarray<PixelType> soreted_array = this->data;
-        std::nth_element(std::begin(soreted_array),
-            std::begin(soreted_array) + soreted_array.size() / 2, std::end(soreted_array));
+        std::valarray<PixelType> sorted_array = this->data_;
+        std::nth_element(std::begin(sorted_array),
+            std::begin(sorted_array) + sorted_array.size() / 2, std::end(sorted_array));
 
-        return soreted_array[soreted_array.size() / 2];
+        return sorted_array[sorted_array.size() / 2];
     }
 
    /**
@@ -131,17 +131,17 @@ public:
     */
     double std_dev() const
     {
-        if (this->data.size() == 0)
+        if (this->data_.size() == 0)
         {
             return 0;
         }
 
         double avg = this->mean();
 
-        std::valarray<double> diff(this->data.size());
+        std::valarray<double> diff(this->data_.size());
         for (size_t i = 0; i < diff.size(); i++)
         {
-            diff[i] = this->data[i] - avg;
+            diff[i] = this->data_[i] - avg;
         }
 
         diff *= diff;
@@ -155,8 +155,13 @@ public:
     */
     PixelType operator() (std::size_t x, std::size_t y)
     {
-        return this->data[(x*this->width) + y];
+        return this->data_[(x*this->width_) + y];
     }
+
+    /**
+     * @brief       Returns the size of image
+    */
+    std::size_t size() { return data_.size(); }
 };
 
 
@@ -249,7 +254,7 @@ public:
     */
     void read_image_logic(std::fstream &image_file)
     {
-        image_file.read((char*)std::begin(data), width*height);
+        image_file.read((char*)std::begin(data_), width_*height_);
         //std::copy_n(std::istreambuf_iterator<char>(file.rdbuf()), width*height, std::begin(data));
     }
 
@@ -271,9 +276,10 @@ public:
     )
     {
         std::fstream image_file(file);
-        data.resize(width*height);
+        data_.resize(width*height);
         image_file.seekg(start);
-
+        this->width_ = width;
+        this->height_ = height;
         read_image_logic(image_file);
 
         image_file.close();
@@ -304,9 +310,10 @@ public:
     */
     void read_image(std::fstream &file, std::size_t width, std::size_t height, std::streamoff start)
     {
-        data.resize(width*height);
+        data_.resize(width*height);
         file.seekg(start);
-
+        this->width_ = width;
+        this->height_ = height;
         read_image_logic(file);
     }
 
@@ -403,10 +410,10 @@ public:
     */
     void read_image_logic(std::fstream &image_file)
     {
-        for (std::size_t i = 0; i < height*width; i++)
+        for (std::size_t i = 0; i < height_*width_; i++)
         {
-            image_file.read((char*)&data[i], 2);
-            data[i] = boost::endian::big_to_native(data[i]);
+            image_file.read((char*)&data_[i], 2);
+            data_[i] = boost::endian::big_to_native(data_[i]);
         }
     }
 
@@ -429,9 +436,10 @@ public:
     {
         std::fstream image_file(file);
         image_file.open(file);
-        data.resize(width*height);
+        data_.resize(width*height);
         image_file.seekg(start);
-
+        this->width_ = width;
+        this->height_ = height;
         read_image_logic(image_file);
 
         image_file.close();
@@ -460,9 +468,10 @@ public:
     */
     void read_image(std::fstream &file, std::size_t width, std::size_t height, std::streamoff start)
     {
-        data.resize(width*height);
+        data_.resize(width*height);
         file.seekg(start);
-
+        this->width_ = width;
+        this->height_ = height;
         read_image_logic(file);
     }
     /**
@@ -558,10 +567,10 @@ public:
     */
     void read_image_logic(std::fstream &image_file)
     {
-        for (std::size_t i = 0; i < height*width; i++)
+        for (std::size_t i = 0; i < height_*width_; i++)
         {
-            image_file.read((char*)&data[i], 4);
-            data[i] = boost::endian::big_to_native(data[i]);
+            image_file.read((char*)&data_[i], 4);
+            data_[i] = boost::endian::big_to_native(data_[i]);
         }
     }
 
@@ -583,9 +592,10 @@ public:
     )
     {
         std::fstream image_file(file);
-        data.resize(width*height);
+        data_.resize(width*height);
         image_file.seekg(start);
-
+        this->width_ = width;
+        this->height_ = height;
         read_image_logic(image_file);
 
         image_file.close();
@@ -615,9 +625,10 @@ public:
    */
     void read_image(std::fstream &file, std::size_t width, std::size_t height, std::streamoff start)
     {
-        data.resize(width*height);
+        data_.resize(width*height);
         file.seekg(start);
-
+        this->width_ = width;
+        this->height_ = height;
         read_image_logic(file);
     }
     /**
@@ -712,11 +723,13 @@ public:
     void read_image_logic(std::fstream &image_file)
     {
         pixel_data single_pixel;
-        for (std::size_t i = 0; i < height*width; i++)
-        {
+        for (std::size_t i = 0; i < height_ * width_; i++) {
             image_file.read((char*)single_pixel.byte, 4);
-            data[i] = (single_pixel.byte[3] << 0) | (single_pixel.byte[2] << 8) |
-                (single_pixel.byte[1] << 16) | (single_pixel.byte[0] << 24);
+            data_[i] = static_cast<boost::float32_t>(
+                (single_pixel.byte[3] << 0) |
+                (single_pixel.byte[2] << 8) |
+                (single_pixel.byte[1] << 16) |
+                (single_pixel.byte[0] << 24));
         }
     }
     /**
@@ -737,9 +750,10 @@ public:
     )
     {
         std::fstream image_file(file);
-        data.resize(width*height);
+        data_.resize(width*height);
         image_file.seekg(start);
-
+        this->width_ = width;
+        this->height_ = height;
         read_image_logic(image_file);
         image_file.close();
     }
@@ -767,9 +781,10 @@ public:
    */
     void read_image(std::fstream &file, std::size_t width, std::size_t height, std::streamoff start)
     {
-        data.resize(width*height);
+        data_.resize(width*height);
         file.seekg(start);
-
+        this->width_ = width;
+        this->height_ = height;
         read_image_logic(file);
     }
     /**
@@ -863,13 +878,20 @@ public:
     void read_image_logic(std::fstream &image_file)
     {
         pixel_data single_pixel;
-        for (std::size_t i = 0; i < height*width; i++)
-        {
+        for (std::size_t i = 0; i < height_ * width_; i++) {
             image_file.read((char*)single_pixel.byte, 8);
-            data[i] = (single_pixel.byte[7] << 0) | (single_pixel.byte[6] << 8) |
-                (single_pixel.byte[5] << 16) | (single_pixel.byte[4] << 24) |
-                (single_pixel.byte[3] << 32) | (single_pixel.byte[2] << 40) |
-                (single_pixel.byte[1] << 48) | (single_pixel.byte[0] << 56);
+
+            std::int64_t data;
+            data = (static_cast<std::int64_t>(single_pixel.byte[7]) << 0) |
+                (static_cast<std::int64_t>(single_pixel.byte[6]) << 8) |
+                (static_cast<std::int64_t>(single_pixel.byte[5]) << 16) |
+                (static_cast<std::int64_t>(single_pixel.byte[4]) << 24) |
+                (static_cast<std::int64_t>(single_pixel.byte[3]) << 32) |
+                (static_cast<std::int64_t>(single_pixel.byte[2]) << 40) |
+                (static_cast<std::int64_t>(single_pixel.byte[1]) << 48) |
+                (static_cast<std::int64_t>(single_pixel.byte[0]) << 56);
+            std::memcpy(&data_[i], &data, sizeof(boost::float64_t));
+
         }
     }
 
@@ -891,9 +913,10 @@ public:
     )
     {
         std::fstream image_file(file);
-        data.resize(width*height);
+        data_.resize(width*height);
         image_file.seekg(start);
-
+        this->width_ = width;
+        this->height_ = height;
         read_image_logic(image_file);
 
         image_file.close();
@@ -923,9 +946,10 @@ public:
    */
     void read_image(std::fstream &file, std::size_t width, std::size_t height, std::streamoff start)
     {
-        data.resize(width*height);
+        data_.resize(width*height);
         file.seekg(start);
-
+        this->width_ = width;
+        this->height_ = height;
         read_image_logic(file);
     }
     /**

@@ -55,14 +55,12 @@ public:
     }
 
     /**
-     * @brief     Constructs an extention_hdu from the filestream and hduobject passed as an argument
-     * @details   This constructor accepts a file stream and hdu_object as argument and creates a extention_hdu
+     * @brief     Constructs an extention_hdu from the hduobject passed as an argument
+     * @details   This constructor accepts a hdu_object as argument and creates a extention_hdu
      *            by copying the header information from hdu_object
-     * @param[in,out] file filestream set to open mode for reading
      * @param[in] other hdu object containing the header information
-     * @note    After the reading the file pointer/cursor will be set to the end of logical HDU unit
     */
-    extension_hdu(std::fstream &file, hdu const& other) : hdu(other)
+    extension_hdu(hdu const& other) : hdu(other)
     {
         set_extension_info();
     }
