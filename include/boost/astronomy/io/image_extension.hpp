@@ -16,6 +16,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/hdu.hpp>
 #include <boost/astronomy/io/extension_hdu.hpp>
 #include <boost/astronomy/io/image.hpp>
+#include <boost/variant.hpp>
 
 /**
  * @file    image_extension.hpp
@@ -35,70 +36,51 @@ namespace boost { namespace astronomy { namespace io {
 template <bitpix DataType>
 struct image_extension : public boost::astronomy::io::extension_hdu
 {
-protected:
+
+    typedef boost::variant<
+        image<bitpix::B8>,
+        image<bitpix::B16>,
+        image<bitpix::B32>,
+        image<bitpix::_B32>,
+        image<bitpix::_B64>
+    > data_type;
+    data_type data;
     image<DataType> data_;
 
 public:
 
-    /**
-     * @brief       Constructs an image_extension object by reading the header information and data from the filestream
-     * @param[in,out] file filestream set to open mode for reading
-     * @note        After the reading the file pointer/cursor will be set to the end of logical HDU unit
-    */
-    image_extension(std::fstream &file) : extension_hdu(file)
-    {
-        set_image_data(file);
-        set_unit_end(file);
-    }
-
-    /**
-     * @brief       Constructs an image_extension from filstream and hdu object
-     * @details     Constructs an image_extension object by reading the data from filestream
-     *              and header information from given hdu object
-     * @param[in,out] file filestream set to open mode for reading
-     * @param[in]   other HDU object from where the header information is read
-     * @note        After the reading the file pointer/cursor will be set to the end of logical HDU unit
-    */
-    image_extension(std::fstream &file, hdu const& other) : extension_hdu(other)
-    {
-        set_image_data(file);
-        set_unit_end(file);
-    }
-
-    /**
-     * @brief       Constructs an image_extension by reading information from specified position in filestream
-     * @details     Constructs an image_extension object by reading the header information and data from specified
-     *              position in filestream
-     * @param[in,out] file filestream set to open mode for reading
-     * @param[in] pos File Pointer/cursor position from where the header information is to be read
-     * @note        After the reading the file pointer/cursor will be set to the end of logical HDU unit
-    */
-    image_extension(std::fstream &file, std::streampos pos) : extension_hdu(file, pos)
-    {
-        set_image_data(file);
-        set_unit_end(file);
-    }
+    image_extension(const header& other, const std::string& data_buffer) :extension_hdu(other) {
+        instantiate_image(other.bitpix());
+        set_image_data(data_buffer);
+    } 
 private:
-    void set_image_data(std::fstream& file) {
-        //read image according to dimension specified by naxis
-        switch (this->naxis())
+    void set_image_data(const std::string& data_buffer) {
+        read_image_visitor read_image_visit(data_buffer);
+        boost::apply_visitor(read_image_visit, data);
+    }
+
+    void instantiate_image(bitpix element_type) {
+        switch (element_type)
         {
-        case 0:
+        case boost::astronomy::io::bitpix::B8:
+            data = image<bitpix::B8>();
             break;
-        case 1:
-            data_.read_image(file, this->naxis(1), 1);
+        case boost::astronomy::io::bitpix::B16:
+            data = image<bitpix::B16>();
             break;
-        case 2:
-            data_.read_image(file, this->naxis(1), this->naxis(2));
+        case boost::astronomy::io::bitpix::B32:
+            data = image<bitpix::B32>();
+            break;
+        case boost::astronomy::io::bitpix::_B32:
+            data = image<bitpix::_B32>();
+            break;
+        case boost::astronomy::io::bitpix::_B64:
+            data = image<bitpix::_B64>();
             break;
         default:
-            data_.read_image(file, this->naxis(1), std::accumulate(this->naxis_.begin() + 1,
-                this->naxis_.end(), 1, std::multiplies<std::size_t>()));
-            break;
             break;
         }
     }
-
 };
 
 }}} //namespace boost::astronomy::io

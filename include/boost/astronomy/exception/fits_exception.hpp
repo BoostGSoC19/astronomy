@@ -10,6 +10,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #define BOOST_ASTRONOMY_EXCEPTION_FITS_EXCEPTION_HPP
 
 #include <exception>
+#include <string>
 
 namespace boost
 {
@@ -86,6 +87,16 @@ namespace boost
                 return "invalid_table_colum_format";
             }
         };
+        class file_reading_exception : public fits_exception {
+            std::string message;
+        public:
+            file_reading_exception(const std::string& error_message):message(error_message) {}
+            const char* what() const noexcept override {
+                return message.c_str();
+            }
+
+        };
+
 
     } //namespace astronomy
 } //namespace boost

@@ -49,48 +49,9 @@ public:
     */
     ascii_table() {}
 
-    /**
-
-    /**
-     * @brief       Constructs an ascii_table object from the given filestream
-     * @details     This constructor constructs an ASCII_table object by reading the
-     *              header information,data from the filestream and populates the field
-     *              information that can be used for easy access to table data
-     * @param[in,out] file filestream set to open mode for reading
-     * @note        After the reading the file pointer/cursor will be set to the end of logical HDU unit
-    */
-    ascii_table(std::fstream &file) : table_extension(file)
-    {
-        set_ascii_table_info(file);
-        set_unit_end(file);
-    }
-
-    /**
-     * @brief       Constructs an ascii_table object from the given filestream and hdu object
-     * @details     Constructs an  ascii_table object by reading the data from filestream
-     *              and header information from hdu object passed as an argument
-     * @param[in,out] file filestream set to open mode for reading
-     * @param[in]   other hdu object containing the header information of the current extension HDU
-     * @note        After the reading the file pointer/cursor will be set to the end of logical HDU unit
-    */
-    ascii_table(std::fstream &file, hdu const& other) : table_extension(other)
-    {
-        set_ascii_table_info(file);
-        set_unit_end(file);
-    }
-
-    /**
-     * @brief       Constructs an ascii_table object from the given position in filestream
-     * @details     Constructs an ascii_table object by reading the HDU information from the
-     *              given  filestream, starting at pos
-     * @param[in,out] file filestream set to open mode for reading
-     * @param[in] pos File Pointer/cursor position from where the header information is to be read
-     * @note        After the reading the file pointer/cursor will be set to the end of logical HDU unit
-    */
-    ascii_table(std::fstream &file, std::streampos pos) : table_extension(file, pos)
-    {
-        set_ascii_table_info(file);
-        set_unit_end(file);
+    //TODO : Add comments
+    ascii_table(header const& other, const std::string& data_buffer) : table_extension(other) {
+        set_ascii_table_info(data_buffer);
     }
 
     /**
@@ -105,46 +66,55 @@ public:
             col_metadata_[i].index(i + 1);
 
             col_metadata_[i].TFORM(
-                value_of<std::string>("TFORM" + boost::lexical_cast<std::string>(i + 1))
+                hdu_header.value_of<std::string>("TFORM" + boost::lexical_cast<std::string>(i + 1))
             );
 
             col_metadata_[i].TBCOL(
-                value_of<std::size_t>("TBCOL" + boost::lexical_cast<std::string>(i + 1))
+                hdu_header.value_of<std::size_t>("TBCOL" + boost::lexical_cast<std::string>(i + 1))
             );
 
             try {
                 col_metadata_[i].TTYPE(
-                    value_of<std::string>("TTYPE" + boost::lexical_cast<std::string>(i + 1))
+                    hdu_header.value_of<std::string>("TTYPE" + boost::lexical_cast<std::string>(i + 1))
                 );
 
                 col_metadata_[i].comment(
-                    value_of<std::string>(col_metadata_[i].TTYPE())
+                    hdu_header.value_of<std::string>(col_metadata_[i].TTYPE())
                 );
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
 
             try {
                 col_metadata_[i].TUNIT(
-                    value_of<std::string>("TUNIT" + boost::lexical_cast<std::string>(i + 1))
+                    hdu_header.value_of<std::string>("TUNIT" + boost::lexical_cast<std::string>(i + 1))
                 );
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
 
             try {
                 col_metadata_[i].TSCAL(
-                    value_of<double>("TSCAL" + boost::lexical_cast<std::string>(i + 1))
+                    hdu_header.value_of<double>("TSCAL" + boost::lexical_cast<std::string>(i + 1))
                 );
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
 
             try {
                 col_metadata_[i].TZERO(
-                    value_of<double>("TZERO" + boost::lexical_cast<std::string>(i + 1))
+                    hdu_header.value_of<double>("TZERO" + boost::lexical_cast<std::string>(i + 1))
                 );
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
         }
     }
+
+
+    void set_data(const std::string& data_buffer) {
+        col_metadata_.clear();
+        data_.clear();
+        col_metadata_.resize(tfields_);
+        set_ascii_table_info(data_buffer);
+    }
+
 
     /**
      * @brief       Returns the data of ASCII table
@@ -163,35 +133,21 @@ public:
      * @param[in]   name Name of the field
      * @return      Returns the metadata along with value for every row of specified field
     */
-    std::unique_ptr<column> get_column(std::string column_name) const {
-        for (auto col : col_metadata_) {
-            if (col.TTYPE() == column_name) {
-                switch (get_type(col.TFORM())) {
-                case 'A': {
-                    auto result = std::make_unique<column_data<std::string>>(col);
-                    fill_column<std::string>(result->get_data(), col);
-                    return std::move(result);
-                }
-                case 'I': {
-                    auto result = std::make_unique<column_data<boost::int32_t>>(col);
-                    fill_column<boost::int32_t>(result->get_data(), col);
-                    return std::move(result);
-                }
-                case 'F':  // Floating Point only hence fallthrough
-                case 'E': {
-                    auto result = std::make_unique<column_data<boost::float32_t>>(col);
-                    fill_column<boost::float32_t>(result->get_data(), col);
-                    return std::move(result);
-                }
-                case 'D': {
-                    auto result = std::make_unique<column_data<boost::float64_t>>(col);
-                    fill_column<boost::float64_t>(result->get_data(), col);
-                    return std::move(result);
-                }
-                }
-            }
+    template<typename ColDataType>
+    std::unique_ptr<column_data<ColDataType>> get_column(const std::string& column_name) const {
+
+        auto column_info = std::find_if(col_metadata_.begin(), col_metadata_.end(), [&column_name](const column& col) {
+            return column_name == col.TTYPE();
+            });
+
+        
+        if (column_info != col_metadata_.end()) {
+            auto result = std::make_unique<column_data<ColDataType>>(*column_info);
+            fill_column<ColDataType>(result);
+            return result;
+        }else {
+            return nullptr;
         }
-        return nullptr;
     }
 
     /**
@@ -199,7 +155,7 @@ public:
      * @param[in] format Field format
      * @return    Returns the width of the field
     */
-    std::size_t column_size(std::string format) const
+    static std::size_t column_size(std::string format)
     {
         std::string form = boost::trim_copy_if(format, [](char c) -> bool {
                             return c == '\'' || c == ' ';
@@ -222,7 +178,7 @@ public:
      * @param[in]   format  Format of field
      * @return      Type of value stored
     */
-    char get_type(std::string format) const
+    static char get_type(std::string format)
     {
         std::string form = boost::trim_copy_if(format, [](char c) -> bool {
                             return c == '\'' || c == ' ';
@@ -233,48 +189,34 @@ public:
 
 private:
 
-    /**
-     * @brief         Populates the container of given type with field_value for every row of specified field
-     * @param[in,out] column_container Container that stores the field value for every row of specified field
-     * @param[in]     start Position where column begins for the field
-     * @param[in]     column_size Total size of the field
-     * @param[in]     lambda Lambda function for fetching the field data from data buffer 
-     * @todo          Why is column size present there
-    */
-    template<typename ColDataType, typename VectorType>
-    void fill_column
-    (
-        std::vector<VectorType> &column_container,
-        const column& col_metadata
-    ) const
-    {
-        column_container.reserve(naxis(2));
-        for (std::size_t i = 0; i < naxis(2); i++) {
+    
+    template<typename ColDataType/*, typename VectorType*/>
+    void fill_column(std::unique_ptr< column_data<ColDataType>>& column_ptr) const
+    {        
+        column_ptr->get_data().reserve(hdu_header.naxis(2));
+        for (std::size_t i = 0; i < hdu_header.naxis(2); i++) {
             auto starting_offset =
-                this->data_.begin() + i * naxis(1) + col_metadata.TBCOL();
+                this->data_.begin() + i * hdu_header.naxis(1) + column_ptr->TBCOL();
 
-            auto ending_offset = starting_offset + column_size(col_metadata.TFORM());
+            auto ending_offset = starting_offset + column_size(column_ptr->TFORM());
 
             std::string row_data_str(starting_offset, ending_offset + 1);
 
             ColDataType row_data = boost::lexical_cast<ColDataType>(
                 boost::algorithm::trim_copy(row_data_str));
 
-            column_container.emplace_back(row_data);
+            column_ptr->get_data().emplace_back(row_data);
         }
+       
     }
-
+   
     /**
      * @brief  Initializes the current object with  column metadata and table data
     */
-    void set_ascii_table_info(std::fstream& file)
-    {
+    void set_ascii_table_info(const std::string& data_buffer) {
         populate_column_data();
-        std::copy_n(std::istreambuf_iterator<char>(file), naxis(1) * naxis(2),
-            std::back_inserter(data_));
-        
+        data_.assign(data_buffer.begin(), data_buffer.end());
     }
-
 
 };
 

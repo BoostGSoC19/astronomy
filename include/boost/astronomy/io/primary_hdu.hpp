@@ -17,6 +17,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/astronomy/io/hdu.hpp>
 #include <boost/astronomy/io/image.hpp>
+#include <boost/variant.hpp>
 
 /**
  * @file    primary_hdu.hpp
@@ -36,58 +37,47 @@ namespace boost { namespace astronomy { namespace io {
  *          <a href="http://archive.stsci.edu/fits/users_guide/node19.html#SECTION00511000000000000000">Primary_HDU</a>
  * @todo    Consider renaming <strong>DataType</strong> to <strong>FieldSize</strong>
  */
-template <bitpix DataType>
-struct primary_hdu : public boost::astronomy::io::hdu
+struct primary_hdu
 {
 protected:
     bool simple; //!Stores the value of SIMPLE
     bool extend; //!Stores the value of EXTEND
-    image<DataType> data_; //!stores the image of primary HDU if any
+    typedef boost::variant<
+        image<bitpix::B8>,
+        image<bitpix::B16>,
+        image<bitpix::B32>,
+        image<bitpix::_B32>,
+        image<bitpix::_B64>
+    > data_type;
 
+    data_type data;
+    header hdu_header;
 public:
     /**
      * @brief   Default Constructor used to create a standalone object of primary_hdu
      */
     primary_hdu() {}
 
-    /**
-     * @brief       Constructs a primary_hdu object and reads the primary header and image of primary HDU from the FITS file
-     * @param[in,out] file filestream set to open mode for reading
-     * @pre         file pointer should be at the beginning of the file
-     * @note        This constructor should be used when file has not been read at all and boost::astronomy::io::hdu object is
-     *              not created from the file. Also after the reading the cursor/file pointer is set to the end of HDU unit
-     */
-    primary_hdu(std::fstream &file) : hdu(file)
-    {
-        init_primary_hdu(file);
-        set_unit_end(file);    //set cursor to the end of the HDU unit
+    primary_hdu( const header & other,const std::string& data_buffer):hdu_header(other) {
+
+        instantiate_primary_hdu(hdu_header.bitpix());
+        read_image_visitor read_image_visit(data_buffer);
+        boost::apply_visitor(read_image_visit, data);
+        init_primary_hdu();
     }
 
-    /**
-     * @brief       Constructs a primary_hdu object based on the file and the hdu object passed
-     * @details     This function constructs a primary_hdu object by copying the header information
-     *              of primary hdu from <strong>other</strong> and reading the image( if any) from the
-     *              FITS file
-     * @param[in,out] file filestream set to open mode for reading
-     * @param[in]   other HDU object that contains header information for the primary HDU
-     * @note        Prefer this constructor to be used when boost::astronomy::io::hdu object already exist for the file
-     *              Also the cursor/ filepointer is set to the end of HDU unit
-    */
-    primary_hdu(std::fstream &file, hdu const& other) : hdu(other)
-    {
-        init_primary_hdu(file);
-        set_unit_end(file);    //set cursor to the end of the HDU unit
+    header get_header() const {
+        return hdu_header;
     }
-
 
     /**
      * @brief   Gets the image data associated with the primary HDU
      * @see     image.hpp
     */
-    image<DataType> get_data() const
-    {
-        return this->data_;
-    }
+
+    template<bitpix DT>
+    image<DT> get_data() const { return *boost::get<image<DT>>(&this->data); }
+
 
     /**
      * @brief   Gets the value of FITS <strong>SIMPLE</strong> keyword
@@ -95,10 +85,9 @@ public:
     */
     bool is_simple() const
     {
-        return this->simple;
+        return simple;
     }
 
-    //!value of EXTEND
     /**
      * @brief   Indicates whether extentions are present in FITS file
      * @details Gets the value of <strong>EXTEND</strong> from the primary header
@@ -106,36 +95,44 @@ public:
     */
     bool is_extended() const
     {
-        return this->extend;
+        return extend;
     }
 private:
-    /**
-     * @brief      Initializes the primary_hdu object(simple,extend) with image data
-     * @param[in]  file filestream set to open mode for reading
-    */
-    void init_primary_hdu(std::fstream& file) {
-        simple = this->value_of<bool>("SIMPLE");
-        extend = this->value_of<bool>("EXTEND");
 
-        // read image according to dimension specified by naxis
-        switch (this->total_dimensions()) {
-        case 0:
+    /**
+    * @brief      Initializes the primary_hdu object(simple,extend) with image data
+    * @param[in]  file filestream set to open mode for reading
+   */
+    void init_primary_hdu() {
+
+        simple = hdu_header.value_of<bool>("SIMPLE");
+        extend = hdu_header.value_of<bool>("EXTEND");
+    }
+    
+    void instantiate_primary_hdu(bitpix element_type) {
+        switch (element_type)
+        {
+        case boost::astronomy::io::bitpix::B8:
+            data = image<bitpix::B8>();
             break;
-        case 1:
-            data_.read_image(file, this->naxis(1), 1);
+        case boost::astronomy::io::bitpix::B16:
+            data = image<bitpix::B16>();
             break;
-        case 2:
-            data_.read_image(file, this->naxis(1), this->naxis(2));
+        case boost::astronomy::io::bitpix::B32:
+            data = image<bitpix::B32>();
+            break;
+        case boost::astronomy::io::bitpix::_B32:
+            data = image<bitpix::_B32>();
+            break;
+        case boost::astronomy::io::bitpix::_B64:
+            data = image<bitpix::_B64>();
             break;
         default:
-            data_.read_image(
-                file, this->naxis(1),
-                std::accumulate(this->naxis_.begin() + 1, this->naxis_.end(),
-                    static_cast<std::size_t>(1),
-                    std::multiplies<std::size_t>()));
             break;
         }
     }
+
+
 };
 
 }}} //namespace boost::astronomy::io

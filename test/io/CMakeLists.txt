@@ -4,6 +4,9 @@ foreach(_name
         t_primary_hdu
         t_ascii_table
         t_binary_table
+        t_fits
+        t_stream_reader
+        t_fits_reader
        )
     set(_target test_fits_${_name})
 
