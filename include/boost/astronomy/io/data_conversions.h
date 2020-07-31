@@ -6,6 +6,7 @@
 #include<cstring>
 #include<complex>
 #include<boost/cstdint.hpp>
+#include<boost/algorithm/string.hpp>
 #include<boost/cstdfloat.hpp>
 #include<boost/endian/conversion.hpp>
 #include<boost/astronomy/io/column.hpp>
@@ -68,23 +69,19 @@ namespace boost{namespace astronomy{namespace io{
         template <typename ComplexType, typename AssumeType = ComplexType>
         static std::vector<std::complex<ComplexType>> elements_to_complex_collection(
             const std::string& elements, std::size_t no_elements) {
+
             std::vector<std::complex<ComplexType>> values;
             values.reserve(no_elements);
 
-            for (std::size_t i = 0; i < no_elements; i++) {
-                AssumeType temp_real =
-                    static_cast<AssumeType>(boost::endian::big_to_native(
-                        *reinterpret_cast<const AssumeType*>(elements.c_str()) + 2 * i));
-                ComplexType real;
-                std::memcpy(&real, &temp_real, sizeof(ComplexType));
+            const char* starting_offset = elements.c_str();
+            const char* ending_offset = starting_offset + sizeof(ComplexType) * 2;
 
-                AssumeType temp_imaginary =
-                    static_cast<AssumeType>(boost::endian::big_to_native(
-                        *reinterpret_cast<const AssumeType*>(elements.c_str()) + 2 * i +
-                        1));
-                ComplexType imaginary;
-                std::memcpy(&imaginary, &temp_imaginary, sizeof(ComplexType));
-                values.emplace_back(std::complex<ComplexType>(real, imaginary));
+            for (std::size_t i = 0; i < no_elements; i++) {
+
+                std::string raw_complex_no(starting_offset, ending_offset);
+                starting_offset = ending_offset;
+                ending_offset = starting_offset + sizeof(ComplexType) * 2;
+                values.push_back(element_to_complex<ComplexType, AssumeType>(raw_complex_no));
             }
             return values;
         }

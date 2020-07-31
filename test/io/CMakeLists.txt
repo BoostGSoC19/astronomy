@@ -7,6 +7,7 @@ foreach(_name
         t_fits
         t_stream_reader
         t_fits_reader
+        t_data_conversions
        )
     set(_target test_fits_${_name})
 
