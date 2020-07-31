@@ -295,7 +295,7 @@ BOOST_AUTO_TEST_SUITE(serial_data_to_floating_collections)
 
 BOOST_FIXTURE_TEST_CASE(serial_data_to_float32_collection, data_conversion_fixture) {
 
-    std::vector<boost::float32_t> sample_data{ 34324.2,4.32,3.24,324.4,32.4,4.21,3.3 };
+    std::vector<boost::float32_t> sample_data{ 34324.2f,4.32f,3.24f,324.4f,32.4f,4.21f,3.3f};
     std::string serialized_data = serialize(reverse_endianess<boost::float32_t,boost::int32_t>(sample_data));
 
     std::vector<boost::float32_t> deserialized_data = data_conversions::elements_to_numeric_collection<boost::float32_t,boost::int32_t>(serialized_data, sample_data.size());
