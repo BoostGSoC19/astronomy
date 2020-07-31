@@ -1,5 +1,7 @@
 /*=============================================================================
 Copyright 2019 Sarthak Singhal <singhalsarthak2007@gmail.com>
+Copyright 2019 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2020 Gopi Krishna Menon <krishnagopi487.github@outlook.com>
 
 Distributed under the Boost Software License, Version 1.0. (See accompanying
 file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
@@ -8,8 +10,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #ifndef BOOST_ASTRONOMY_IO_ASCII_TABLE_HPP
 #define BOOST_ASTRONOMY_IO_ASCII_TABLE_HPP
 
-#include <valarray>
-#include <fstream>
 #include <cstddef>
 #include <algorithm>
 #include <iterator>
@@ -24,11 +24,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/endian/conversion.hpp>
 #include <boost/cstdfloat.hpp>
 
-/**
- * @file    ascii_table.hpp
- * @author  Sarthak Singhal
- * @details This file contains definition for ascii_table structure
- */
 
 namespace boost { namespace astronomy {  namespace io {
 
@@ -37,7 +32,7 @@ namespace boost { namespace astronomy {  namespace io {
  * @details         This class provides a set of methods for creating,querying, and manipulation of ASCII_table extension HDU
  *                  For more information on Ascii_Table extension visit
  *                  <A href="http://archive.stsci.edu/fits/users_guide/node37.html#SECTION00540000000000000000">ASCII_TABLE</A>
- * @author          Sarthak Singhal
+ * @author          Sarthak Singhal,Gopi Krishna Menon, Pranam Lashkari
 */
 
 struct ascii_table : public table_extension
@@ -49,7 +44,11 @@ public:
     */
     ascii_table() {}
 
-    //TODO : Add comments
+    /**
+     * @brief      Constructs an ASCII Table object from header and data buffer
+     * @param[in]  other Header part of ASCII table
+     * @param[in]  data_buffer Data part of ASCII table
+    */
     ascii_table(header const& other, const std::string& data_buffer) : table_extension(other) {
         set_ascii_table_info(data_buffer);
     }
@@ -107,7 +106,10 @@ public:
         }
     }
 
-
+    /**
+     * @brief      Sets the data of ASCII Table from data_buffer
+     * @param[in]  data_buffer Data of ASCII Table
+    */
     void set_data(const std::string& data_buffer) {
         col_metadata_.clear();
         data_.clear();
@@ -189,8 +191,13 @@ public:
 
 private:
 
-    
-    template<typename ColDataType/*, typename VectorType*/>
+    /**
+     * @brief      Fills a perticular column with column data from internal buffer
+     * @details    This method converts the raw column elements to ColDataType and fills
+                   the column_data object passed as argument
+     * @param[in]  column_ptr Pointer to column container 
+    */
+    template<typename ColDataType>
     void fill_column(std::unique_ptr< column_data<ColDataType>>& column_ptr) const
     {        
         column_ptr->get_data().reserve(hdu_header.naxis(2));
@@ -212,6 +219,7 @@ private:
    
     /**
      * @brief  Initializes the current object with  column metadata and table data
+     * @param[in] data_buffer Data of the ASCII table
     */
     void set_ascii_table_info(const std::string& data_buffer) {
         populate_column_data();

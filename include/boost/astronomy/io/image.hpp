@@ -9,8 +9,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #define BOOST_ASTRONOMY_IO_IMAGE_HPP
 
 
-#include <valarray>
-#include <fstream>
 #include <cstddef>
 #include <algorithm>
 #include <iterator>
@@ -18,6 +16,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <string>
 #include <cmath>
 #include <numeric>
+#include <valarray>
 
 #include <boost/endian/conversion.hpp>
 #include <boost/cstdfloat.hpp>
@@ -188,6 +187,10 @@ template<bitpix bitpix_val>
 struct image:public image_buffer<typename bitpix_type<bitpix_val>::underlying_type> {
 
 public:
+    /**
+     * @brief Reads an image from the data buffer
+     * @param[in] data_buffer Data associated with image HDU or primary HDU
+    */
     void read_image(const std::string& data_buffer) {
 
         if (data_buffer.empty()) { return; }

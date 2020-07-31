@@ -1,5 +1,6 @@
 /*=============================================================================
 Copyright 2019 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2020 Gopi Krishna Menon <krishnagopi487.github@outlook.com>
 
 Distributed under the Boost Software License, Version 1.0. (See accompanying
 file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
@@ -8,7 +9,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #ifndef BOOST_ASTRONOMY_IO_BINARY_TABLE_HPP
 #define BOOST_ASTRONOMY_IO_BINARY_TABLE_HPP
 
-#include <fstream>
 #include <stdexcept>
 #include <iterator>
 #include <algorithm>
@@ -27,11 +27,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/data_conversions.h>
 
 
-/**
- * @file    binary_table.hpp
- * @author  Pranam Lashkari
- * @details This file contains definition for binary_table_extension structure
- */
 
 namespace boost { namespace astronomy { namespace io {
  /**
@@ -51,7 +46,11 @@ public:
     binary_table_extension() {}
 
     
-
+    /**
+    * @brief      Constructs an Binary Table object from header and data buffer
+    * @param[in]  other Header part of Binary table
+    * @param[in]  data_buffer Data part of Binary table
+   */
     binary_table_extension(header const& other, const std::string& data_buffer) : table_extension(other) {
 
         set_binary_table_info(data_buffer);
@@ -159,6 +158,10 @@ public:
     */
     const std::vector<char>& get_data() const { return data_; }
 
+    /**
+     * @brief      Sets the data of Binary Table from data_buffer
+     * @param[in]  data_buffer Data of Binary Table
+    */
     void set_data(const std::string& data_buffer) {
         data_.clear();
         col_metadata_.clear();
@@ -254,7 +257,6 @@ private:
      * @param[in,out] column_container Container that stores the field value for every row of specified field
      * @param[in]   col_metadata Column Metadata ( Some problems exists otherwise this param is not needed )
      * @param[in]   lambda Lambda function for fetching the field data from data buffer
-     * @todo        Why is column size present there
     */
     template <typename VectorType, typename Lambda>
     void fill_col(
@@ -284,12 +286,19 @@ private:
         }
     }
 
-
+    /**
+     * @brief  Initializes the current object with  column metadata and table data
+     * @param[in] data_buffer Data of the Binary table
+    */
     void set_binary_table_info(const std::string& data_buffer) {
         populate_column_data();
         data_.assign(data_buffer.begin(), data_buffer.end());
     }
 
+    /**
+     * @brief  Converts raw binary table field data to the given type and returns the column data
+     * @param[in] col_metadata Column metadata used for parsing
+    */
     template <typename T>
     std::unique_ptr<column_data<T>> parse_to(const column& col_metadata) {
         auto result = std::make_unique<column_data<T>>(col_metadata);

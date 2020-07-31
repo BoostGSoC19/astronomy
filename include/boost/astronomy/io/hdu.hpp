@@ -1,5 +1,6 @@
 /*=============================================================================
 Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2020 Gopi Krishna Menon <krishnagopi487.github@outlook.com>
 
 Distributed under the Boost Software License, Version 1.0. (See accompanying
 file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
@@ -9,11 +10,11 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #define BOOST_ASTRONOMY_IO_HDU_HPP
 
 #include <string>
-#include <fstream>
 #include <vector>
 #include <cstddef>
 #include <unordered_map>
 #include <memory>
+#include <fstream>
 
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
@@ -24,11 +25,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/card.hpp>
 #include <boost/astronomy/io/column.hpp>
 
-/**
- * @file    hdu.hpp
- * @author  Pranam Lashkari
- * @details Contains definition for structure <strong>hdu</strong>
- */
 namespace boost { namespace astronomy { namespace io {
 
 
@@ -64,7 +60,6 @@ public:
         return card(card_buffer);
     }
 
-    //TODO: Work on it
     template<typename FileReader>
     void read_header(FileReader& file_reader) {
 

@@ -1,5 +1,6 @@
 /*=============================================================================
 Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2020 Gopi Krishna Menon <krishnagopi487.github@outlook.com>
 
 Distributed under the Boost Software License, Version 1.0. (See accompanying
 file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
@@ -18,11 +19,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/image.hpp>
 #include <boost/variant.hpp>
 
-/**
- * @file    image_extension.hpp
- * @author  Pranam Lashkari
- * @details Contains definition for image_extension structure
- */
 
 namespace boost { namespace astronomy { namespace io {
 
@@ -49,16 +45,29 @@ struct image_extension : public boost::astronomy::io::extension_hdu
 
 public:
 
+    /**
+     * @brief Initializes the image extension object with header and data passed as argument
+     * @param[in] other Header associated with Image HDU
+     * @param[in] data_buffer Data associated with the Image HDU
+    */
     image_extension(const header& other, const std::string& data_buffer) :extension_hdu(other) {
         instantiate_image(other.bitpix());
         set_image_data(data_buffer);
     } 
 private:
+    /**
+     * @brief Sets the image data
+     * @param[in] data_buffer Image data in binary form from the file
+    */
     void set_image_data(const std::string& data_buffer) {
         read_image_visitor read_image_visit(data_buffer);
         boost::apply_visitor(read_image_visit, data);
     }
 
+    /**
+     * @brief Instantiates an image object
+     * @param[in] element_type Size of element ( bits per pixel )
+    */
     void instantiate_image(bitpix element_type) {
         switch (element_type)
         {

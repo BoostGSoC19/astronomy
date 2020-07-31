@@ -1,3 +1,11 @@
+/*=============================================================================
+Copyright 2019 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2020 Gopi Krishna Menon <krishnagopi487.github@outlook.com>
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+=============================================================================*/
+
 #ifndef BOOST_ASTRONOMY_IO_DATA_CONVERSIONS_HPP
 #define BOOST_ASTRONOMY_IO_DATA_CONVERSIONS_HPP
 
@@ -14,9 +22,20 @@
 
 
 namespace boost{namespace astronomy{namespace io{
+ /**
+  * @brief           Provides convenience methods for deserializing Binary data
+  * @author          Gopi Krishna Menon
+ */
     class data_conversions {
 
     public:
+
+        /**
+         * @brief  Deserializes single element in binary form to its original type
+         * @tparam NumericType Original Type in which element is to be returned
+         * @tparam AssumeType  An integral type with size same as NumericType to cirumvent endian conversion problem
+         * @param[in] element  data in binary format
+        */
         template <typename NumericType, typename AssumeType = NumericType>
         static NumericType element_to_numeric(const std::string& element) {
             AssumeType temp = boost::endian::big_to_native(
@@ -27,6 +46,13 @@ namespace boost{namespace astronomy{namespace io{
             return value;
         }
 
+        /**
+         * @brief  Deserializes multiple elements in binary form to its original type
+         * @tparam NumericType Original Type in which element is to be returned
+         * @tparam AssumeType  An integral type with size same as NumericType to cirumvent endian conversion problem
+         * @param[in] elements  Collection of elements with representation in binary form
+         * @param[in] no_elements  Number of elements of Numeric Type present in elements
+        */
         template <typename NumericType, typename AssumeType = NumericType>
         static std::vector<NumericType> elements_to_numeric_collection(
             const std::string& elements, std::size_t no_elements) {
@@ -50,6 +76,12 @@ namespace boost{namespace astronomy{namespace io{
             return values;
         }
 
+        /**
+         * @brief  Deserializes element in binary form to its Complex type
+         * @tparam ComplexType   Type of complex number
+         * @tparam AssumeType    An integral type with size same as ComplexType to cirumvent endian conversion problem
+         * @param[in] element    Data with representation in binary form
+        */
         template <typename ComplexType, typename AssumeType = ComplexType>
         static std::complex<ComplexType> element_to_complex(const std::string& element) {
             AssumeType temp_real = boost::endian::big_to_native(
@@ -66,6 +98,13 @@ namespace boost{namespace astronomy{namespace io{
             return std::complex<ComplexType>(real, imaginary);
         }
 
+        /**
+         * @brief  Deserializes multiple  elements in binary form to its Complex type
+         * @tparam ComplexType   Type of complex number
+         * @tparam AssumeType    An integral type with size same as ComplexType to cirumvent endian conversion problem
+         * @param[in] elements  Collection of elements with representation in binary form
+         * @param[in] no_elements  Number of elements of ComplexType present in elements
+        */
         template <typename ComplexType, typename AssumeType = ComplexType>
         static std::vector<std::complex<ComplexType>> elements_to_complex_collection(
             const std::string& elements, std::size_t no_elements) {
@@ -85,11 +124,23 @@ namespace boost{namespace astronomy{namespace io{
             }
             return values;
         }
+
+        /**
+         * @brief  Deserializes element in binary form to its ByteType
+         * @tparam ByteType Type to convert the binary data into    
+         * @param[in] element    Data with representation in binary form
+        */
         template <typename ByteType>
         static ByteType element_to_byte(const std::string& element) {
             return boost::lexical_cast<ByteType>(element);
         }
 
+        /**
+         * @brief  Deserializes multiple elements in binary form to its ByteType
+         * @tparam ByteType Type to convert the binary data into
+         * @param[in] elements    Data with representation in binary form
+         * @param[in] no_elements Number of elements of ByteType present
+        */
         template <typename ByteType>
         static std::vector<ByteType> elements_to_byte_collection(const std::string& elements,
             std::size_t no_elements) {
@@ -97,6 +148,10 @@ namespace boost{namespace astronomy{namespace io{
                 elements.begin() + no_elements);
         }
 
+        /**
+        * @brief  Returns the number of elements present in the field array
+        * @param[in] format Format of field
+       */
         static std::size_t element_count(std::string format) {
             std::string form = boost::trim_copy_if(format, [](char c) -> bool {
                 return c == '\'' || c == ' ';
@@ -107,6 +162,9 @@ namespace boost{namespace astronomy{namespace io{
                 static_cast<std::size_t>(1);
         }
 
+        /**
+        * @brief  Dispatcher method whose specializations perform deserialization of data
+       */
         template<typename T>
         static T convert(const std::string&, const column&) {
             return T();

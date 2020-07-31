@@ -1,4 +1,5 @@
 /*=============================================================================
+Copyright 2020 Pranam Lashkari <plashkari628@gmail.com>
 Copyright 2020 Gopi Krishna Menon <krishnagopi487.github@outlook.com>
 
 Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +17,10 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/hdu.hpp>
 
 namespace boost { namespace astronomy { namespace io {
-
+    /**
+     * @brief Stores cache related information for every HDU to control and improve performance
+     * @author Gopi Krishna Menon
+    */
     struct control_block {
         std::string filepath;
         struct info {
@@ -25,13 +29,20 @@ namespace boost { namespace astronomy { namespace io {
             std::size_t hdu_index;
             bool read_status;
             info() = default;
-            info(std::size_t loc, std::size_t index, std::size_t status) :header_location(loc), hdu_index(index), read_status(status) {}
+            info(std::size_t header_loc, std::size_t data_loc, std::size_t index, std::size_t status) :header_location(header_loc),data_location(data_loc), hdu_index(index), read_status(status) {}
         };
         std::map<std::string, info> hdus_info;
 
+        /**
+         * @brief Returns the total number of HDU's present in file
+        */
         std::size_t total_hdus() {
             return hdus_info.size();
         }
+
+        /**
+         * @brief Clears the control block object
+        */
         void clear() {
             filepath.clear();
             hdus_info.clear();
@@ -39,26 +50,48 @@ namespace boost { namespace astronomy { namespace io {
         }
     };
 
+    /**
+     * @brief This class provides services for accessing and manipulating different HDU objects
+     * @tparam FileReader Represents the reader class for reading related operations
+     * @tparam ExtensionsSupported Contains the list of extensions along with their construction methods   
+    */
     template<typename FileReader, typename ExtensionsSupported>
     class fits_reader {
         FileReader file_reader;
         std::vector<typename ExtensionsSupported::Extension> hdu_list;
         control_block hdus_control_block;
     public:
+        /**
+         * @brief Creates a default object of fits_reader
+        */
         fits_reader() {}
+
+        /**
+         * @brief Creates a fits_reader object and initializes it with the location of the file
+         * @param[in] filepath Location of file
+        */
         fits_reader(const std::string& filepath) {
             initialize(filepath);
         }
+
+        /**
+         * @brief Initializes the file_reader and hdu control block
+         * @param[in] filepath Location of file
+        */
         void initialize(const std::string& filepath) {
             file_reader.set_file(filepath);
             hdus_control_block.clear();
             hdus_control_block.filepath = filepath;
         }
+
+        /**
+         * @brief Reads only the HDU's header portion and caches the header location and data location
+        */
         void read_only_headers() {
             while (!file_reader.at_end()) {
                 auto hdu_position = file_reader.get_current_pos();
                 header hdu_header = extract_header();
-                hdus_control_block.hdus_info[hdu_header.get_hdu_name()] = control_block::info(hdu_position, hdu_list.size(), false);
+                hdus_control_block.hdus_info[hdu_header.get_hdu_name()] = control_block::info(hdu_position,file_reader.get_current_pos(), hdu_list.size(), false);
                 auto hdu_instance = ExtensionsSupported::construct_hdu(hdu_header, "");
                 hdu_list.push_back(hdu_instance);
                 if (hdu_header.data_size() != 0) {
@@ -67,37 +100,68 @@ namespace boost { namespace astronomy { namespace io {
                 }
             }
         }
+
+
+        /**
+         * @brief Reads both the HDU's header portion and data portion
+         * @note  Similar to the read_only_headers() method this method also caches the hdu information
+        */
         void read_entire_hdus() {
             while (!file_reader.at_end()) {
-                auto hdu_position = file_reader.get_current_pos();
+                auto header_loc = file_reader.get_current_pos();
                 header hdu_header = extract_header();
+                auto data_loc = file_reader.get_current_pos();
                 std::string hdu_data = extract_data_buffer(hdu_header);
-                hdus_control_block.hdus_info[hdu_header.get_hdu_name()] = control_block::info(hdu_position, hdu_list.size(), false);
+                hdus_control_block.hdus_info[hdu_header.get_hdu_name()] = control_block::info(header_loc,data_loc, hdu_list.size(), false);
                 auto hdu_instance = ExtensionsSupported::construct_hdu(hdu_header, hdu_data);
                 hdu_list.push_back(hdu_instance);
             }
         }
+
+        /**
+         * @brief Returns the HDU at given index
+        */
         typename ExtensionsSupported::Extension& operator [](int index) {
             return hdu_list.at(index);
         }
+
+        /**
+         * @brief Returns the HDU based on the hdu_name 
+        */
         typename ExtensionsSupported::Extension& operator [](const std::string& hdu_name) {
             return hdu_list[hdus_control_block.hdus_info.at(hdu_name).hdu_index];
         }
+
+        /**
+         * @brief Returns the list of hdu objects associated with a FITS file
+        */
         std::vector<typename ExtensionsSupported::Extension> get_hdu_list() {
             return hdu_list;
         }
+
+        /**
+         * @brief Returns the control block containing the hdu cache information
+        */
         control_block get_control_block_info() {
             return hdus_control_block;
         }
 
 
     private:
+        /**
+         * @brief Extracts the header from the FITS file
+        */
         header extract_header() {
             header hdu_header;
             hdu_header.read_header(file_reader);
             file_reader.set_unit_end();
             return hdu_header;
         }
+
+        /**
+         * @brief Extracts the data associated with a perticular HDU from the FITS file
+         * @param[in] hdu_header Header information related to the current HDU
+        */
         std::string extract_data_buffer(header& hdu_header) {
             if (hdu_header.data_size() == 0) {
                 return "";

@@ -1,5 +1,6 @@
 /*=============================================================================
 Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2020 Gopi Krishna Menon <krishnagopi487.github@outlook.com>
 
 Distributed under the Boost Software License, Version 1.0. (See accompanying
 file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
@@ -8,12 +9,9 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #ifndef BOOST_ASTRONOMY_IO_PRIMARY_HDU_HPP
 #define BOOST_ASTRONOMY_IO_PRIMARY_HDU_HPP
 
-//#include <map>
 #include <string>
 #include <vector>
 #include <cstddef>
-#include <valarray>
-#include <fstream>
 
 #include <boost/astronomy/io/hdu.hpp>
 #include <boost/astronomy/io/image.hpp>
@@ -58,6 +56,11 @@ public:
      */
     primary_hdu() {}
 
+    /**
+     * @brief Initializes the primary hdu object with header and data passed as argument
+     * @param[in] other Header associated with Primary HDU
+     * @param[in] data_buffer Data associated with the Primary HDU
+    */
     primary_hdu( const header & other,const std::string& data_buffer):hdu_header(other) {
 
         instantiate_primary_hdu(hdu_header.bitpix());
@@ -66,6 +69,9 @@ public:
         init_primary_hdu();
     }
 
+    /**
+     * @brief Returns the header associated with the currently held primary hdu
+    */
     header get_header() const {
         return hdu_header;
     }
@@ -108,7 +114,11 @@ private:
         simple = hdu_header.value_of<bool>("SIMPLE");
         extend = hdu_header.value_of<bool>("EXTEND");
     }
-    
+
+    /**
+     * @brief Instantiates an image object
+     * @param[in] element_type Size of element ( bits per pixel )
+    */
     void instantiate_primary_hdu(bitpix element_type) {
         switch (element_type)
         {
@@ -131,8 +141,6 @@ private:
             break;
         }
     }
-
-
 };
 
 }}} //namespace boost::astronomy::io

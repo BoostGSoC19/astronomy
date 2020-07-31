@@ -1,5 +1,6 @@
 /*=============================================================================
 Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2020 Gopi Krishna Menon <krishnagopi487.github@outlook.com>
 
 Distributed under the Boost Software License, Version 1.0. (See accompanying
 file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
@@ -11,15 +12,8 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <string>
 #include <vector>
 #include <cstddef>
-#include <valarray>
 
 #include <boost/astronomy/io/hdu.hpp>
-
-/**
- * @file    extension_hdu.hpp
- * @author  Pranam Lashkari
- * @details Contains the definition for extension_hdu
-*/
 
 namespace boost { namespace astronomy { namespace io {
 
