@@ -24,6 +24,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/table_extension.hpp>
 #include <boost/astronomy/io/column.hpp>
 #include <boost/astronomy/io/column_data.hpp>
+#include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/astronomy/io/data_conversions.h>
 
 
@@ -36,14 +37,15 @@ namespace boost { namespace astronomy { namespace io {
   *                  <A href="http://archive.stsci.edu/fits/users_guide/node44.html#SECTION00560000000000000000">BINARY_TABLE</A>
   * @author          Pranam Lashkari
  */
-struct binary_table_extension : table_extension
+template<typename CardPolicy=card_policy>
+struct basic_binary_table_extension : table_extension<CardPolicy>
 {
 public:
 
     /**
      * @brief       Creates a standalone object of binary_table_extension
     */
-    binary_table_extension() {}
+    basic_binary_table_extension() {}
 
     
     /**
@@ -51,7 +53,7 @@ public:
     * @param[in]  other Header part of Binary table
     * @param[in]  data_buffer Data part of Binary table
    */
-    binary_table_extension(header const& other, const std::string& data_buffer) : table_extension(other) {
+    basic_binary_table_extension(header<CardPolicy> const& other, const std::string& data_buffer) : table_extension<CardPolicy>(other) {
 
         set_binary_table_info(data_buffer);
 
@@ -69,58 +71,58 @@ public:
         std::size_t start = 0;
         for (std::size_t i = 0; i < this->tfields_; i++)
         {
-            col_metadata_[i].index(i + 1);
+            this->col_metadata_[i].index(i + 1);
 
-            col_metadata_[i].TFORM(
-                hdu_header.value_of<std::string>("TFORM" + boost::lexical_cast<std::string>(i + 1))
+            this->col_metadata_[i].TFORM(
+                this->hdu_header.template value_of<std::string>("TFORM" + boost::lexical_cast<std::string>(i + 1))
             );
 
-            col_metadata_[i].TBCOL(start);
+            this->col_metadata_[i].TBCOL(start);
 
-            start += column_size(col_metadata_[i].TFORM());
-
-            try {
-                col_metadata_[i].TTYPE(
-                    hdu_header.value_of<std::string>("TTYPE" + boost::lexical_cast<std::string>(i + 1))
-                );
-
-                col_metadata_[i].comment(
-                    hdu_header.value_of<std::string>(col_metadata_[i].TTYPE())
-                );
-            }
-            catch (std::out_of_range&) {/*Do Nothing*/ }
+            start += column_size(this->col_metadata_[i].TFORM());
 
             try {
-                col_metadata_[i].TUNIT(
-                    hdu_header.value_of<std::string>("TUNIT" + boost::lexical_cast<std::string>(i + 1))
+                this->col_metadata_[i].TTYPE(
+                    this->hdu_header.template value_of<std::string>("TTYPE" + boost::lexical_cast<std::string>(i + 1))
+                );
+
+                this->col_metadata_[i].comment(
+                    this->hdu_header.template value_of<std::string>(this->col_metadata_[i].TTYPE())
                 );
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
 
             try {
-                col_metadata_[i].TSCAL(
-                    hdu_header.value_of<double>("TSCAL" + boost::lexical_cast<std::string>(i + 1))
+                this->col_metadata_[i].TUNIT(
+                    this->hdu_header.template value_of<std::string>("TUNIT" + boost::lexical_cast<std::string>(i + 1))
                 );
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
 
             try {
-                col_metadata_[i].TZERO(
-                    hdu_header.value_of<double>("TZERO" + boost::lexical_cast<std::string>(i + 1))
+                this->col_metadata_[i].TSCAL(
+                    this->hdu_header.template value_of<double>("TSCAL" + boost::lexical_cast<std::string>(i + 1))
                 );
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
 
             try {
-                col_metadata_[i].TDISP(
-                    hdu_header.value_of<std::string>("TDISP" + boost::lexical_cast<std::string>(i + 1))
+                this->col_metadata_[i].TZERO(
+                    this->hdu_header.template value_of<double>("TZERO" + boost::lexical_cast<std::string>(i + 1))
                 );
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
 
             try {
-                col_metadata_[i].TDIM(
-                    hdu_header.value_of<std::string>("TDIM" + boost::lexical_cast<std::string>(i + 1))
+                this->col_metadata_[i].TDISP(
+                    this->hdu_header.template value_of<std::string>("TDISP" + boost::lexical_cast<std::string>(i + 1))
+                );
+            }
+            catch (std::out_of_range&) {/*Do Nothing*/ }
+
+            try {
+                this->col_metadata_[i].TDIM(
+                    this->hdu_header.template value_of<std::string>("TDIM" + boost::lexical_cast<std::string>(i + 1))
                 );
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
@@ -139,11 +141,11 @@ public:
     template <typename ColDataType>
     std::unique_ptr<column_data<ColDataType>> get_column(const std::string name) {
         auto column_info = std::find_if(
-            col_metadata_.begin(), col_metadata_.end(),
+            this->col_metadata_.begin(), this->col_metadata_.end(),
             [&name](const column& col) { return col.TTYPE() == name; }
         );
 
-        if (column_info == col_metadata_.end()) { return nullptr; }
+        if (column_info == this->col_metadata_.end()) { return nullptr; }
 
         return parse_to<ColDataType>(*column_info);
     }
@@ -151,21 +153,21 @@ public:
     /**
      * @brief       Returns the data of Binary Table
     */
-    std::vector<char>& get_data() { return data_; }
+    std::vector<char>& get_data() { return this->data_; }
 
     /**
      * @brief       Returns the data of Binary table (const version)
     */
-    const std::vector<char>& get_data() const { return data_; }
+    const std::vector<char>& get_data() const { return this->data_; }
 
     /**
      * @brief      Sets the data of Binary Table from data_buffer
      * @param[in]  data_buffer Data of Binary Table
     */
     void set_data(const std::string& data_buffer) {
-        data_.clear();
-        col_metadata_.clear();
-        col_metadata_.resize(tfields_);
+        this->data_.clear();
+        this->col_metadata_.clear();
+        this->col_metadata_.resize(this->tfields_);
         set_binary_table_info(data_buffer);
     }
 
@@ -265,13 +267,13 @@ private:
         Lambda lambda
                  ) const {
         auto is_single_element = element_count(col_metadata.TFORM()) > 1;
-        column_container.reserve(hdu_header.naxis(2));
-        for (std::size_t i = 0; i < hdu_header.naxis(2); i++) {
+        column_container.reserve(this->hdu_header.naxis(2));
+        for (std::size_t i = 0; i < this->hdu_header.naxis(2); i++) {
 
             std::string raw_data;
 
-            auto start_off = this->data_.data() + (i * hdu_header.naxis(1) + col_metadata.TBCOL());
-            auto ending_off = this->data_.data() +(i * hdu_header.naxis(1) + col_metadata.TBCOL()) +
+            auto start_off = this->data_.data() + (i * this->hdu_header.naxis(1) + col_metadata.TBCOL());
+            auto ending_off = this->data_.data() +(i * this->hdu_header.naxis(1) + col_metadata.TBCOL()) +
                 column_size(col_metadata.TFORM());
 
             if (is_single_element) {
@@ -292,7 +294,7 @@ private:
     */
     void set_binary_table_info(const std::string& data_buffer) {
         populate_column_data();
-        data_.assign(data_buffer.begin(), data_buffer.end());
+        this->data_.assign(data_buffer.begin(), data_buffer.end());
     }
 
     /**
@@ -305,9 +307,10 @@ private:
         fill_col(result->get_data(), col_metadata, data_conversions::convert<T>);
         return result;
     }
-
-    
 };
+
+using binary_table = basic_binary_table_extension<card_policy>;
+
 
 }}} //namespace boost::astronomy::io
 #endif // BOOST_ASTRONOMY_IO_BINARY_TABLE_HPP

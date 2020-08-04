@@ -23,7 +23,7 @@ namespace fits_test {
         std::string samples_directory;
     public:
         std::string sample1_path;
-        fits_reader<fits_stream_reader, default_hdu_manager> reader;
+        fits_reader<fits_stream_reader, default_hdu_manager<card_policy>> reader;
         fits_reader_fixture() {
 
 #ifdef SOURCE_DIR
@@ -51,7 +51,7 @@ namespace fits_test {
         return 0;
     }
     template<>
-     std::size_t fits_test::fetch_data_size::operator()(const primary_hdu& prime_hdu)const {
+     std::size_t fits_test::fetch_data_size::operator()(const basic_primary_hdu<card_policy>& prime_hdu)const {
         return prime_hdu.get_data<bitpix::_B32>().size();
     }
 }
@@ -80,7 +80,7 @@ BOOST_FIXTURE_TEST_CASE(get_hdu_by_index, fits_test::fits_reader_fixture) {
     reader.read_only_headers();
 
     BOOST_NOEXCEPT_OR_NOTHROW(
-        basic_fits<fits_stream_reader, default_hdu_manager>::convert_to<primary_hdu>(reader[0])
+        fits::convert_to<basic_primary_hdu<card_policy>>(reader[0])
     );
 }
 BOOST_FIXTURE_TEST_CASE(invalid_index, fits_test::fits_reader_fixture) {
@@ -92,7 +92,7 @@ BOOST_FIXTURE_TEST_CASE(get_hdu_by_name, fits_test::fits_reader_fixture) {
     reader.read_only_headers();
 
     BOOST_NOEXCEPT_OR_NOTHROW(
-        basic_fits<fits_stream_reader, default_hdu_manager>::convert_to<primary_hdu>(reader["primary_hdu"])
+        fits::convert_to<basic_primary_hdu<card_policy>>(reader["primary_hdu"])
     );
 }
 BOOST_FIXTURE_TEST_CASE(invalid_name, fits_test::fits_reader_fixture) {

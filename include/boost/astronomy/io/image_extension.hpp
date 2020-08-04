@@ -27,10 +27,9 @@ namespace boost { namespace astronomy { namespace io {
  * @details     For more information on Ascii_Table extension visit
  *              <A href="http://archive.stsci.edu/fits/users_guide/node41.html#SECTION00550000000000000000"> IMAGE_EXTENSION</A>
  * @author      Pranam Lashkari
- * @tparam      DataType Specifies the number of bits that represents a data value in image.
 */
-template <bitpix DataType>
-struct image_extension : public boost::astronomy::io::extension_hdu
+template <typename CardPolicy>
+struct basic_image_extension : public boost::astronomy::io::extension_hdu<CardPolicy>
 {
 
     typedef boost::variant<
@@ -50,7 +49,7 @@ public:
      * @param[in] other Header associated with Image HDU
      * @param[in] data_buffer Data associated with the Image HDU
     */
-    image_extension(const header& other, const std::string& data_buffer) :extension_hdu(other) {
+    basic_image_extension(const header<CardPolicy>& other, const std::string& data_buffer) :extension_hdu(other) {
         instantiate_image(other.bitpix());
         set_image_data(data_buffer);
     } 
@@ -91,6 +90,9 @@ private:
         }
     }
 };
+
+using image_extension = basic_image_extension<card_policy>;
+
 
 }}} //namespace boost::astronomy::io
 

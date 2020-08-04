@@ -16,9 +16,9 @@ using namespace boost::astronomy::io;
 
 namespace fits_test {
 
-    class primary_hdu_fixture:public base_fixture<fits_stream_reader> {
+    class primary_hdu_fixture:public base_fixture<fits_stream_reader,card_policy> {
     public:
-        primary_hdu test_p_hdu1;
+        basic_primary_hdu<card_policy> test_p_hdu1;
         primary_hdu_fixture() {
 #ifdef SOURCE_DIR
             samples_directory =
@@ -32,10 +32,10 @@ namespace fits_test {
             initialize_primary_hdu(test_p_hdu1, "fits_sample1");
         }
     private:
-        void initialize_primary_hdu(primary_hdu& prime_hdu, const std::string& sample_name) {
-            hdu_store* raw_primary_hdu_sample = get_raw_hdu(sample_name, "primary_hdu");
+        void initialize_primary_hdu(basic_primary_hdu<card_policy>& prime_hdu, const std::string& sample_name) {
+            hdu_store<card_policy>* raw_primary_hdu_sample = get_raw_hdu(sample_name, "primary_hdu");
             if (raw_primary_hdu_sample != nullptr) {
-                prime_hdu = primary_hdu(raw_primary_hdu_sample->hdu_header, raw_primary_hdu_sample->hdu_data_buffer);
+                prime_hdu = basic_primary_hdu<card_policy>(raw_primary_hdu_sample->hdu_header, raw_primary_hdu_sample->hdu_data_buffer);
             }
         }
     };
@@ -46,9 +46,9 @@ BOOST_AUTO_TEST_SUITE(primary_hdu_constructors)
 
 BOOST_FIXTURE_TEST_CASE(primary_hdu_ctor, fits_test::primary_hdu_fixture) {
 
-    fits_test::hdu_store* raw_prime_hdu = get_raw_hdu("fits_sample1", "primary_hdu");
+    fits_test::hdu_store<card_policy>* raw_prime_hdu = get_raw_hdu("fits_sample1", "primary_hdu");
    
-    primary_hdu prime_hdu_1(raw_prime_hdu->hdu_header,raw_prime_hdu->hdu_data_buffer);
+    basic_primary_hdu<card_policy> prime_hdu_1(raw_prime_hdu->hdu_header,raw_prime_hdu->hdu_data_buffer);
     BOOST_REQUIRE_EQUAL(prime_hdu_1.get_header().card_count(), 262);     
     BOOST_REQUIRE_EQUAL(prime_hdu_1.get_data<bitpix::_B32>().size(), 200 * 200 * 4);
 

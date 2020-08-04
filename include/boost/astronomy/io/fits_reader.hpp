@@ -90,12 +90,20 @@ namespace boost { namespace astronomy { namespace io {
         void read_only_headers() {
             while (!file_reader.at_end()) {
                 auto hdu_position = file_reader.get_current_pos();
-                header hdu_header = extract_header();
+
+                typename ExtensionsSupported::header_type hdu_header = extract_header();
+
                 hdus_control_block.hdus_info[hdu_header.get_hdu_name()] = control_block::info(hdu_position,file_reader.get_current_pos(), hdu_list.size(), false);
+
                 auto hdu_instance = ExtensionsSupported::construct_hdu(hdu_header, "");
+
                 hdu_list.push_back(hdu_instance);
+
                 if (hdu_header.data_size() != 0) {
-                    file_reader.set_reading_pos(file_reader.get_current_pos() + hdu_header.data_size());
+
+                    auto total_elements = hdu_header.data_size();
+                    auto element_size = get_element_size_from_bitpix(hdu_header.bitpix());
+                    file_reader.set_reading_pos(file_reader.get_current_pos() + (total_elements*element_size));
                     file_reader.set_unit_end();
                 }
             }
@@ -109,7 +117,7 @@ namespace boost { namespace astronomy { namespace io {
         void read_entire_hdus() {
             while (!file_reader.at_end()) {
                 auto header_loc = file_reader.get_current_pos();
-                header hdu_header = extract_header();
+                typename ExtensionsSupported::header_type hdu_header = extract_header();
                 auto data_loc = file_reader.get_current_pos();
                 std::string hdu_data = extract_data_buffer(hdu_header);
                 hdus_control_block.hdus_info[hdu_header.get_hdu_name()] = control_block::info(header_loc,data_loc, hdu_list.size(), false);
@@ -151,8 +159,8 @@ namespace boost { namespace astronomy { namespace io {
         /**
          * @brief Extracts the header from the FITS file
         */
-        header extract_header() {
-            header hdu_header;
+        typename ExtensionsSupported::header_type extract_header() {
+            typename ExtensionsSupported::header_type hdu_header;
             hdu_header.read_header(file_reader);
             file_reader.set_unit_end();
             return hdu_header;
@@ -162,7 +170,7 @@ namespace boost { namespace astronomy { namespace io {
          * @brief Extracts the data associated with a perticular HDU from the FITS file
          * @param[in] hdu_header Header information related to the current HDU
         */
-        std::string extract_data_buffer(header& hdu_header) {
+        std::string extract_data_buffer(typename ExtensionsSupported::header_type& hdu_header) {
             if (hdu_header.data_size() == 0) {
                 return "";
             }

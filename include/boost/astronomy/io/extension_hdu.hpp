@@ -23,13 +23,14 @@ namespace boost { namespace astronomy { namespace io {
  *          with setting the value of variables - extname, gcount,pcount
  * @see     boost::astronomy::io::hdu
 */
+template<typename CardPolicy>
 struct extension_hdu
 {
 protected:
     std::string extname;
     int gcount = 1;
     int pcount = 0;
-    header hdu_header;
+    header<CardPolicy> hdu_header;
 
 public:
     /**
@@ -44,7 +45,7 @@ public:
      *            by copying the header information from hdu_object
      * @param[in] other hdu object containing the header information
     */
-    extension_hdu(header const& other) :hdu_header(other)
+    extension_hdu(header<CardPolicy> const& other) :hdu_header(other)
     {
         set_extension_info();
     }
@@ -55,9 +56,9 @@ private:
      * @brief       Sets the extension_hdu's info from the header
     */
     void set_extension_info() {
-        gcount = hdu_header.value_of<int>("GCOUNT");
-        pcount = hdu_header.value_of<int>("PCOUNT");
-        extname = hdu_header.value_of<std::string>("EXTNAME");
+        gcount = hdu_header.template value_of<int>("GCOUNT");
+        pcount = hdu_header.template value_of<int>("PCOUNT");
+        extname = hdu_header.template value_of<std::string>("EXTNAME");
     }
 };
 

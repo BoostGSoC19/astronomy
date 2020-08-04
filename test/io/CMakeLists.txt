@@ -8,6 +8,7 @@ foreach(_name
         t_stream_reader
         t_fits_reader
         t_data_conversions
+        t_card_policy
        )
     set(_target test_fits_${_name})
 

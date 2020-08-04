@@ -12,6 +12,8 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/variant.hpp>
 #include <boost/astronomy/io/fits_reader.hpp>
+#include <boost/astronomy/io/default_card_policy.hpp>
+#include <boost/astronomy/io/default_hdus.hpp>
 
 
 namespace boost { namespace astronomy {namespace io {
@@ -66,6 +68,7 @@ namespace boost { namespace astronomy {namespace io {
             return boost::get<ConversionType>(extension);
         }
     };
+    using fits = basic_fits<fits_stream_reader, default_hdu_manager<card_policy>>;
 
         }
     }

@@ -15,13 +15,8 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/astronomy/io/hdu.hpp>
 #include <boost/astronomy/io/image.hpp>
+#include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/variant.hpp>
-
-/**
- * @file    primary_hdu.hpp
- * @author  Pranam Lashkari
- * @details Contains definition for primary_hdu structure.
- */
 
 namespace boost { namespace astronomy { namespace io {
 
@@ -30,12 +25,11 @@ namespace boost { namespace astronomy { namespace io {
  * @details This structure holds the primary HDU's header information and image data (if any)
  *          and as of now provides methods for only querying the header information and data of
  *          primary HDU
- * @tparam  DataType    Specifies the number of bits that represents a data value in image.
  * @note    For more information on primary_hdu visit
  *          <a href="http://archive.stsci.edu/fits/users_guide/node19.html#SECTION00511000000000000000">Primary_HDU</a>
- * @todo    Consider renaming <strong>DataType</strong> to <strong>FieldSize</strong>
  */
-struct primary_hdu
+template<typename CardPolicy=card_policy>
+struct basic_primary_hdu
 {
 protected:
     bool simple; //!Stores the value of SIMPLE
@@ -49,19 +43,19 @@ protected:
     > data_type;
 
     data_type data;
-    header hdu_header;
+    header<CardPolicy> hdu_header;
 public:
     /**
      * @brief   Default Constructor used to create a standalone object of primary_hdu
      */
-    primary_hdu() {}
+    basic_primary_hdu() {}
 
     /**
      * @brief Initializes the primary hdu object with header and data passed as argument
      * @param[in] other Header associated with Primary HDU
      * @param[in] data_buffer Data associated with the Primary HDU
     */
-    primary_hdu( const header & other,const std::string& data_buffer):hdu_header(other) {
+    basic_primary_hdu( const header<CardPolicy> & other,const std::string& data_buffer):hdu_header(other) {
 
         instantiate_primary_hdu(hdu_header.bitpix());
         read_image_visitor read_image_visit(data_buffer);
@@ -72,7 +66,7 @@ public:
     /**
      * @brief Returns the header associated with the currently held primary hdu
     */
-    header get_header() const {
+    header<CardPolicy> get_header() const {
         return hdu_header;
     }
 
@@ -111,8 +105,8 @@ private:
    */
     void init_primary_hdu() {
 
-        simple = hdu_header.value_of<bool>("SIMPLE");
-        extend = hdu_header.value_of<bool>("EXTEND");
+        simple = hdu_header.template value_of<bool>("SIMPLE");
+        extend = hdu_header.template value_of<bool>("EXTEND");
     }
 
     /**
@@ -142,6 +136,8 @@ private:
         }
     }
 };
+
+using primary_hdu = basic_primary_hdu<card_policy>;
 
 }}} //namespace boost::astronomy::io
 

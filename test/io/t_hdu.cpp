@@ -9,6 +9,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/astronomy/io/hdu.hpp>
 #include <boost/astronomy/io/stream_reader.hpp>
+#include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/test/unit_test.hpp>
 #include "base_fixture.hpp"
 #include <map>
@@ -16,9 +17,9 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 using namespace boost::astronomy::io;
 namespace fits_test {
 
-    class hdu_fixture :public base_fixture<fits_stream_reader> {
+    class hdu_fixture :public base_fixture<fits_stream_reader,card_policy> {
     public:
-        header sample_1;
+        header<card_policy> sample_1;
         hdu_fixture() {
 #ifdef SOURCE_DIR
             samples_directory = std::string((std::string(SOURCE_DIR) +
@@ -33,8 +34,8 @@ namespace fits_test {
         }
     private:
 
-        void initialize_header(header& hdu_header, const std::string& sample_name, const std::string& hdu_name) {
-            hdu_store* sample = get_raw_hdu(sample_name, hdu_name);
+        void initialize_header(header<card_policy>& hdu_header, const std::string& sample_name, const std::string& hdu_name) {
+            hdu_store<card_policy>* sample = get_raw_hdu(sample_name, hdu_name);
             if (sample != nullptr) {
                 hdu_header = sample->hdu_header;
             }

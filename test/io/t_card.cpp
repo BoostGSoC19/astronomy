@@ -10,6 +10,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/test/unit_test.hpp>
 #include <boost/astronomy/io/card.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
+#include <boost/astronomy/io/default_card_policy.hpp>
 
 
 class card_fixture {
@@ -106,7 +107,7 @@ public:
 
 
         //Comment only Card
-        std::string raw_comment_card = "COMMENT  Morph_Flag: '<' for star-like appearance, '>' for fainter spherical   ";
+        std::string raw_comment_card = "COMMENT  Morph_Flag: '<' for star-like appearance, '>' for fainter spherical    ";
         fixture_card comment_card;
         comment_card.raw_form = raw_comment_card;
         comment_card.key = "COMMENT";
@@ -115,11 +116,15 @@ public:
         card_list.emplace("comment_card", comment_card);
 
 
-        //Date ( This will be there in future )
-
         // Complex ( This will be there in future )
-
-
+        std::string raw_complex_card = "COMPLEX = "+std::string(16,' ')+"12.3"+std::string(16,' ')+"45.6";
+        raw_complex_card.append(80 - raw_complex_card.length(), ' ');
+        fixture_card complex_card;
+        complex_card.raw_form = raw_complex_card;
+        complex_card.key = "COMPLEX";
+        complex_card.value = "12.3 45.6";
+        complex_card.comment = "";
+        card_list.emplace("complex_card", complex_card);
 
     }
 
@@ -140,22 +145,22 @@ BOOST_FIXTURE_TEST_SUITE(card_constructors, card_fixture)
 
 BOOST_AUTO_TEST_CASE(card_cstring_ctor) {
 
-    card test_card(get_card("boolean_card").raw_form.c_str());
+    card<card_policy> test_card(get_card("boolean_card").raw_form.c_str());
 
-    BOOST_REQUIRE_EQUAL(test_card.key(), get_card("boolean_card").key);
+    BOOST_REQUIRE_EQUAL(test_card.keyword(), get_card("boolean_card").key);
     BOOST_REQUIRE_EQUAL(test_card.value<bool>(), get_card("boolean_card").value == "T" ? true : false);
 }
 
 
 BOOST_AUTO_TEST_CASE(card_string_ctor) {
-    card test_card(get_card("string_card").raw_form);
+    card<card_policy> test_card(get_card("string_card").raw_form);
 
 
-    BOOST_REQUIRE_EQUAL(test_card.key(), get_card("string_card").key);
+    BOOST_REQUIRE_EQUAL(test_card.keyword(), get_card("string_card").key);
     BOOST_REQUIRE_EQUAL(test_card.value < std::string >(), get_card("string_card").value);
 
     // Case where the length is more than 80 ( Should throw exception )
-    BOOST_REQUIRE_THROW((card(get_card("invalid_card").raw_form)), boost::astronomy::invalid_card_length_exception);
+    BOOST_REQUIRE_THROW((card<card_policy>(get_card("invalid_card").raw_form)), boost::astronomy::invalid_card);
 
 }
 
@@ -165,7 +170,7 @@ BOOST_FIXTURE_TEST_SUITE(card_create_card_variants, card_fixture)
 
 
 BOOST_AUTO_TEST_CASE(card_create_card) {
-    card test_card;
+    card<card_policy> test_card;
     auto string_card = get_card("string_card");
     auto string_card_nocomment = get_card("string_card_nocomment");
 
@@ -180,28 +185,14 @@ BOOST_AUTO_TEST_CASE(card_create_card) {
     test_card.create_card(string_card_nocomment.key, string_card_nocomment.value);
     BOOST_REQUIRE_EQUAL(test_card.raw_card(), string_card_nocomment.raw_form);
 
-
-    // Takes a random card and increases the keyword length to force an invalid_key exception
-    BOOST_REQUIRE_THROW(
-        test_card.create_card(string_card.key + "abcd", string_card.value, string_card.comment),
-        boost::astronomy::invalid_key_length_exception
-    );
-
-    // Takes a random card and adds some spaces to the value to force an exception
-    BOOST_REQUIRE_THROW(
-        test_card.create_card(string_card.key,
-            std::string(string_card.value).insert(string_card.value.length() - 1, std::string(52, ' ') + '\''),
-            string_card.comment + "dummy"),
-        boost::astronomy::invalid_value_length_exception
-    );
-
-
 }
 
 BOOST_AUTO_TEST_CASE(card_create_card_bool) {
     auto boolean_card = get_card("boolean_card");
-    card test_card;
+    card<card_policy> test_card;
     test_card.create_card(boolean_card.key, boolean_card.value == "T" ? true : false, boolean_card.comment);
+
+
 
     BOOST_REQUIRE_EQUAL(test_card.raw_card(), boolean_card.raw_form);
 }
@@ -210,11 +201,15 @@ BOOST_AUTO_TEST_CASE(card_create_card_numeric) {
     auto fixture_integer_card = get_card("integer_card");
     auto fixture_floating_card = get_card("floating_card");
 
-    card integer_card;
-    card floating_card;
+    card<card_policy> integer_card;
+    card<card_policy> floating_card;
 
     integer_card.create_card(fixture_integer_card.key, std::atoi(fixture_integer_card.value.c_str()), fixture_integer_card.comment);
     floating_card.create_card(fixture_floating_card.key, std::atof(fixture_floating_card.value.c_str()), fixture_floating_card.comment);
+
+    auto a = integer_card.raw_card();
+    auto b = fixture_integer_card.raw_form;
+
 
 
     BOOST_REQUIRE_EQUAL(integer_card.raw_card(), fixture_integer_card.raw_form);
@@ -223,13 +218,27 @@ BOOST_AUTO_TEST_CASE(card_create_card_numeric) {
 
 
 BOOST_AUTO_TEST_CASE(card_create_card_complex) {
-    // TODO : Write the tests after including support for complex numbers
+    auto fixture_complex_card = get_card("complex_card");
+
+    card<card_policy> complex_card;
+
+    complex_card.create_card(fixture_complex_card.key, std::complex<double>(12.3, 45.6), "");
+
+    auto a = complex_card.raw_card();
+    auto b = fixture_complex_card.raw_form;
+
+    BOOST_REQUIRE_EQUAL(complex_card.raw_card(), fixture_complex_card.raw_form);
 }
 
 BOOST_AUTO_TEST_CASE(card_create_commentary_card) {
     auto fixture_comment_card = get_card("comment_card");
-    card comment_card;
+    card<card_policy> comment_card;
     comment_card.create_commentary_card(fixture_comment_card.key, fixture_comment_card.value);
+
+    auto a = comment_card.raw_card() ;
+    auto b = fixture_comment_card.raw_form;
+
+
     BOOST_REQUIRE_EQUAL(comment_card.raw_card(), fixture_comment_card.raw_form);
 
 }
@@ -240,9 +249,9 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_FIXTURE_TEST_SUITE(card_utility_methods, card_fixture)
 
 BOOST_AUTO_TEST_CASE(card_key) {
-    auto integer_card = card(get_card("integer_card").raw_form).key();
-    auto floating_card = card(get_card("floating_card").raw_form).key();
-    auto comment_card = card(get_card("comment_card").raw_form).key();
+    auto integer_card = card<card_policy>(get_card("integer_card").raw_form).keyword();
+    auto floating_card = card<card_policy>(get_card("floating_card").raw_form).keyword();
+    auto comment_card = card<card_policy>(get_card("comment_card").raw_form).keyword();
 
 
     BOOST_REQUIRE_EQUAL(integer_card, get_card("integer_card").key);
@@ -255,9 +264,9 @@ BOOST_AUTO_TEST_CASE(card_value) {
     auto fixture_floating_card = get_card("floating_card");
     auto fixture_comment_card = get_card("comment_card");
 
-    card integer_card(fixture_integer_card.raw_form);
-    card floating_card(fixture_floating_card.raw_form);
-    card comment_card(fixture_comment_card.raw_form);
+    card<card_policy> integer_card(fixture_integer_card.raw_form);
+    card<card_policy> floating_card(fixture_floating_card.raw_form);
+    card<card_policy> comment_card(fixture_comment_card.raw_form);
 
     BOOST_REQUIRE_EQUAL(integer_card.value<int>(), std::atoi(fixture_integer_card.value.c_str()));
     BOOST_CHECK_CLOSE(floating_card.value<float>(), std::atof(fixture_floating_card.value.c_str()), 0.001);
@@ -268,12 +277,12 @@ BOOST_AUTO_TEST_CASE(card_value) {
 
 BOOST_AUTO_TEST_CASE(card_value_comment) {
     auto fixture_integer_card = get_card("integer_card");
-    BOOST_REQUIRE_EQUAL(card(fixture_integer_card.raw_form).value_with_comment(),
+    BOOST_REQUIRE_EQUAL(card<card_policy>(fixture_integer_card.raw_form).value_with_comment(),
         fixture_integer_card.value + " /" + fixture_integer_card.comment
     );
 
     auto fixture_floating_card = get_card("floating_card");
-    BOOST_REQUIRE_EQUAL(card(fixture_floating_card.raw_form).value_with_comment(),
+    BOOST_REQUIRE_EQUAL(card<card_policy>(fixture_floating_card.raw_form).value_with_comment(),
         fixture_floating_card.value + " /" + fixture_floating_card.comment
     );
 
@@ -281,8 +290,12 @@ BOOST_AUTO_TEST_CASE(card_value_comment) {
 }
 
 BOOST_AUTO_TEST_CASE(card_setvalue) {
-    // TODO : Problems with main codebase please check
+    card<card_policy> test_card;
+    test_card.create_card("TEST", 123, "This is a test card");
 
+    test_card.set_value(45.6);
+
+    BOOST_REQUIRE_CLOSE(test_card. template value<double>(), 45.6, 0.001);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

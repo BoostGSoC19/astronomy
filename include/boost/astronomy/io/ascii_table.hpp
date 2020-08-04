@@ -20,9 +20,11 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/astronomy/io/column.hpp>
 #include <boost/astronomy/io/column_data.hpp>
+#include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/astronomy/io/table_extension.hpp>
 #include <boost/endian/conversion.hpp>
 #include <boost/cstdfloat.hpp>
+
 
 
 namespace boost { namespace astronomy {  namespace io {
@@ -35,21 +37,22 @@ namespace boost { namespace astronomy {  namespace io {
  * @author          Sarthak Singhal,Gopi Krishna Menon, Pranam Lashkari
 */
 
-struct ascii_table : public table_extension
+template<typename CardPolicy>
+struct basic_ascii_table : public table_extension<CardPolicy>
 {
 public:
 
     /**
      * @brief      Creates a standalone ascii_table object
     */
-    ascii_table() {}
+    basic_ascii_table() {}
 
     /**
      * @brief      Constructs an ASCII Table object from header and data buffer
      * @param[in]  other Header part of ASCII table
      * @param[in]  data_buffer Data part of ASCII table
     */
-    ascii_table(header const& other, const std::string& data_buffer) : table_extension(other) {
+    basic_ascii_table(header<CardPolicy> const& other, const std::string& data_buffer) : table_extension<CardPolicy>(other) {
         set_ascii_table_info(data_buffer);
     }
 
@@ -62,44 +65,44 @@ public:
     {
         for (std::size_t i = 0; i < this->tfields_; i++)
         {
-            col_metadata_[i].index(i + 1);
+            this->col_metadata_[i].index(i + 1);
 
-            col_metadata_[i].TFORM(
-                hdu_header.value_of<std::string>("TFORM" + boost::lexical_cast<std::string>(i + 1))
+            this->col_metadata_[i].TFORM(
+                this->hdu_header.template value_of<std::string>("TFORM" + boost::lexical_cast<std::string>(i + 1))
             );
 
-            col_metadata_[i].TBCOL(
-                hdu_header.value_of<std::size_t>("TBCOL" + boost::lexical_cast<std::string>(i + 1))
+            this->col_metadata_[i].TBCOL(
+                this->hdu_header.template value_of<std::size_t>("TBCOL" + boost::lexical_cast<std::string>(i + 1))
             );
 
             try {
-                col_metadata_[i].TTYPE(
-                    hdu_header.value_of<std::string>("TTYPE" + boost::lexical_cast<std::string>(i + 1))
+                this->col_metadata_[i].TTYPE(
+                    this->hdu_header.template value_of<std::string>("TTYPE" + boost::lexical_cast<std::string>(i + 1))
                 );
 
-                col_metadata_[i].comment(
-                    hdu_header.value_of<std::string>(col_metadata_[i].TTYPE())
-                );
-            }
-            catch (std::out_of_range&) {/*Do Nothing*/ }
-
-            try {
-                col_metadata_[i].TUNIT(
-                    hdu_header.value_of<std::string>("TUNIT" + boost::lexical_cast<std::string>(i + 1))
+                this->col_metadata_[i].comment(
+                    this->hdu_header.template value_of<std::string>(this->col_metadata_[i].TTYPE())
                 );
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
 
             try {
-                col_metadata_[i].TSCAL(
-                    hdu_header.value_of<double>("TSCAL" + boost::lexical_cast<std::string>(i + 1))
+                this->col_metadata_[i].TUNIT(
+                    this->hdu_header.template value_of<std::string>("TUNIT" + boost::lexical_cast<std::string>(i + 1))
                 );
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
 
             try {
-                col_metadata_[i].TZERO(
-                    hdu_header.value_of<double>("TZERO" + boost::lexical_cast<std::string>(i + 1))
+                this->col_metadata_[i].TSCAL(
+                    this->hdu_header.template value_of<double>("TSCAL" + boost::lexical_cast<std::string>(i + 1))
+                );
+            }
+            catch (std::out_of_range&) {/*Do Nothing*/ }
+
+            try {
+                this->col_metadata_[i].TZERO(
+                    this->hdu_header.template value_of<double>("TZERO" + boost::lexical_cast<std::string>(i + 1))
                 );
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
@@ -111,9 +114,9 @@ public:
      * @param[in]  data_buffer Data of ASCII Table
     */
     void set_data(const std::string& data_buffer) {
-        col_metadata_.clear();
-        data_.clear();
-        col_metadata_.resize(tfields_);
+        this->col_metadata_.clear();
+        this->data_.clear();
+        this->col_metadata_.resize(this->tfields_);
         set_ascii_table_info(data_buffer);
     }
 
@@ -121,12 +124,12 @@ public:
     /**
      * @brief       Returns the data of ASCII table
     */
-    std::vector<char>& get_data() { return data_; }
+    std::vector<char>& get_data() { return this->data_; }
 
     /**
      * @brief       Returns the data of ASCII table (const version)
     */
-    const std::vector<char>& get_data() const { return data_; }
+    const std::vector<char>& get_data() const { return this->data_; }
 
     /**
      * @brief       Gets the metadata along with value(field_value) for every row of specified field
@@ -138,12 +141,12 @@ public:
     template<typename ColDataType>
     std::unique_ptr<column_data<ColDataType>> get_column(const std::string& column_name) const {
 
-        auto column_info = std::find_if(col_metadata_.begin(), col_metadata_.end(), [&column_name](const column& col) {
+        auto column_info = std::find_if(this->col_metadata_.begin(), this->col_metadata_.end(), [&column_name](const column& col) {
             return column_name == col.TTYPE();
             });
 
         
-        if (column_info != col_metadata_.end()) {
+        if (column_info != this->col_metadata_.end()) {
             auto result = std::make_unique<column_data<ColDataType>>(*column_info);
             fill_column<ColDataType>(result);
             return result;
@@ -200,10 +203,10 @@ private:
     template<typename ColDataType>
     void fill_column(std::unique_ptr< column_data<ColDataType>>& column_ptr) const
     {        
-        column_ptr->get_data().reserve(hdu_header.naxis(2));
-        for (std::size_t i = 0; i < hdu_header.naxis(2); i++) {
+        column_ptr->get_data().reserve(this->hdu_header.naxis(2));
+        for (std::size_t i = 0; i < this->hdu_header.naxis(2); i++) {
             auto starting_offset =
-                this->data_.begin() + i * hdu_header.naxis(1) + column_ptr->TBCOL();
+                this->data_.begin() + i * this->hdu_header.naxis(1) + column_ptr->TBCOL();
 
             auto ending_offset = starting_offset + column_size(column_ptr->TFORM());
 
@@ -223,10 +226,13 @@ private:
     */
     void set_ascii_table_info(const std::string& data_buffer) {
         populate_column_data();
-        data_.assign(data_buffer.begin(), data_buffer.end());
+        this->data_.assign(data_buffer.begin(), data_buffer.end());
     }
 
 };
+
+using ascii_table = basic_ascii_table<card_policy>;
+
 
 }}} //namespace boost::astronomy::io
 

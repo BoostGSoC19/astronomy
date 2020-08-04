@@ -15,6 +15,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/lexical_cast.hpp>
 #include <boost/type.hpp>
 
+#include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
 
 /**
@@ -31,20 +32,13 @@ namespace boost { namespace astronomy { namespace io {
  * @details This structure provides functions for storage, manipulation and access of FITS cards.
  * @author  Pranam Lashkari
  */
-struct card
+template<typename CardPolicy>
+struct card: CardPolicy
 {
 private:
     std::string card_;
 
 public:
-
-    enum value_type {
-        logical_val,
-        string_val,
-        numeric_val,
-        complex_val
-    };
-
 
     /**
      * @brief   Default Constructor to create a standalone object of <strong>card</strong>
@@ -55,41 +49,22 @@ public:
         this->card_.reserve(80);
     }
 
-    /**
-     * @brief       Constructs a card from a C-style string
-     * @details     This functions copies the first 80 characters from the array of characters pointed by c and
-     *              stores them internally.
-     * @param[in]   c Pointer to an array of characters.
-     * @pre         The C-Style string supplied to the constructor must contain the card information ( key, value,
-                    comment ) and should comply with the format of FITS standard
-                    validation of data ( A policy class would work here)
-     * @throws      std::bad_alloc If the request of 80bytes of memory allocation fails.
-     * @todo        Provide validation features inside this constructor to prevent the user being concerned with
-    */
-    card(char const* c) : card()
-    {
-        this->card_.assign(c, 80);
-    }
-
+    
 
     /**
      * @brief       Takes a string as argument and creates a card object based on that string.
      * @details     This function accepts a string as an argument and stores it internally provided
                     the content inside the string complies with the FITS standard requirements.
      * @param[in]   str String that contains the key-value-comment data
-     * @pre         The string provided as an argument must not be more than 80 characters in length
-                    and should follow the FITS standard requirements for ( key,value,comments)
-     * @throws      invalid_card_length_exception If the length of string is more than 80 characters
-     * @throws      std::bad_alloc If the request of 80bytes of memory allocation fails.
-     * @todo        This constructor also requires some validation features to make things simpler for user
     */
-    card(std::string str) : card()
+    card(std::string fits_card) : card()
     {
-        if (str.length() > 80)
-        {
-            throw invalid_card_length_exception();
+        if (this->is_card_valid(fits_card)) {
+            this->card_ = fits_card;
         }
-        this->card_ = str.append(80 - str.length(), ' ');
+        else {
+            throw invalid_card();
+        }
     }
 
 
@@ -98,12 +73,6 @@ public:
      * @param[in]   key Keyword associated with the FITS card
      * @param[in]   value Value associated with the FITS card
      * @param[in]   comment Optional comment associated with the FITS card
-     * @pre         The keyword length should be greater than 8 characters
-     * @pre         If comment is present then <strong>value.length()+comment.length()<=68 (The forward slash(/) and blank
-                    are accounted for already else value should be of no more than 70 characters
-     * @throws      invalid_key_length_exception If keyword length > 8
-     * @throws      invalid_value_length_exception If value+comment length >68 or  value length >70 ( No comments)
-     * @throws      std::bad_alloc If the request of 80bytes of memory allocation fails.
     */
     card
     (
@@ -114,131 +83,24 @@ public:
     {
         create_card(key, value, comment);
     }
-
-
-    /**
-     * @brief Constructs a card from key,value,comment(optional) supplied as the argument to the function
-     * @see   card (std::string const& key,std::string const& value,std::string const& comment = "")
-    */
-    void create_card(std::string const& key, std::string const& value,
-        std::string const& comment = "", value_type v_type = value_type::string_val) {
-
-        if (key.length() > 8) {
-            throw invalid_key_length_exception();
-        }
-        if (!comment.empty() && (value.length() + comment.length() > 68)) {
-            throw invalid_value_length_exception();
-        }
-        else if (value.length() > 70) {
-            throw invalid_value_length_exception();
-        }
-
-        std::string content_string;
-
-        if (v_type == value_type::string_val) {
-            if (!comment.empty()) {
-                content_string = std::string(key).append(8 - key.length(), ' ') + "= " +
-                    '\'' + value + '\'' + " /" + comment;
-            }
-            else {
-                content_string = std::string(key).append(8 - key.length(), ' ') + "= " +
-                    '\'' + std::string(value) + '\'';
-            }
-        }
-        else {
-            if (!comment.empty()) {
-                content_string = std::string(key).append(8 - key.length(), ' ') + "= " +
-                    value + " /" + comment;
-            }
-            else {
-                content_string = std::string(key).append(8 - key.length(), ' ') + "= " +
-                    std::string(value);
-            }
-        }
-
-
-        this->card_ = content_string + std::string(80 - content_string.length(), ' ');
-    }
-
-    /**
-     * @brief    Creates/Initializes the card object with a boolean value
-     * @see      create_card(std::string const& key,std::string const& value,std::string const& comment = "")
-     *           for more information on exception specification
-    */
-    void create_card(std::string const& key, bool value, std::string const& comment = "")
-    {
-        if (value)
-        {
-            create_card(key, std::string("T").insert(0, 19, ' '), comment, value_type::logical_val);
-        }
-        else
-        {
-            create_card(key, std::string("F").insert(0, 19, ' '), comment);
-        }
-    }
-
+    
+    
     /**
      * @brief       Creates/Initializes the card object with a numeric value
      * @tparam      Value Represents a numeric type that has extraction (<<) operator defined
      * @param[in]   key  keyword associated with the FITS card
      * @param[in]   value Numeric value associated with FITS card
      * @param[in]   comment Optional comment that describes the content of card
-     * @see         create_card(std::string const& key,std::string const& value,std::string const& comment = "")
-     *              for more information on exception specification
     */
     template <typename Value>
     void create_card(std::string const& key, Value value, std::string const& comment = "")
     {
-        std::string val;
-
-        std::stringstream value_stream;
-        value_stream << value;
-        val = value_stream.str();
-
-        // TODO: Macro to run this code in C++14 :). Average performance improvement 4 times
-        /*boost::hana::eval_if(
-            boost::is_same<double, Value>::value,
-            [&val, &value](void) { val = std::to_string(value); },
-            [&val, &value](void) {
-              std::stringstream value_stream;
-              value_stream << std::scientific << value;
-              val = value_stream.str();
-            }
-
-        );*/
-
-        val.insert(0, 20 - val.length(), ' ');
-        create_card(key, val, comment, value_type::numeric_val);
+        create_card_impl(key, this->serialize_to_fits_format(value), comment);
 
     }
 
 
-    /**
-     * @brief       Creates/Initializes the card object with a complex value
-     * @tparam      Real Any Numeric type representing <strong>real</strong> part of complex number
-     * @tparam      Imaginary Any Numeric type representing <strong>imaginary</strong> part of complex number
-     * @param[in]   key Keyword associated with FITS card
-     * @param[in]   real Real part of complex number
-     * @param[in]   imaginary Imaginary part of complex number
-     * @param[in]   comment Represents an optional comment that describes the FITS card
-     * @see         create_card(std::string const& key,std::string const& value,std::string const& comment = "")
-     *              for more information on exception specification
-    */
-    template <typename Real, typename Imaginary>
-    void create_card
-    (
-        // Use complex class. Its much better
-        std::string const& key,
-        Real real,
-        Imaginary imaginary,
-        std::string const& comment = ""
-    )
-    {
-       std::string value = "(" + std::to_string(real)+','+std::to_string(imaginary) + ")";
-
-       create_card(key, value, comment, value_type::complex_val);
-    }
-
+    
     /**
      * @brief       This function takes a key and value as argument and creates a card from it.
      * @details     This function is be used to create a <strong>comment,history,blank</strong> card.
@@ -247,23 +109,17 @@ public:
      * @pre         key.length()<=8 characters
      * @pre         value.length()<=70 characters
      * @note        If some value is present then it will be inserted from 11th position onwards
-     * @throws      invalid_key_length_exception If keyword.length()>8
-     * @throws      invalid_value_length_exception  If value.length()>70
     */
     void create_commentary_card(std::string const& key, std::string const& value)
     {
-
-        if (key.length() > 8)
-        {
-            throw invalid_key_length_exception();
-        }
-        if (value.length() > 70)
-        {
-            throw invalid_value_length_exception();
+        if (this->is_key_valid(key)) {
+            std::string card_content = key + "  " + value;
+            this->card_ = card_content;
+            this->card_.append(80 - card_content.length(),' ');
+            return;
         }
 
-        this->card_ = std::string(key).append(8 - key.length(), ' ') + " " +
-            std::string(value).append(70 - value.length(), ' ');
+        throw invalid_card();
     }
 
     /**
@@ -271,13 +127,14 @@ public:
      * @param[in]   whole Indicates whether the keyword should be returned with or without trailing spaces
      * @return      Returns the keyword part of the card
     */
-    std::string key(bool whole = false) const
+    std::string keyword(bool whole = false) const
     {
+        std::string keyword = this->extract_keyword(this->card_);
         if (whole)
         {
-            return this->card_.substr(0, 8);
+            return keyword;
         }
-        return boost::algorithm::trim_copy(this->card_.substr(0, 8));
+        return boost::algorithm::trim_copy(keyword);
     }
 
     /**
@@ -306,21 +163,19 @@ public:
     /**
      * @brief       Sets the value of current card
      * @param[in]   value Value to be set.
-     * @throws      key_not_defined_exception If keyword length of current card object is 0
-     * @throws      invalid_value_length_exception If the value.length()>70
     */
-    void value(std::string const& value)
+    template<typename DataType>
+    void set_value(DataType value)
     {
-        // Just put empty instead of length please
-        if (this->key().length() == 0)
-        {
-            throw key_not_defined_exception();
+
+        std::string serialized_value = this->serialize_to_fits_format(value);
+
+        if (this->is_card_valid(this->keyword(), serialized_value, "")) { 
+            std::string key = this->keyword(true);
+            this->card_.clear();
+            this->card_.append(key);
+            this->card_.append(serialized_value);
         }
-        if (value.length() > 70)
-        {
-            throw invalid_value_length_exception();
-        }
-        this->card_.append(70 - value.length(), ' ');
     }
 
     /**
@@ -331,27 +186,44 @@ public:
 private:
 
     /**
+     * @brief Creates a card from key, value and comment supplied to the method
+    */
+    void create_card_impl(const std::string& key, const std::string& value, const std::string& comment="") {
+
+        if (this->is_card_valid(key, value, comment)) {
+
+            if (comment.empty()) {
+                this->card_ = this->format_keyword(key) + "= " + value;
+            }
+            else {
+                this->card_ = this->format_keyword(key) +"= "+value + " /" + comment;
+            }
+
+            this->card_.append(80 - this->card_.length(), ' ');
+            return;
+        }
+
+        throw invalid_card();
+    }
+
+    /**
      * @brief   Returns the value associated with the card in required type.
      * @tparam  ReturnType Type to which the value needs to be converted.
      * @return  The value associated with card in the Required Type
-     * @throws  boost::bad_lexical_cast If the conversion could not succeed
     */
     template <typename ReturnType>
     ReturnType value_imp(boost::type<ReturnType>) const
     {
-        std::string val = boost::algorithm::trim_copy(
-            this->card_.substr(9, this->card_.find('/') - 10));
-        return boost::lexical_cast<ReturnType>(val);
+        std::string val = boost::algorithm::trim_copy(this->extract_value(this->card_));
+        return this->template parse_to<ReturnType>(val);
     }
-
 
     /**
      * @brief   Returns the value associated with the card in string type
      * @return  string value
     */
     std::string value_imp(boost::type<std::string>) const {
-        std::string val = boost::algorithm::trim_copy(
-            this->card_.substr(9, this->card_.find('/') - 10));
+        std::string val = boost::algorithm::trim_copy(this->extract_value(this->card_));
         if (val[0] == '\'') {
             return boost::algorithm::trim_copy(std::string(val.begin() + 1, val.end() - 1));
         }
@@ -359,23 +231,8 @@ private:
             return val;
         }
     }
-
-    /**
-     * @brief   Returns the value associated with the card in logical type
-     * @return  boolean value
-    */
-    bool value_imp(boost::type<bool>) const
-    {
-        std::string val = boost::algorithm::trim_copy(
-            this->card_.substr(9, this->card_.find('/') - 10));
-        if (val == "T")
-        {
-            return true;
-        }
-        return false;
-    }
-
 };
+
 
 }}} //namespace boost
 #endif // !BOOST_ASTRONOMY_IO_CARD_HPP

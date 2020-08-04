@@ -12,15 +12,16 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/test/unit_test.hpp>
 #include <sstream>
 #include <boost/astronomy/io/stream_reader.hpp>
+#include <boost/astronomy/io/default_card_policy.hpp>
 #include "base_fixture.hpp"
 
 using namespace boost::astronomy::io;
 
 namespace fits_test {
 
-    class ascii_table_fixture:public base_fixture<fits_stream_reader> {
+    class ascii_table_fixture:public base_fixture<fits_stream_reader,card_policy> {
     public:
-        ascii_table ascii_hdu1;
+        basic_ascii_table<card_policy> ascii_hdu1;
     
         ascii_table_fixture() {
 #ifdef SOURCE_DIR
@@ -38,10 +39,10 @@ namespace fits_test {
         }
     private:
          
-        void initialize_ascii_hdu(ascii_table& ascii_hdu, const std::string& sample_name) {
-            hdu_store* raw_ascii_sample = get_raw_hdu(sample_name, "TABLE");
+        void initialize_ascii_hdu(basic_ascii_table<card_policy>& ascii_hdu, const std::string& sample_name) {
+            hdu_store<card_policy>* raw_ascii_sample = get_raw_hdu(sample_name, "TABLE");
             if (raw_ascii_sample != nullptr) {
-                ascii_hdu = ascii_table(raw_ascii_sample->hdu_header, raw_ascii_sample->hdu_data_buffer);
+                ascii_hdu = basic_ascii_table<card_policy>(raw_ascii_sample->hdu_header, raw_ascii_sample->hdu_data_buffer);
             }
         }
     };
@@ -54,8 +55,8 @@ BOOST_FIXTURE_TEST_CASE(ascii_table_get_data, fits_test::ascii_table_fixture) {
  }
 
 BOOST_FIXTURE_TEST_CASE(ascii_table_set_data, fits_test::ascii_table_fixture) {
-    fits_test::hdu_store* raw_ascii_hdu = get_raw_hdu("fits_sample1", "TABLE");
-    ascii_table test_hdu(raw_ascii_hdu->hdu_header,"");
+    fits_test::hdu_store<card_policy>* raw_ascii_hdu = get_raw_hdu("fits_sample1", "TABLE");
+    basic_ascii_table<card_policy> test_hdu(raw_ascii_hdu->hdu_header,"");
 
     test_hdu.set_data(raw_ascii_hdu->hdu_data_buffer);
 
@@ -74,10 +75,10 @@ BOOST_FIXTURE_TEST_CASE(ascii_table_get_column,fits_test::ascii_table_fixture) {
 }
 
 BOOST_AUTO_TEST_CASE(ascii_table_get_column_size) {
-    BOOST_REQUIRE_EQUAL(ascii_table::column_size("D25.17"), 25);
+    BOOST_REQUIRE_EQUAL(basic_ascii_table<card_policy>::column_size("D25.17"), 25);
 }
 BOOST_AUTO_TEST_CASE(ascii_table_get_column_type) {
-    BOOST_REQUIRE_EQUAL(ascii_table::get_type("D25.17"), 'D');
+    BOOST_REQUIRE_EQUAL(basic_ascii_table<card_policy>::get_type("D25.17"), 'D');
 }
 
 BOOST_AUTO_TEST_SUITE_END()

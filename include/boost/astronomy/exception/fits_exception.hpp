@@ -34,15 +34,28 @@ namespace boost
             }
         };
 
-        class invalid_card_length_exception : public fits_exception
+        class invalid_card : public fits_exception
         {
         public:
             const char* what() const throw()
             {
-                return "Card length must not be more than 80 chars";
+                return "The given Card String does not follow all the requirements of a Card";
             }
         };
 
+        class invalid_cast : public fits_exception
+        {
+            std::string message;
+        public:
+            invalid_cast(const std::string& error_message) :message(error_message) {}
+            const char* what() const throw()
+            {
+                return message.c_str();
+            }
+        };
+
+
+        // ? What is this???
         class hdu_unit_overflow_exception : public fits_exception
         {
         public:
@@ -52,7 +65,7 @@ namespace boost
             }
         };
 
-        class invalid_key_length_exception : public invalid_card_length_exception
+        class invalid_key_length_exception : public invalid_card
         {
         public:
             const char* what() const throw()
@@ -61,7 +74,7 @@ namespace boost
             }
         };
 
-        class invalid_value_length_exception : public invalid_card_length_exception
+        class invalid_value_length_exception : public invalid_card
         {
         public:
             const char* what() const throw()

@@ -16,6 +16,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #include<boost/astronomy/io/stream_reader.hpp>
 #include<boost/astronomy/io/default_hdus.hpp>
+#include<boost/astronomy/io/default_card_policy.hpp>
 #include<boost/astronomy/io/fits.hpp>
 #include "base_fixture.hpp"
 
@@ -47,7 +48,7 @@ namespace fits_test {
 }
 
 using namespace boost::astronomy::io;
-using fits = basic_fits<fits_stream_reader, default_hdu_manager>;
+using fits = basic_fits<fits_stream_reader, default_hdu_manager<card_policy>>;
 
 
 BOOST_FIXTURE_TEST_CASE(set_filename_on_valid_filepath,fits_test::fits_fixture) {

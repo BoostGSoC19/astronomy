@@ -37,6 +37,7 @@ namespace boost { namespace astronomy { namespace io {
  * @note    To learn more about HDU please refer
  *          <a href="http://archive.stsci.edu/fits/users_guide/node5.html#SECTION00320000000000000000">FITS</a>
  */
+template<typename CardPolicy>
 struct header
 {
 protected:
@@ -45,21 +46,17 @@ protected:
     std::string hdu_name;
 
     //! Stores the each card in header unit (80 char key value pair)
-    std::vector<card> cards;
+    std::vector<card<CardPolicy>> cards;
 
     //! stores the card-key index (used for faster searching)
     std::unordered_map<std::string, std::size_t> key_index;
 
 public:
 
-    template<typename FileReader>
-    static card read_signature_card(FileReader& file_reader) {
-        auto old_position = file_reader.get_current_pos();
-        std::string card_buffer=file_reader.read(80);
-        file_reader.set_reading_pos(old_position);
-        return card(card_buffer);
-    }
-
+    /**
+     * @brief Reads the header portion of an HDU using file reader
+     * @param[in] file_reader Reader used to access the FITS file
+    */
     template<typename FileReader>
     void read_header(FileReader& file_reader) {
 
@@ -74,17 +71,17 @@ public:
             cards.emplace_back(card_buffer);
 
             //store the index of the card in map
-            this->key_index[this->cards.back().key()] = this->cards.size() - 1;
+            this->key_index[this->cards.back().keyword()] = this->cards.size() - 1;
 
             //check if end card is found
-            if (this->cards.back().key(true) == "END     ")
+            if (this->cards.back().keyword(true) == "END     ")
             {
                 break;
             }
         }
         //finding and storing bitpix value
 
-        switch (cards[key_index["BITPIX"]].value<int>())
+        switch (cards[key_index["BITPIX"]]. template value<int>())
         {
         case 8:
             this->bitpix_value = io::bitpix::B8;
@@ -107,17 +104,20 @@ public:
         }
 
         //setting naxis values
-        std::size_t total_dimensions = cards[key_index["NAXIS"]].value<std::size_t>();
+        std::size_t total_dimensions = cards[key_index["NAXIS"]].template value<std::size_t>();
         naxis_.reserve(total_dimensions);
 
         for (std::size_t i = 1; i <= total_dimensions; i++)
         {
             naxis_.emplace_back(cards[key_index["NAXIS" +
-                boost::lexical_cast<std::string>(i)]].value<std::size_t>());
+                boost::lexical_cast<std::string>(i)]].template value<std::size_t>());
         }
 
     }
 
+    /**
+     * @brief Returns the name of the HDU
+    */
     std::string get_hdu_name() {
         // Check if its a extension
         try {
@@ -133,8 +133,8 @@ public:
     }
 
     bool contains_keyword(const std::string& keyword) {
-        auto keyword_found = std::find_if(cards.begin(), cards.end(), [&keyword](const card& h_card) {
-            return h_card.key() == keyword;
+        auto keyword_found = std::find_if(cards.begin(), cards.end(), [&keyword](const card<CardPolicy>& h_card) {
+            return h_card.keyword() == keyword;
             });
         return keyword_found != cards.end();
     }
@@ -186,7 +186,7 @@ public:
     template <typename ReturnType>
     ReturnType value_of(std::string const& key)// const
     {
-        return this->cards[key_index.at(key)].value<ReturnType>();
+        return this->cards[key_index.at(key)].template value<ReturnType>();
     }
 
 
