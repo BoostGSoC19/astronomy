@@ -40,8 +40,7 @@ struct basic_image_extension : public boost::astronomy::io::extension_hdu<CardPo
         image<bitpix::_B64>
     > data_type;
     data_type data;
-    image<DataType> data_;
-
+    
 public:
 
     /**
