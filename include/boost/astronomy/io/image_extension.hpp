@@ -49,7 +49,7 @@ public:
      * @param[in] other Header associated with Image HDU
      * @param[in] data_buffer Data associated with the Image HDU
     */
-    basic_image_extension(const header<CardPolicy>& other, const std::string& data_buffer) :extension_hdu(other) {
+    basic_image_extension(const header<CardPolicy>& other, const std::string& data_buffer) :extension_hdu<CardPolicy>(other) {
         instantiate_image(other.bitpix());
         set_image_data(data_buffer);
     } 
