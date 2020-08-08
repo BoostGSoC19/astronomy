@@ -18,8 +18,8 @@ namespace boost {namespace astronomy {namespace io {
     * @note  file is a pointer in this class due to a bug in GCC 4.9 which does not
     *        implement move constructor for fstream class
     */
-    class fits_stream_reader {
-
+    struct fits_stream_reader {
+    private:
         std::fstream* file;
 
     public:

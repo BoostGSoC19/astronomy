@@ -10,7 +10,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include<limits>
 #include<complex>
 #include<boost/test/unit_test.hpp>
-#include<boost/astronomy/io/data_conversions.h>
+#include<boost/astronomy/io/data_conversions.hpp>
 
 
 

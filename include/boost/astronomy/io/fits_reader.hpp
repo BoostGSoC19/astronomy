@@ -56,7 +56,8 @@ namespace boost { namespace astronomy { namespace io {
      * @tparam ExtensionsSupported Contains the list of extensions along with their construction methods   
     */
     template<typename FileReader, typename ExtensionsSupported>
-    class fits_reader {
+    struct fits_reader {
+    private:
         FileReader file_reader;
         std::vector<typename ExtensionsSupported::Extension> hdu_list;
         control_block hdus_control_block;

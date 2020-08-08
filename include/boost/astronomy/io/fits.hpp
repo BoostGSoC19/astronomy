@@ -31,7 +31,8 @@ namespace boost { namespace astronomy {namespace io {
      * @tparam ExtensionsSupported Contains the list of extensions along with their construction methods 
     */
     template<typename FileReader, typename ExtensionsSupported>
-    class basic_fits {
+    struct basic_fits {
+    private:
         typedef fits_reader<FileReader, ExtensionsSupported> fitsreader;
     public:
         /**

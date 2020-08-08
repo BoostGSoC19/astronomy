@@ -52,6 +52,14 @@ public:
         set_table_extension_info();
     }
 
+
+    /**
+     * @brief Returns the header associated with the currently held primary hdu
+    */
+    header get_header() const {
+        return hdu_header;
+    }
+
     private:
     void set_table_extension_info() {
         tfields_ = hdu_header.value_of<std::size_t>("TFIELDS");
