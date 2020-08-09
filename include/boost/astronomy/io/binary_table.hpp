@@ -25,7 +25,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/column.hpp>
 #include <boost/astronomy/io/column_data.hpp>
 #include <boost/astronomy/io/default_card_policy.hpp>
-#include <boost/astronomy/io/data_conversions.h>
+#include <boost/astronomy/io/data_conversions.hpp>
 
 
 

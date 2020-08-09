@@ -210,7 +210,7 @@ private:
 
             auto ending_offset = starting_offset + column_size(column_ptr->TFORM());
 
-            std::string row_data_str(starting_offset, ending_offset + 1);
+            std::string row_data_str(starting_offset, ending_offset);
 
             ColDataType row_data = boost::lexical_cast<ColDataType>(
                 boost::algorithm::trim_copy(row_data_str));
