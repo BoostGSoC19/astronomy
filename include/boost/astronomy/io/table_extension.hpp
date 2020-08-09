@@ -11,6 +11,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <cstddef>
 #include <fstream>
 #include <string>
+#include <boost/astronomy/io/hdu.hpp>
 #include <boost/astronomy/io/extension_hdu.hpp>
 #include <boost/astronomy/io/column.hpp>
 
@@ -57,8 +58,8 @@ public:
     /**
      * @brief Returns the header associated with the currently held primary hdu
     */
-    header get_header() const {
-        return hdu_header;
+    header<CardPolicy> get_header() const {
+        return this->hdu_header;
     }
 
     private:
