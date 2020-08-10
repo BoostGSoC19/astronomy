@@ -153,12 +153,12 @@ public:
     /**
      * @brief       Returns the data of Binary Table
     */
-    std::vector<char>& get_data() { return this->data_; }
+    std::string& get_data() { return this->data_; }
 
     /**
      * @brief       Returns the data of Binary table (const version)
     */
-    const std::vector<char>& get_data() const { return this->data_; }
+    const std::string& get_data() const { return this->data_; }
 
     /**
      * @brief      Sets the data of Binary Table from data_buffer

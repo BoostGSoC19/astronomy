@@ -67,11 +67,11 @@ BOOST_FIXTURE_TEST_CASE(ascii_table_set_data, fits_test::ascii_table_fixture) {
 }
 
 BOOST_FIXTURE_TEST_CASE(ascii_table_get_column,fits_test::ascii_table_fixture) {
-    boost::float32_t mean_c200_data[] = { 0.3115222f, 0.6534808f, 0.7027547f, 0.9687142f };
+    boost::float32_t backgrnd_col_data[] = { -0.367635f, 0.210143f, 0.476156f, 0.346646f };
 
-    auto mean_c200_col = ascii_hdu1.get_column<boost::float32_t>("MEANC200");
+    auto backgrnd_col = ascii_hdu1.get_column<boost::float32_t>("BACKGRND");
     for(int i=0 ; i<4; i++)
-    BOOST_REQUIRE_CLOSE(mean_c200_col->get_data()[i], mean_c200_data[i],0.001);
+    BOOST_REQUIRE_CLOSE(backgrnd_col->get_data()[i], backgrnd_col_data[i],0.001);
 }
 
 BOOST_AUTO_TEST_CASE(ascii_table_get_column_size) {

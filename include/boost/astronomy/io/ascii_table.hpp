@@ -124,12 +124,12 @@ public:
     /**
      * @brief       Returns the data of ASCII table
     */
-    std::vector<char>& get_data() { return this->data_; }
+    std::string& get_data() { return this->data_; }
 
     /**
      * @brief       Returns the data of ASCII table (const version)
     */
-    const std::vector<char>& get_data() const { return this->data_; }
+    const std::string& get_data() const { return this->data_; }
 
     /**
      * @brief       Gets the metadata along with value(field_value) for every row of specified field

@@ -33,8 +33,8 @@ struct table_extension : public extension_hdu<CardPolicy>
 protected:
     std::size_t tfields_;
     std::vector<column> col_metadata_;
-    std::vector<char> data_;
-
+    //std::vector<char> data_;
+    std::string data_;
 public:
     /**
      * @brief       Constructs a standalone object of table_extentsion
