@@ -23,6 +23,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/astronomy/io/table_extension.hpp>
 #include <boost/endian/conversion.hpp>
+#include <boost/astronomy/io/string_conversion_utility.hpp>
 #include <boost/cstdfloat.hpp>
 
 
@@ -212,8 +213,10 @@ private:
 
             std::string row_data_str(this->data_.substr(starting_index, column_size(column_ptr->TFORM())));
 
-            ColDataType row_data = boost::lexical_cast<ColDataType>(
-                boost::algorithm::trim_copy(row_data_str));
+            /*ColDataType row_data = boost::lexical_cast<ColDataType>(
+                boost::algorithm::trim_copy(row_data_str));*/
+
+            ColDataType row_data = convert_to<ColDataType>(boost::algorithm::trim_copy(row_data_str));
 
             column_ptr->get_data().emplace_back(row_data);
         }
