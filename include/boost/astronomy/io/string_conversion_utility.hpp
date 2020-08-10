@@ -17,10 +17,15 @@ namespace boost{namespace astronomy{namespace io{
    template<typename T>
    void spirit_type(boost::type<T>dummy) {}
 
-   boost::spirit::qi::int_type spirit_type(boost::type<int>) { return boost::spirit::qi::int_; }
+   boost::spirit::qi::int_type spirit_type(boost::type<int>) { return boost::spirit::qi::int_;  }
+   boost::spirit::qi::uint_type spirit_type(boost::type<unsigned int>) { return boost::spirit::qi::uint_; }
+
    boost::spirit::qi::float_type spirit_type(boost::type<float>) { return boost::spirit::qi::float_; }
+
    boost::spirit::qi::double_type spirit_type(boost::type<double>) { return boost::spirit::qi::double_; }
+
    boost::spirit::qi::long_long_type spirit_type(boost::type<long long>) { return boost::spirit::qi::long_long; }
+   boost::spirit::qi::ulong_long_type spirit_type(boost::type<std::size_t>) {return boost::spirit::qi::ulong_long ;}
 
     template<typename T>
     T convert_to(const std::string& convert_str) {

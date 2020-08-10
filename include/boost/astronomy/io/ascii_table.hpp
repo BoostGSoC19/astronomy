@@ -213,9 +213,6 @@ private:
 
             std::string row_data_str(this->data_.substr(starting_index, column_size(column_ptr->TFORM())));
 
-            /*ColDataType row_data = boost::lexical_cast<ColDataType>(
-                boost::algorithm::trim_copy(row_data_str));*/
-
             ColDataType row_data = convert_to<ColDataType>(boost::algorithm::trim_copy(row_data_str));
 
             column_ptr->get_data().emplace_back(row_data);
