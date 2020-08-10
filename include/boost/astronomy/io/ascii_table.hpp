@@ -205,12 +205,12 @@ private:
     {        
         column_ptr->get_data().reserve(this->hdu_header.naxis(2));
         for (std::size_t i = 0; i < this->hdu_header.naxis(2); i++) {
-            auto starting_offset =
-                this->data_.begin() + i * this->hdu_header.naxis(1) + column_ptr->TBCOL();
+         
+            auto column_position_iter = this->data_.begin();
+            std::advance(column_position_iter, i * this->hdu_header.naxis(1) + column_ptr->TBCOL());
+            auto starting_index = std::distance(this->data_.begin(), column_position_iter);
 
-            auto ending_offset = starting_offset + column_size(column_ptr->TFORM());
-
-            std::string row_data_str(starting_offset, ending_offset);
+            std::string row_data_str(this->data_.substr(starting_index, column_size(column_ptr->TFORM())));
 
             ColDataType row_data = boost::lexical_cast<ColDataType>(
                 boost::algorithm::trim_copy(row_data_str));

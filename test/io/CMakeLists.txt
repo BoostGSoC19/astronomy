@@ -9,6 +9,7 @@ foreach(_name
         t_fits_reader
         t_data_conversions
         t_card_policy
+        t_string_conversions
        )
     set(_target test_fits_${_name})
 
