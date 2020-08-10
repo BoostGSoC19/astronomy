@@ -48,7 +48,6 @@ namespace fits_test {
 }
 
 using namespace boost::astronomy::io;
-using fits = basic_fits<fits_stream_reader, default_hdu_manager<card_policy>>;
 
 
 BOOST_FIXTURE_TEST_CASE(set_filename_on_valid_filepath,fits_test::fits_fixture) {
