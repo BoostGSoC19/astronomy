@@ -63,7 +63,7 @@ BOOST_FIXTURE_TEST_CASE(ascii_table_set_data, fits_test::ascii_table_fixture) {
 
     BOOST_REQUIRE_EQUAL(test_hdu.get_data().size(), 3184);
     auto mean_c200_col = ascii_hdu1.get_column<boost::float32_t>("MEANC200");
-    BOOST_REQUIRE_CLOSE(mean_c200_col->get_data()[0], 0.3115222f, 0.001);
+    BOOST_REQUIRE_CLOSE(mean_c200_col.get_data()[0], 0.3115222f, 0.001);
 }
 
 BOOST_FIXTURE_TEST_CASE(ascii_table_get_column,fits_test::ascii_table_fixture) {
@@ -71,8 +71,14 @@ BOOST_FIXTURE_TEST_CASE(ascii_table_get_column,fits_test::ascii_table_fixture) {
 
     auto backgrnd_col = ascii_hdu1.get_column<boost::float32_t>("BACKGRND");
     for(int i=0 ; i<4; i++)
-    BOOST_REQUIRE_CLOSE(backgrnd_col->get_data()[i], backgrnd_col_data[i],0.001);
+    BOOST_REQUIRE_CLOSE(backgrnd_col.get_data()[i], backgrnd_col_data[i],0.001);
 }
+
+BOOST_FIXTURE_TEST_CASE(ascii_table_invalid_column_name, fits_test::ascii_table_fixture) {
+
+    BOOST_REQUIRE_THROW(ascii_hdu1.get_column<boost::float32_t>("GARBAGE"),boost::astronomy::column_not_found_exception);  
+}
+
 
 BOOST_AUTO_TEST_CASE(ascii_table_get_column_size) {
     BOOST_REQUIRE_EQUAL(basic_ascii_table<card_policy>::column_size("D25.17"), 25);

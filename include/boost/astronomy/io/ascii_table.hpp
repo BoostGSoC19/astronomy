@@ -23,6 +23,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/astronomy/io/table_extension.hpp>
 #include <boost/endian/conversion.hpp>
+#include <boost/variant.hpp>
 #include <boost/astronomy/io/string_conversion_utility.hpp>
 #include <boost/cstdfloat.hpp>
 
@@ -41,6 +42,17 @@ namespace boost { namespace astronomy {  namespace io {
 template<typename CardPolicy>
 struct basic_ascii_table : public table_extension<CardPolicy>
 {
+
+    mutable std::unordered_map<std::string,
+        boost::variant<
+
+        column_data<std::string>,
+        column_data<long long>,
+        column_data<float>,
+        column_data<double>
+        >
+    > cached_columns ;
+
 public:
 
     /**
@@ -140,20 +152,34 @@ public:
      * @return      Returns the metadata along with value for every row of specified field
     */
     template<typename ColDataType>
-    std::unique_ptr<column_data<ColDataType>> get_column(const std::string& column_name) const {
+    column_data<ColDataType>& get_column(const std::string& column_name) const {
 
-        auto column_info = std::find_if(this->col_metadata_.begin(), this->col_metadata_.end(), [&column_name](const column& col) {
-            return column_name == col.TTYPE();
-            });
+        auto cache_entry = cached_columns.find(column_name);
 
-        
-        if (column_info != this->col_metadata_.end()) {
-            auto result = std::make_unique<column_data<ColDataType>>(*column_info);
-            fill_column<ColDataType>(result);
-            return result;
-        }else {
-            return nullptr;
+        if (cache_entry != cached_columns.end()) {
+
+            return boost::get<column_data<ColDataType>>(cache_entry->second);
+
         }
+        else {
+
+            auto column_info = std::find_if(this->col_metadata_.begin(), this->col_metadata_.end(), [&column_name](const column& col) {
+                return column_name == col.TTYPE();
+                });
+
+            if (column_info != this->col_metadata_.end()) {
+                 auto iter = cached_columns.emplace(column_name, extract_column_data<ColDataType>(*column_info));
+                 return boost::get<column_data<ColDataType>>(iter.first->second);
+
+            }
+            else {
+
+                throw column_not_found_exception(column_name);
+                
+            }
+
+        }
+        
     }
 
     /**
@@ -219,7 +245,30 @@ private:
         }
        
     }
-   
+
+    template<typename ColDataType>
+    column_data<ColDataType> extract_column_data(const column& column_metadata)const  {
+
+        column_data<ColDataType> column_dat(column_metadata);
+        column_dat.get_data().reserve(this->hdu_header.naxis(2));
+
+        for (std::size_t i = 0; i < this->hdu_header.naxis(2); i++) {
+
+            auto column_position_iter = this->data_.begin();
+            std::advance(column_position_iter, i * this->hdu_header.naxis(1) + column_metadata.TBCOL());
+
+            auto starting_index = std::distance(this->data_.begin(), column_position_iter);
+            std::string row_data_str(this->data_.substr(starting_index, column_size(column_metadata.TFORM())));
+
+            ColDataType row_data = convert_to<ColDataType>(boost::algorithm::trim_copy(row_data_str));
+
+            column_dat.get_data().emplace_back(row_data);
+        }
+        return column_dat;
+    }
+
+
+
     /**
      * @brief  Initializes the current object with  column metadata and table data
      * @param[in] data_buffer Data of the ASCII table
