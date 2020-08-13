@@ -9,7 +9,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/astronomy/io/binary_table.hpp>
 #include <boost/test/unit_test.hpp>
-#include <boost/astronomy/io/stream_reader.hpp>
+#include <boost/astronomy/io/fits_stream.hpp>
 #include <boost/astronomy/io/default_card_policy.hpp>
 #include "base_fixture.hpp"
 
@@ -17,7 +17,7 @@ using namespace boost::astronomy::io;
 
 namespace fits_test {
 
-    class binary_table_fixture :public base_fixture<fits_stream_reader,card_policy> {
+    class binary_table_fixture :public base_fixture<fits_stream,card_policy> {
     public:
         basic_binary_table_extension<card_policy> binary_table1;
         binary_table_fixture() {

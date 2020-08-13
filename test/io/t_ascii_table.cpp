@@ -11,7 +11,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/pointer_cast.hpp>
 #include <boost/test/unit_test.hpp>
 #include <sstream>
-#include <boost/astronomy/io/stream_reader.hpp>
+#include <boost/astronomy/io/fits_stream.hpp>
 #include <boost/astronomy/io/default_card_policy.hpp>
 #include "base_fixture.hpp"
 
@@ -19,7 +19,7 @@ using namespace boost::astronomy::io;
 
 namespace fits_test {
 
-    class ascii_table_fixture:public base_fixture<fits_stream_reader,card_policy> {
+    class ascii_table_fixture:public base_fixture<fits_stream,card_policy> {
     public:
         basic_ascii_table<card_policy> ascii_hdu1;
     

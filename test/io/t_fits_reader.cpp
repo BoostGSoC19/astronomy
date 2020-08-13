@@ -10,7 +10,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/test/unit_test.hpp>
 #include <boost/variant.hpp>
 #include <boost/astronomy/io/fits_reader.hpp>
-#include <boost/astronomy/io/stream_reader.hpp>
+#include <boost/astronomy/io/fits_stream.hpp>
 #include <boost/astronomy/io/default_hdus.hpp>
 #include <boost/astronomy/io/primary_hdu.hpp>
 #include <boost/astronomy/io/fits.hpp>
@@ -23,7 +23,7 @@ namespace fits_test {
         std::string samples_directory;
     public:
         std::string sample1_path;
-        fits_reader<fits_stream_reader, default_hdu_manager<card_policy>> reader;
+        fits_reader<fits_stream, default_hdu_manager<card_policy>> reader;
         fits_reader_fixture() {
 
 #ifdef SOURCE_DIR
