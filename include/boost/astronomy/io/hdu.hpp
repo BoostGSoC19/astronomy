@@ -53,6 +53,17 @@ protected:
 
 public:
 
+   /**
+     * @todo Take note of whether to make it templated or not
+    */
+   bool operator == (const header& other) {
+       return bitpix_value == other.bitpix_value &&
+           this->naxis_ == other.naxis_ &&
+           this->hdu_name == other.hdu_name &&
+           this->cards == other.cards &&
+           this->key_index == other.key_index;
+   }
+
     /**
      * @brief Reads the header portion of an HDU using file reader
      * @param[in] file_reader Reader used to access the FITS file
@@ -115,6 +126,17 @@ public:
 
     }
 
+
+    template<typename FileWriter>
+    void write_header(FileWriter& file_reader) {
+        std::string temp_buffer;
+        for (auto& header_card : this->cards) {
+            temp_buffer += header_card.raw_card();
+            
+        }
+        file_reader.write(temp_buffer);
+    }
+
     /**
      * @brief Returns the name of the HDU
     */
@@ -171,6 +193,10 @@ public:
     */
     std::size_t total_dimensions() const { return all_naxis().size(); }
 
+
+    /**
+     * @brief   Returns the total number of elements in HDU data
+    */
     std::size_t data_size() {
         if (naxis_.empty()) { return 0; }
         return std::accumulate(naxis_.begin(), naxis_.end(), static_cast<std::size_t > (1), std::multiplies<std::size_t>());
@@ -189,17 +215,6 @@ public:
         return this->cards[key_index.at(key)].template value<ReturnType>();
     }
 
-
-    /**
-     * @brief       Sets the file_pointer/cursor to the end of current HDU unit
-     * @param[out] file filestream whose position needs to be set to current HDU boundary
-    */
-    void set_unit_end(std::fstream &file) const
-    {
-        //set cursor to the end of the HDU unit
-        file.seekg((file.tellg() + (2880 - (file.tellg() % 2880))));
-    }
-
     /**
      * @brief      Gets the number of cards in HDU header
      * @return     total number of cards in HDU header
@@ -208,6 +223,9 @@ public:
         return cards.size() - 1; // Last one is END Card ( It will not be counted )
 
     }
+
+    friend bool operator == (const header<CardPolicy>& lhs, const header<CardPolicy>& rhs);
+
 };
 }}} //namespace boost::astronomy::io
 

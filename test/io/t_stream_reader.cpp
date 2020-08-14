@@ -7,6 +7,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #define BOOST_TEST_MODULE stream_reader_test
 
+#include <stdio.h>
 #include <boost/test/unit_test.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
 #include <boost/astronomy/io/fits_stream.hpp>
@@ -99,6 +100,10 @@ BOOST_FIXTURE_TEST_CASE(create_file, fits_test::stream_reader_fixture) {
     bool file_successfully_opened = sample_reader.is_open();
     BOOST_REQUIRE_EQUAL(file_successfully_opened, true);
     BOOST_REQUIRE_EQUAL(sample_reader.read(5), "Hello");
+
+    sample_reader.close();
+    remove("test.txt");
+
 }
 
 
@@ -109,6 +114,9 @@ BOOST_FIXTURE_TEST_CASE(write_to_file, fits_test::stream_reader_fixture) {
 
     sample_reader.set_file("test_w.txt");
     BOOST_REQUIRE_EQUAL(sample_reader.read(9), "Astronomy");
+
+    sample_reader.close();
+    remove("test.txt");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

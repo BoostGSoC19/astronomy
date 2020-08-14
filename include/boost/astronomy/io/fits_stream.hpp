@@ -135,6 +135,13 @@ namespace boost {namespace astronomy {namespace io {
         }
 
         /**
+         * @brief Closes the file if opened
+        */
+        void close() {
+            this->file->close();
+        }
+
+        /**
          * @brief Returns the internal file stream 
         */
         std::fstream& get_internal_stream() { return *file; }
