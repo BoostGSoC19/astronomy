@@ -40,9 +40,9 @@ BOOST_AUTO_TEST_CASE(string_to_long_long) {
     BOOST_REQUIRE_EQUAL(convert_to<long long>("123444345345543345"),123444345345543345);
 }
 
-BOOST_AUTO_TEST_CASE(string_to_unsigned_long_long) {
+BOOST_AUTO_TEST_CASE(string_to_size_t) {
 
-    BOOST_REQUIRE_EQUAL(convert_to<std::size_t>("184467409551615221"), 184467409551615221);
+    BOOST_REQUIRE_EQUAL(convert_to<std::size_t>("18446"), 18446);
 }
 
 
