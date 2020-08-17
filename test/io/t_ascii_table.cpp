@@ -51,7 +51,12 @@ namespace fits_test {
 BOOST_AUTO_TEST_SUITE(convenience_methods)
 
 BOOST_FIXTURE_TEST_CASE(ascii_table_get_data, fits_test::ascii_table_fixture) {
-    BOOST_REQUIRE_EQUAL(ascii_hdu1.get_data().size(), 3184);
+    auto total_rows = ascii_hdu1.get_data().size();
+    auto total_columns = ascii_hdu1.get_data()[0].size();
+
+    BOOST_REQUIRE_EQUAL(total_rows, 4);
+    BOOST_REQUIRE_EQUAL(total_columns, 49);
+
  }
 
 BOOST_FIXTURE_TEST_CASE(ascii_table_set_data, fits_test::ascii_table_fixture) {
@@ -60,18 +65,27 @@ BOOST_FIXTURE_TEST_CASE(ascii_table_set_data, fits_test::ascii_table_fixture) {
 
     test_hdu.set_data(raw_ascii_hdu->hdu_data_buffer);
 
+    auto total_rows = test_hdu.get_data().size();
+    auto total_columns = test_hdu.get_data()[0].size();
 
-    BOOST_REQUIRE_EQUAL(test_hdu.get_data().size(), 3184);
+    BOOST_REQUIRE_EQUAL(total_rows, 4);
+    BOOST_REQUIRE_EQUAL(total_columns, 49);
+
     auto mean_c200_col = ascii_hdu1.get_column<boost::float32_t>("MEANC200");
-    BOOST_REQUIRE_CLOSE(mean_c200_col.get_data()[0], 0.3115222f, 0.001);
+    BOOST_REQUIRE_CLOSE(static_cast<float>(mean_c200_col[0]), 0.3115222f, 0.001);
 }
 
 BOOST_FIXTURE_TEST_CASE(ascii_table_get_column,fits_test::ascii_table_fixture) {
     boost::float32_t backgrnd_col_data[] = { -0.367635f, 0.210143f, 0.476156f, 0.346646f };
 
     auto backgrnd_col = ascii_hdu1.get_column<boost::float32_t>("BACKGRND");
-    for(int i=0 ; i<4; i++)
-    BOOST_REQUIRE_CLOSE(backgrnd_col.get_data()[i], backgrnd_col_data[i],0.001);
+    for (int i = 0; i < 4; i++)
+    BOOST_REQUIRE_CLOSE(static_cast<float>(backgrnd_col[i]), backgrnd_col_data[i], 0.001);
+    float m = 0;
+    for (auto element : backgrnd_col) {
+         m=element;
+    }
+   
 }
 
 BOOST_FIXTURE_TEST_CASE(ascii_table_invalid_column_name, fits_test::ascii_table_fixture) {

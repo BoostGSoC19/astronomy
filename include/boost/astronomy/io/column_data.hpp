@@ -11,10 +11,13 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <string>
 #include <cstddef>
 #include <vector>
+#include <unordered_map>
+#include <sstream>
 
 #include <boost/static_assert.hpp>
 
 #include <boost/astronomy/io/column.hpp>
+#include <boost/astronomy/io/string_conversion_utility.hpp>
 
 /**
  * @file    column_data.hpp
@@ -69,6 +72,90 @@ public:
     std::vector<Type>& get_data()
     {
         return column_data_;
+    }
+
+};
+
+
+// Forward declaration for proxy
+template<typename DataType>
+struct column_view; 
+
+
+template<typename DataType>
+struct Proxy {
+private:
+    int index;
+    DataType value;
+    column_view<DataType>* callback_ptr;
+public:
+    Proxy(DataType val, column_view<DataType>* callbck_ptr, int row) : value(val), callback_ptr(callbck_ptr),index(row){}
+
+    operator DataType () const  { return value; }
+
+    DataType operator = (DataType value)  {
+        this->callback_ptr->update_value(index, value);
+        return value;
+    }
+
+
+};
+
+
+template<typename DataType>
+struct column_view{
+private:
+    int column_number;
+    std::vector<std::vector<std::string>>* table_ref;
+    std::unordered_map<int, DataType> cached_index;
+public:
+    // For storage purpose
+    column_view() {}
+    int get_column_number() { return column_number; }
+    std::size_t get_row_count() { return table_ref->size(); }
+
+    class iterator {
+        int index;
+        column_view<DataType>& col_view;
+    public:
+        iterator(column_view<DataType>& col,int indx) :col_view(col),index(indx) {}
+        iterator operator ++() {
+            index++;
+            return *this;
+        }
+        bool operator != (const iterator& other) {
+            return index != other.index;
+        }
+        Proxy<DataType> operator* () {
+            return col_view[index];
+        }
+
+    };
+    column_view(int col_number, std::vector<std::vector<std::string>>* tb_ref): column_number( col_number), table_ref(tb_ref) {}
+
+    iterator begin() { return iterator(*this,0); }
+    iterator end() { return iterator(*this, get_row_count()); }
+
+    void update_value(int index, DataType new_value){
+        std::stringstream serialized_stream;
+        serialized_stream << new_value;
+        auto serialized_value = serialized_stream.str();
+        cached_index[index] = new_value;
+        (*table_ref)[index][column_number] = serialized_value;
+    }
+
+  
+    Proxy<DataType> operator [](int index) {
+
+        auto cached_iter = cached_index.find(index);
+        
+        if (cached_iter != cached_index.end()) {
+            return Proxy<DataType>(cached_iter->second, this,index);
+        }
+
+        auto raw_data_str = (*table_ref)[index][column_number];
+        cached_index.emplace(index, convert_to<DataType>(boost::algorithm::trim_copy(raw_data_str)));
+        return Proxy<DataType>(cached_index.find(index)->second, this,index);
     }
 
 };

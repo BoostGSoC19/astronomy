@@ -42,16 +42,20 @@ namespace boost { namespace astronomy {  namespace io {
 template<typename CardPolicy>
 struct basic_ascii_table : public table_extension<CardPolicy>
 {
-
     mutable std::unordered_map<std::string,
         boost::variant<
 
-        column_data<std::string>,
-        column_data<long long>,
-        column_data<float>,
-        column_data<double>
+        column_view<std::string>,
+        column_view<long long>,
+        column_view<float>,
+        column_view<double>
         >
-    > cached_columns ;
+    > cached_columns;
+
+    typedef std::vector<std::vector<std::string>> table_data;
+    mutable table_data tb_data;
+
+
 
 public:
 
@@ -128,59 +132,49 @@ public:
     */
     void set_data(const std::string& data_buffer) {
         this->col_metadata_.clear();
-        this->data_.clear();
         this->col_metadata_.resize(this->tfields_);
         set_ascii_table_info(data_buffer);
     }
 
 
     /**
-     * @brief       Returns the data of ASCII table
+     * @brief       Returns the data of ASCII table in table_data format (2D matrix)
     */
-    std::string& get_data() { return this->data_; }
+    table_data& get_data() { return this->tb_data; }
 
     /**
      * @brief       Returns the data of ASCII table (const version)
     */
-    const std::string& get_data() const { return this->data_; }
+    const table_data& get_data() const { return this->tb_data; }
 
     /**
-     * @brief       Gets the metadata along with value(field_value) for every row of specified field
-     * @details     This methods takes a field name as argument and returns the metadata information
-     *              of the field along with the field value for all the rows in the table.
+     * @brief       Returns a editable view of the column
      * @param[in]   name Name of the field
-     * @return      Returns the metadata along with value for every row of specified field
-    */
+     * @return      Returns a view of the column for reading or writing data
+    */ 
     template<typename ColDataType>
-    column_data<ColDataType>& get_column(const std::string& column_name) const {
+    column_view<ColDataType>& get_column(const std::string& column_name) const {
 
-        auto cache_entry = cached_columns.find(column_name);
+        auto cache_entry = this->cached_columns.find(column_name);
 
-        if (cache_entry != cached_columns.end()) {
-
-            return boost::get<column_data<ColDataType>>(cache_entry->second);
-
+        if (cache_entry != this->cached_columns.end()) {
+            return boost::get<column_view<ColDataType>>(this->cached_columns[column_name]);
         }
         else {
+        auto column_info = std::find_if(this->col_metadata_.begin(), this->col_metadata_.end(), [&column_name](const column& col) {
+            return column_name == col.TTYPE();
+            });
 
-            auto column_info = std::find_if(this->col_metadata_.begin(), this->col_metadata_.end(), [&column_name](const column& col) {
-                return column_name == col.TTYPE();
-                });
-
-            if (column_info != this->col_metadata_.end()) {
-                 auto iter = cached_columns.emplace(column_name, extract_column_data<ColDataType>(*column_info));
-                 return boost::get<column_data<ColDataType>>(iter.first->second);
-
-            }
-            else {
-
-                throw column_not_found_exception(column_name);
-                
-            }
-
+        if (column_info != this->col_metadata_.end()) {
+            this->cached_columns.emplace(column_name, column_view<ColDataType>(column_info->index() - static_cast<std::size_t>(1), &tb_data));
+            return boost::get<column_view<ColDataType>>(this->cached_columns[column_name]);
         }
-        
+        }
+
+       throw column_not_found_exception(column_name);
     }
+
+
 
     /**
      * @brief     Returns the field width based on the specified format
@@ -219,65 +213,54 @@ public:
         return form[0];
     }
 
+
+   
+    table_data get_table() { return this->tb_data; }
+
 private:
 
-    /**
-     * @brief      Fills a perticular column with column data from internal buffer
-     * @details    This method converts the raw column elements to ColDataType and fills
-                   the column_data object passed as argument
-     * @param[in]  column_ptr Pointer to column container 
-    */
-    template<typename ColDataType>
-    void fill_column(std::unique_ptr< column_data<ColDataType>>& column_ptr) const
-    {        
-        column_ptr->get_data().reserve(this->hdu_header.naxis(2));
-        for (std::size_t i = 0; i < this->hdu_header.naxis(2); i++) {
-         
-            auto column_position_iter = this->data_.begin();
-            std::advance(column_position_iter, i * this->hdu_header.naxis(1) + column_ptr->TBCOL());
-            auto starting_index = std::distance(this->data_.begin(), column_position_iter);
-
-            std::string row_data_str(this->data_.substr(starting_index, column_size(column_ptr->TFORM())));
-
-            ColDataType row_data = convert_to<ColDataType>(boost::algorithm::trim_copy(row_data_str));
-
-            column_ptr->get_data().emplace_back(row_data);
-        }
-       
-    }
-
-    template<typename ColDataType>
-    column_data<ColDataType> extract_column_data(const column& column_metadata)const  {
-
-        column_data<ColDataType> column_dat(column_metadata);
-        column_dat.get_data().reserve(this->hdu_header.naxis(2));
-
-        for (std::size_t i = 0; i < this->hdu_header.naxis(2); i++) {
-
-            auto column_position_iter = this->data_.begin();
-            std::advance(column_position_iter, i * this->hdu_header.naxis(1) + column_metadata.TBCOL());
-
-            auto starting_index = std::distance(this->data_.begin(), column_position_iter);
-            std::string row_data_str(this->data_.substr(starting_index, column_size(column_metadata.TFORM())));
-
-            ColDataType row_data = convert_to<ColDataType>(boost::algorithm::trim_copy(row_data_str));
-
-            column_dat.get_data().emplace_back(row_data);
-        }
-        return column_dat;
-    }
-
-
-
+  
     /**
      * @brief  Initializes the current object with  column metadata and table data
      * @param[in] data_buffer Data of the ASCII table
     */
     void set_ascii_table_info(const std::string& data_buffer) {
         populate_column_data();
-        this->data_.assign(data_buffer.begin(), data_buffer.end());
+
+        if (!data_buffer.empty()) {
+          set_table_data(data_buffer);
+        }
+
     }
 
+    /**
+     * @brief Converts the data_buffer into table_data format (2D matrix )
+    */
+    void set_table_data(const std::string& data_buffer) {
+
+        auto total_rows = this->hdu_header.naxis(2);
+        auto total_fields = this->tfields_;
+        auto total_characters_per_row = this->hdu_header.naxis(1);
+
+        // Initialize table data matrix with total_rows * total_columns elements of type string
+        tb_data = table_data(total_rows, std::vector<std::string>(total_fields, std::string()));
+
+        auto current_row = 0;
+        auto current_column = 0;
+
+        while(current_row< total_rows) {
+            auto starting_offset = data_buffer.begin()+ current_row * total_characters_per_row + this->col_metadata_[current_column].TBCOL() - 1;
+            auto ending_offset = starting_offset + this->column_size(this->col_metadata_[current_column].TFORM());
+
+            this->tb_data[current_row][current_column++] = std::string(starting_offset, ending_offset);
+
+            if (current_column % this->tfields_ == 0) {
+                current_row++;
+                current_column = 0;
+            }
+
+        }
+    }
 };
 
 using ascii_table = basic_ascii_table<card_policy>;
