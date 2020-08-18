@@ -14,6 +14,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/default_hdus.hpp>
 #include <boost/astronomy/io/primary_hdu.hpp>
 #include <boost/astronomy/io/fits.hpp>
+#include <boost/astronomy/io/string_conversion_utility.hpp>
 
 using namespace boost::astronomy::io;
 
@@ -23,7 +24,7 @@ namespace fits_test {
         std::string samples_directory;
     public:
         std::string sample1_path;
-        fits_reader<fits_stream, default_hdu_manager<card_policy>> reader;
+        fits_reader<fits_stream, default_hdu_manager<card_policy,ascii_converter>> reader;
         fits_reader_fixture() {
 
 #ifdef SOURCE_DIR

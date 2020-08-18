@@ -26,14 +26,14 @@ namespace boost { namespace astronomy {namespace io {
      * @author          Gopi Krishna Menon
      */
 
-    template<typename CardPolicy=card_policy>
+    template<typename CardPolicy=card_policy,typename Converter=ascii_converter>
     struct default_hdu_manager{
 
         typedef boost::variant<
             boost::blank,
             basic_primary_hdu<CardPolicy>,   
             basic_binary_table_extension<CardPolicy>,
-            basic_ascii_table<CardPolicy>
+            basic_ascii_table<CardPolicy,Converter>
 
         >  Extension;
 
@@ -62,7 +62,7 @@ namespace boost { namespace astronomy {namespace io {
         */
         static Extension generate_extension_hdu(header<CardPolicy>& hdu_header, const std::string& data_buffer) {
             std::string extension_name = hdu_header.template value_of<std::string>("XTENSION");
-            if (extension_name == "TABLE") { return basic_ascii_table<CardPolicy>(hdu_header, data_buffer); }
+            if (extension_name == "TABLE") { return basic_ascii_table<CardPolicy,Converter>(hdu_header, data_buffer); }
             else if (extension_name == "BINTABLE") { return basic_binary_table_extension<CardPolicy>(hdu_header, data_buffer); }
             else { return boost::blank{}; }
         }

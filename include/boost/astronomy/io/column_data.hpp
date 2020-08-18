@@ -13,17 +13,8 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <vector>
 #include <unordered_map>
 #include <sstream>
-
 #include <boost/static_assert.hpp>
-
 #include <boost/astronomy/io/column.hpp>
-#include <boost/astronomy/io/string_conversion_utility.hpp>
-
-/**
- * @file    column_data.hpp
- * @author  Pranam Lashkari
- * @details Contains definition for column_data structure
- */
 
 namespace boost { namespace astronomy { namespace io {
 /**
@@ -78,18 +69,18 @@ public:
 
 
 // Forward declaration for proxy
-template<typename DataType>
+template<typename DataType,typename Converter>
 struct column_view; 
 
 
-template<typename DataType>
+template<typename DataType,typename Converter>
 struct Proxy {
 private:
     int index;
     DataType value;
-    column_view<DataType>* callback_ptr;
+    column_view<DataType,Converter>* callback_ptr;
 public:
-    Proxy(DataType val, column_view<DataType>* callbck_ptr, int row) : value(val), callback_ptr(callbck_ptr),index(row){}
+    Proxy(DataType val, column_view<DataType,Converter>* callbck_ptr, int row) : value(val), callback_ptr(callbck_ptr),index(row){}
 
     operator DataType () const  { return value; }
 
@@ -102,7 +93,7 @@ public:
 };
 
 
-template<typename DataType>
+template<typename DataType,typename Converter>
 struct column_view{
 private:
     int column_number;
@@ -116,9 +107,9 @@ public:
 
     class iterator {
         int index;
-        column_view<DataType>& col_view;
+        column_view<DataType,Converter>& col_view;
     public:
-        iterator(column_view<DataType>& col,int indx) :col_view(col),index(indx) {}
+        iterator(column_view<DataType,Converter>& col,int indx) :col_view(col),index(indx) {}
         iterator operator ++() {
             index++;
             return *this;
@@ -126,7 +117,7 @@ public:
         bool operator != (const iterator& other) {
             return index != other.index;
         }
-        Proxy<DataType> operator* () {
+        Proxy<DataType,Converter> operator* () {
             return col_view[index];
         }
 
@@ -137,25 +128,22 @@ public:
     iterator end() { return iterator(*this, get_row_count()); }
 
     void update_value(int index, DataType new_value){
-        std::stringstream serialized_stream;
-        serialized_stream << new_value;
-        auto serialized_value = serialized_stream.str();
         cached_index[index] = new_value;
-        (*table_ref)[index][column_number] = serialized_value;
+        (*table_ref)[index][column_number] = Converter::serialize(new_value);
     }
 
   
-    Proxy<DataType> operator [](int index) {
+    Proxy<DataType,Converter> operator [](int index) {
 
         auto cached_iter = cached_index.find(index);
         
         if (cached_iter != cached_index.end()) {
-            return Proxy<DataType>(cached_iter->second, this,index);
+            return Proxy<DataType,Converter>(cached_iter->second, this,index);
         }
 
         auto raw_data_str = (*table_ref)[index][column_number];
-        cached_index.emplace(index, convert_to<DataType>(raw_data_str));
-        return Proxy<DataType>(cached_index.find(index)->second, this,index);
+        cached_index.emplace(index, Converter::deserialize_to<DataType>(raw_data_str));
+        return Proxy<DataType,Converter>(cached_index.find(index)->second, this,index);
     }
 
 };

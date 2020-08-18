@@ -87,7 +87,7 @@ public:
      */
     template<typename T>
     T parse_to(const std::string& value, boost::type <T>) const {
-        return convert_to<T>(value);
+        return ascii_converter::deserialize_to<T>(value);
     }
 
     bool parse_to(const std::string& value, boost::type<bool>) const {
