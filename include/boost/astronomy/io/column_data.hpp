@@ -142,7 +142,7 @@ public:
         }
 
         auto raw_data_str = (*table_ref)[index][column_number];
-        cached_index.emplace(index, Converter::deserialize_to<DataType>(raw_data_str));
+        cached_index.emplace(index, Converter::template deserialize_to<DataType>(raw_data_str));
         return Proxy<DataType,Converter>(cached_index.find(index)->second, this,index);
     }
 
