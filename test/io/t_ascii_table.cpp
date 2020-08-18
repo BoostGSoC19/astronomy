@@ -81,12 +81,8 @@ BOOST_FIXTURE_TEST_CASE(ascii_table_get_column,fits_test::ascii_table_fixture) {
     auto backgrnd_col = ascii_hdu1.get_column<boost::float32_t>("BACKGRND");
     for (int i = 0; i < 4; i++)
     BOOST_REQUIRE_CLOSE(static_cast<float>(backgrnd_col[i]), backgrnd_col_data[i], 0.001);
-    float m = 0;
-    for (auto element : backgrnd_col) {
-         m=element;
-    }
-   
 }
+
 
 BOOST_FIXTURE_TEST_CASE(ascii_table_invalid_column_name, fits_test::ascii_table_fixture) {
 

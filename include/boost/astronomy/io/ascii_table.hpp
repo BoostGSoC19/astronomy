@@ -213,9 +213,27 @@ public:
         return form[0];
     }
 
+    template<typename FileWriter>
+    void write_to(FileWriter& file_writer) {
 
-   
-    table_data get_table() { return this->tb_data; }
+        this->hdu_header.write_header(file_writer);
+
+        for (int row = 0; row < this->tb_data.size(); row++) {
+
+            std::string row_temp_buffer = "";
+
+            for (int col = 0; col < this->tb_data[row].size(); col++) {
+                std::string padding = std::string(this->column_size(this->col_metadata_[col].TFORM())-this->tb_data[row][col].length(),' ');
+                std::string final_data = padding + this->tb_data[row][col];
+                row_temp_buffer += final_data;
+            }
+            file_writer.write(row_temp_buffer);
+        }
+        auto current_write_pos = file_writer.get_current_pos();
+        auto logical_record_end_pos = file_writer.find_unit_end();
+
+        file_writer.write(std::string(logical_record_end_pos - current_write_pos, ' '));
+    }
 
 private:
 
@@ -252,7 +270,7 @@ private:
             auto starting_offset = data_buffer.begin()+ current_row * total_characters_per_row + this->col_metadata_[current_column].TBCOL() - 1;
             auto ending_offset = starting_offset + this->column_size(this->col_metadata_[current_column].TFORM());
 
-            this->tb_data[current_row][current_column++] = std::string(starting_offset, ending_offset);
+            this->tb_data[current_row][current_column++] = boost::algorithm::trim_copy(std::string(starting_offset, ending_offset));
 
             if (current_column % this->tfields_ == 0) {
                 current_row++;

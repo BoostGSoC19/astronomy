@@ -150,13 +150,19 @@ namespace boost {namespace astronomy {namespace io {
          * @brief Sets the file pointer to the end of current logical record ( or beginning of next record )
         */
         void set_unit_end() {
+            set_reading_pos(find_unit_end());
+        }
+
+        /**
+         * @brief Finds the end of current logical record ( or beginning of next record )
+        */
+        std::size_t find_unit_end() {
             std::size_t current_pos = file->tellg();
             std::size_t logical_record_size = 2880;
 
             std::size_t offset = logical_record_size - (current_pos % logical_record_size);
             std::size_t newpos = (current_pos + offset);
-
-            set_reading_pos(newpos);
+            return newpos;
         }
 
         /**

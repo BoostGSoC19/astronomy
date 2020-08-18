@@ -128,13 +128,17 @@ public:
 
 
     template<typename FileWriter>
-    void write_header(FileWriter& file_reader) {
+    void write_header(FileWriter& file_writer) {
         std::string temp_buffer;
         for (auto& header_card : this->cards) {
             temp_buffer += header_card.raw_card();
             
         }
-        file_reader.write(temp_buffer);
+        file_writer.write(temp_buffer);
+        auto current_write_pos = file_writer.get_current_pos();
+        auto logical_record_end_pos = file_writer.find_unit_end();
+
+        file_writer.write(std::string(logical_record_end_pos - current_write_pos, ' '));
     }
 
     /**

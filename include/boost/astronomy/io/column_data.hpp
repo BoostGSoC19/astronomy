@@ -154,7 +154,7 @@ public:
         }
 
         auto raw_data_str = (*table_ref)[index][column_number];
-        cached_index.emplace(index, convert_to<DataType>(boost::algorithm::trim_copy(raw_data_str)));
+        cached_index.emplace(index, convert_to<DataType>(raw_data_str));
         return Proxy<DataType>(cached_index.find(index)->second, this,index);
     }
 
