@@ -26,7 +26,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/column_data.hpp>
 #include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/astronomy/io/data_conversions.hpp>
-
+#include <boost/astronomy/exception/fits_exception.hpp>
 
 
 namespace boost { namespace astronomy { namespace io {
@@ -37,9 +37,48 @@ namespace boost { namespace astronomy { namespace io {
   *                  <A href="http://archive.stsci.edu/fits/users_guide/node44.html#SECTION00560000000000000000">BINARY_TABLE</A>
   * @author          Pranam Lashkari
  */
-template<typename CardPolicy=card_policy>
+template<typename CardPolicy, typename Converter>
 struct basic_binary_table_extension : table_extension<CardPolicy>
 {
+
+    mutable std::unordered_map<std::string,
+        boost::variant<
+        column_view<bool, data_conversions>,
+        column_view<std::vector<bool>, data_conversions>,
+
+        column_view<boost::int16_t, data_conversions>,
+        column_view<std::vector<boost::int16_t>, data_conversions>,
+
+        column_view<boost::int32_t, data_conversions>,
+        column_view<std::vector<boost::int32_t>, data_conversions>,
+
+        column_view<boost::float32_t, data_conversions>,
+        column_view<std::vector<boost::float32_t>, data_conversions>,
+
+        column_view<boost::float64_t, data_conversions>,
+        column_view<std::vector<boost::float64_t>, data_conversions>,
+
+        column_view<std::pair<boost::int32_t, boost::int32_t>, data_conversions>,
+        column_view<std::vector<std::pair<boost::int32_t, boost::int32_t>>, data_conversions>,
+
+        column_view<std::complex<boost::float32_t>, data_conversions>,
+        column_view<std::vector<std::complex<boost::float32_t>>, data_conversions>,
+
+        column_view<std::complex<boost::float64_t>, data_conversions>,
+        column_view<std::vector<std::complex<boost::float64_t>>, data_conversions>,
+
+        column_view<std::uint8_t, data_conversions>,
+        column_view<std::vector<std::uint8_t>, data_conversions>,
+
+        column_view<char, data_conversions>,
+        column_view<std::vector<char>, data_conversions>
+         >
+    > cached_columns;
+
+
+    typedef std::vector<std::vector<std::string>> table_data;
+    mutable table_data tb_data;
+
 public:
 
     /**
@@ -129,43 +168,67 @@ public:
         }
     }
 
-    /**
-     * @brief       Gets the metadata along with value(field_value) for every row of specified field
-     * @details     This methods takes a field name as argument and returns the
-     *              metadata information of the field along with the field value for all the
-     *              rows in the table.
-     * @param[in]   name Name of the field
-     * @return      Returns the metadata along with value for every row of
-     *              specified field
-     */
-    template <typename ColDataType>
-    std::unique_ptr<column_data<ColDataType>> get_column(const std::string name) {
-        auto column_info = std::find_if(
-            this->col_metadata_.begin(), this->col_metadata_.end(),
-            [&name](const column& col) { return col.TTYPE() == name; }
-        );
+    
 
-        if (column_info == this->col_metadata_.end()) { return nullptr; }
+    template<typename ColDataType>
+    column_view<ColDataType, Converter> get_column(const std::string& column_name) {
+        auto cache_entry = this->cached_columns.find(column_name);
 
-        return parse_to<ColDataType>(*column_info);
+        if (cache_entry != this->cached_columns.end()) {
+            return boost::get<column_view<ColDataType, Converter>>(this->cached_columns[column_name]);
+        }
+        else {
+            auto column_info = std::find_if(this->col_metadata_.begin(), this->col_metadata_.end(), [&column_name](const column& col) {
+                return column_name == col.TTYPE();
+                });
+
+            if (column_info != this->col_metadata_.end()) {
+                this->cached_columns.emplace(column_name, column_view<ColDataType, Converter>(column_info->index() - static_cast<std::size_t>(1), &tb_data,element_count(column_info->TFORM())));
+                return boost::get<column_view<ColDataType, Converter>>(this->cached_columns[column_name]);
+            }
+        }
+
+        throw column_not_found_exception(column_name);
     }
+
+
+    template<typename FileWriter>
+    void write_to(FileWriter& file_writer) {
+
+        this->hdu_header.write_header(file_writer);
+
+        for (int row = 0; row < this->tb_data.size(); row++) {
+
+            std::string row_temp_buffer = "";
+
+            for (int col = 0; col < this->tb_data[row].size(); col++) {
+                row_temp_buffer += tb_data[row][col];
+            }
+
+            file_writer.write(row_temp_buffer);
+        }
+        auto current_write_pos = file_writer.get_current_pos();
+        auto logical_record_end_pos = file_writer.find_unit_end();
+
+        file_writer.write(std::string(logical_record_end_pos - current_write_pos, ' '));
+    }
+
 
     /**
      * @brief       Returns the data of Binary Table
     */
-    std::string& get_data() { return this->data_; }
+    table_data& get_data() { return this->tb_data; }
 
     /**
      * @brief       Returns the data of Binary table (const version)
     */
-    const std::string& get_data() const { return this->data_; }
+    const table_data& get_data() const { return this->tb_data; }
 
     /**
      * @brief      Sets the data of Binary Table from data_buffer
      * @param[in]  data_buffer Data of Binary Table
     */
     void set_data(const std::string& data_buffer) {
-        this->data_.clear();
         this->col_metadata_.clear();
         this->col_metadata_.resize(this->tfields_);
         set_binary_table_info(data_buffer);
@@ -253,40 +316,17 @@ public:
         }
     }
 
-private:
-    /**
-     * @brief       Populates the container of given type with field_value for every row of specified field
-     * @param[in,out] column_container Container that stores the field value for every row of specified field
-     * @param[in]   col_metadata Column Metadata ( Some problems exists otherwise this param is not needed )
-     * @param[in]   lambda Lambda function for fetching the field data from data buffer
-    */
-    template <typename VectorType, typename Lambda>
-    void fill_col(
-        std::vector<VectorType>& column_container,
-        const column& col_metadata,
-        Lambda lambda
-                 ) const {
-        auto is_single_element = element_count(col_metadata.TFORM()) > 1;
-        column_container.reserve(this->hdu_header.naxis(2));
-        for (std::size_t i = 0; i < this->hdu_header.naxis(2); i++) {
-
-            std::string raw_data;
-
-            auto start_off = this->data_.data() + (i * this->hdu_header.naxis(1) + col_metadata.TBCOL());
-            auto ending_off = this->data_.data() +(i * this->hdu_header.naxis(1) + col_metadata.TBCOL()) +
-                column_size(col_metadata.TFORM());
-
-            if (is_single_element) {
-                raw_data.assign(start_off, ending_off);
-                column_container.push_back(lambda(raw_data,col_metadata));
+ 
+    column& get_column_metadata(const std::string& column_name) {
+        auto pos = std::find_if(this->col_metadata_.begin(), col_metadata_.end(), [&](const column& col) {return column_name == col.TTYPE(); });
+            if (pos != this->col_metadata_.end()) {
+                return (*pos);
             }
-            else {
-                ending_off = start_off + (ending_off - start_off) * element_count(col_metadata.TFORM());
-                raw_data.assign(start_off, ending_off);
-                column_container.push_back(lambda(raw_data,col_metadata));
-            }
-        }
+        throw  column_exception();
     }
+
+private:
+   
 
     /**
      * @brief  Initializes the current object with  column metadata and table data
@@ -294,22 +334,45 @@ private:
     */
     void set_binary_table_info(const std::string& data_buffer) {
         populate_column_data();
-        this->data_.assign(data_buffer.begin(), data_buffer.end());
+        if (!data_buffer.empty()) {
+            set_table_data(data_buffer);
+        }
     }
 
-    /**
-     * @brief  Converts raw binary table field data to the given type and returns the column data
-     * @param[in] col_metadata Column metadata used for parsing
-    */
-    template <typename T>
-    std::unique_ptr<column_data<T>> parse_to(const column& col_metadata) {
-        auto result = std::make_unique<column_data<T>>(col_metadata);
-        fill_col(result->get_data(), col_metadata, data_conversions::convert<T>);
-        return result;
+
+    
+    void set_table_data(const std::string& data_buffer) {
+
+        auto total_rows = this->hdu_header.naxis(2);
+        auto total_fields = this->tfields_;
+        auto total_characters_per_row = this->hdu_header.naxis(1);
+
+        // Initialize table data matrix with total_rows * total_columns elements of type string
+        tb_data = table_data(total_rows, std::vector<std::string>(total_fields, std::string()));
+
+        auto current_row = 0;
+        auto current_column = 0;
+
+
+        auto starting_offset = data_buffer.begin();
+        auto ending_offset = starting_offset;
+
+        while (current_row<total_rows) {
+
+            starting_offset = ending_offset;
+            ending_offset = starting_offset + column_size(this->col_metadata_[current_column].TFORM());
+
+            this->tb_data[current_row][current_column++] = boost::algorithm::trim_copy(std::string(starting_offset, ending_offset));
+            if (current_column % this->tfields_ == 0) {
+                current_row++;
+                current_column = 0;
+            }
+
+        }
     }
 };
 
-using binary_table = basic_binary_table_extension<card_policy>;
+using binary_table = basic_binary_table_extension<card_policy, data_conversions>;
 
 
 }}} //namespace boost::astronomy::io

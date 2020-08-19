@@ -153,12 +153,12 @@ public:
      * @return      Returns a view of the column for reading or writing data
     */ 
     template<typename ColDataType>
-    column_view<ColDataType,ascii_converter>& get_column(const std::string& column_name) const {
+    column_view<ColDataType,Converter>& get_column(const std::string& column_name) const {
 
         auto cache_entry = this->cached_columns.find(column_name);
 
         if (cache_entry != this->cached_columns.end()) {
-            return boost::get<column_view<ColDataType,ascii_converter>>(this->cached_columns[column_name]);
+            return boost::get<column_view<ColDataType,Converter>>(this->cached_columns[column_name]);
         }
         else {
         auto column_info = std::find_if(this->col_metadata_.begin(), this->col_metadata_.end(), [&column_name](const column& col) {
@@ -166,8 +166,8 @@ public:
             });
 
         if (column_info != this->col_metadata_.end()) {
-            this->cached_columns.emplace(column_name, column_view<ColDataType,ascii_converter>(column_info->index() - static_cast<std::size_t>(1), &tb_data));
-            return boost::get<column_view<ColDataType,ascii_converter>>(this->cached_columns[column_name]);
+            this->cached_columns.emplace(column_name, column_view<ColDataType,Converter>(column_info->index() - static_cast<std::size_t>(1), &tb_data));
+            return boost::get<column_view<ColDataType,Converter>>(this->cached_columns[column_name]);
         }
         }
 

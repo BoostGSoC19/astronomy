@@ -29,7 +29,7 @@ namespace boost{namespace astronomy{namespace io{
        static boost::spirit::qi::ulong_long_type spirit_type(boost::type<unsigned long long>) { return boost::spirit::qi::ulong_long; }
     public:
         template<typename T>
-        static T deserialize_to(const std::string& convert_str) {
+        static T deserialize_to(const std::string& convert_str, int) {
 
             T converted_value;
             auto iter_pos = convert_str.begin();

@@ -96,6 +96,7 @@ public:
 template<typename DataType,typename Converter>
 struct column_view{
 private:
+    int num_elements;
     int column_number;
     std::vector<std::vector<std::string>>* table_ref;
     std::unordered_map<int, DataType> cached_index;
@@ -109,7 +110,7 @@ public:
         int index;
         column_view<DataType,Converter>& col_view;
     public:
-        iterator(column_view<DataType,Converter>& col,int indx) :col_view(col),index(indx) {}
+        iterator(column_view<DataType,Converter>& col,int indx) :col_view(col),index(indx){}
         iterator operator ++() {
             index++;
             return *this;
@@ -122,7 +123,11 @@ public:
         }
 
     };
-    column_view(int col_number, std::vector<std::vector<std::string>>* tb_ref): column_number( col_number), table_ref(tb_ref) {}
+    column_view(int col_number, std::vector<std::vector<std::string>>* tb_ref,int no_elements=0):
+        column_number( col_number),
+        table_ref(tb_ref),
+        num_elements(no_elements)
+        {}
 
     iterator begin() { return iterator(*this,0); }
     iterator end() { return iterator(*this, get_row_count()); }
@@ -142,7 +147,7 @@ public:
         }
 
         auto raw_data_str = (*table_ref)[index][column_number];
-        cached_index.emplace(index, Converter::template deserialize_to<DataType>(raw_data_str));
+        cached_index.emplace(index, Converter::template deserialize_to<DataType>(raw_data_str,num_elements));
         return Proxy<DataType,Converter>(cached_index.find(index)->second, this,index);
     }
 
