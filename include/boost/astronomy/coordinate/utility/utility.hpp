@@ -11,8 +11,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <iostream>
 #include <utility>
 #include <cmath>
-
-#include <boost/astronomy/coordinate/coord_sys/coord_sys.hpp>
+#include <math.h>
 
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -27,6 +26,8 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 //Time
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+
+#include <boost/astronomy/coordinate/coord_sys/coord_sys.hpp>
 
 using namespace std;
 namespace bu = boost::units;
