@@ -17,6 +17,14 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/string_conversion_utility.hpp>
 #include <boost/astronomy/io/data_conversions.hpp>
 #include <boost/astronomy/io/default_hdus.hpp>
+#include <boost/astronomy/io/ascii_table.hpp>
+#include <boost/astronomy/io/binary_table.hpp>
+#include <boost/astronomy/io/primary_hdu.hpp>
+#include <boost/astronomy/io/data_conversions.hpp>
+#include <boost/astronomy/io/string_conversion_utility.hpp>
+
+
+
 
 
 namespace boost { namespace astronomy {namespace io {
@@ -38,7 +46,7 @@ namespace boost { namespace astronomy {namespace io {
     template<typename FileReader, typename ExtensionsSupported>
     struct basic_fits {
     private:
-        typedef fits_reader<FileReader, ExtensionsSupported> fitsreader;
+        typedef fits_io<FileReader, ExtensionsSupported> fitsreader;
     public:
         /**
          * @brief Constructs a default object of basic_fits
@@ -73,6 +81,10 @@ namespace boost { namespace astronomy {namespace io {
         }
     };
     using fits = basic_fits<fits_stream, default_hdu_manager<card_policy,ascii_converter,data_conversions>>;
+    using ascii_table = basic_ascii_table<card_policy, ascii_converter>;
+    using binary_table = basic_binary_table_extension<card_policy, data_conversions>;
+    using primary_hdu = basic_primary_hdu<card_policy>;
+
 
         }
     }

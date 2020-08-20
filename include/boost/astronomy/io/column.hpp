@@ -38,6 +38,7 @@ private:
     std::string display;    //TDISP
     std::string dimension;   //TDIM
     std::string comment_;
+    std::size_t total_elem_field;  // ASCII table 0 
 
 public:
     /**
@@ -269,10 +270,15 @@ public:
         dimension = tdim;
     }
 
-    /**
-     * @brief       Allows column to acts as a polymorphic base for other class ( column_data)
-    */
-    virtual ~column() {}
+
+    void total_elements_per_field(std::size_t count) {
+        total_elem_field = count;
+    }
+
+    std::size_t total_elements_per_field() {
+        return total_elem_field;
+    }
+
 };
 
 }}}

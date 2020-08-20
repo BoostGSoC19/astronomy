@@ -20,11 +20,9 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/astronomy/io/column.hpp>
 #include <boost/astronomy/io/column_data.hpp>
-#include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/astronomy/io/table_extension.hpp>
 #include <boost/endian/conversion.hpp>
 #include <boost/variant.hpp>
-#include <boost/astronomy/io/string_conversion_utility.hpp>
 #include <boost/cstdfloat.hpp>
 
 
@@ -52,11 +50,6 @@ struct basic_ascii_table : public table_extension<CardPolicy>
         >
     > cached_columns;
 
-    typedef std::vector<std::vector<std::string>> table_data;
-    mutable table_data tb_data;
-
-
-
 public:
 
     /**
@@ -74,59 +67,6 @@ public:
     }
 
     /**
-     * @brief    Populates the metadata information for all fields of ASCII_Table extension
-     * @details  This method populates the metadata information for all fields in a table
-     *           for easy access to the data of ASCII table extention extension
-    */
-    void populate_column_data()
-    {
-        for (std::size_t i = 0; i < this->tfields_; i++)
-        {
-            this->col_metadata_[i].index(i + 1);
-
-            this->col_metadata_[i].TFORM(
-                this->hdu_header.template value_of<std::string>("TFORM" + boost::lexical_cast<std::string>(i + 1))
-            );
-
-            this->col_metadata_[i].TBCOL(
-                this->hdu_header.template value_of<std::size_t>("TBCOL" + boost::lexical_cast<std::string>(i + 1))
-            );
-
-            try {
-                this->col_metadata_[i].TTYPE(
-                    this->hdu_header.template value_of<std::string>("TTYPE" + boost::lexical_cast<std::string>(i + 1))
-                );
-
-                this->col_metadata_[i].comment(
-                    this->hdu_header.template value_of<std::string>(this->col_metadata_[i].TTYPE())
-                );
-            }
-            catch (std::out_of_range&) {/*Do Nothing*/ }
-
-            try {
-                this->col_metadata_[i].TUNIT(
-                    this->hdu_header.template value_of<std::string>("TUNIT" + boost::lexical_cast<std::string>(i + 1))
-                );
-            }
-            catch (std::out_of_range&) {/*Do Nothing*/ }
-
-            try {
-                this->col_metadata_[i].TSCAL(
-                    this->hdu_header.template value_of<double>("TSCAL" + boost::lexical_cast<std::string>(i + 1))
-                );
-            }
-            catch (std::out_of_range&) {/*Do Nothing*/ }
-
-            try {
-                this->col_metadata_[i].TZERO(
-                    this->hdu_header.template value_of<double>("TZERO" + boost::lexical_cast<std::string>(i + 1))
-                );
-            }
-            catch (std::out_of_range&) {/*Do Nothing*/ }
-        }
-    }
-
-    /**
      * @brief      Sets the data of ASCII Table from data_buffer
      * @param[in]  data_buffer Data of ASCII Table
     */
@@ -136,16 +76,6 @@ public:
         set_ascii_table_info(data_buffer);
     }
 
-
-    /**
-     * @brief       Returns the data of ASCII table in table_data format (2D matrix)
-    */
-    table_data& get_data() { return this->tb_data; }
-
-    /**
-     * @brief       Returns the data of ASCII table (const version)
-    */
-    const table_data& get_data() const { return this->tb_data; }
 
     /**
      * @brief       Returns a editable view of the column
@@ -161,17 +91,9 @@ public:
             return boost::get<column_view<ColDataType,Converter>>(this->cached_columns[column_name]);
         }
         else {
-        auto column_info = std::find_if(this->col_metadata_.begin(), this->col_metadata_.end(), [&column_name](const column& col) {
-            return column_name == col.TTYPE();
-            });
-
-        if (column_info != this->col_metadata_.end()) {
-            this->cached_columns.emplace(column_name, column_view<ColDataType,Converter>(column_info->index() - static_cast<std::size_t>(1), &tb_data));
+            this->cached_columns.emplace(column_name, this->template make_column_view<ColDataType,Converter>(column_name));
             return boost::get<column_view<ColDataType,Converter>>(this->cached_columns[column_name]);
         }
-        }
-
-       throw column_not_found_exception(column_name);
     }
 
 
@@ -239,6 +161,62 @@ private:
 
   
     /**
+     * @brief    Populates the metadata information for all fields of ASCII_Table extension
+     * @details  This method populates the metadata information for all fields in a table
+     *           for easy access to the data of ASCII table extention extension
+    */
+    void populate_column_data()
+    {
+        for (std::size_t i = 0; i < this->tfields_; i++)
+        {
+            this->col_metadata_[i].index(i + 1);
+
+            this->col_metadata_[i].TFORM(
+                this->hdu_header.template value_of<std::string>("TFORM" + boost::lexical_cast<std::string>(i + 1))
+            );
+
+            this->col_metadata_[i].TBCOL(
+                this->hdu_header.template value_of<std::size_t>("TBCOL" + boost::lexical_cast<std::string>(i + 1))
+            );
+
+            try {
+                this->col_metadata_[i].TTYPE(
+                    this->hdu_header.template value_of<std::string>("TTYPE" + boost::lexical_cast<std::string>(i + 1))
+                );
+
+                this->col_metadata_[i].comment(
+                    this->hdu_header.template value_of<std::string>(this->col_metadata_[i].TTYPE())
+                );
+            }
+            catch (std::out_of_range&) {/*Do Nothing*/ }
+
+            try {
+                this->col_metadata_[i].TUNIT(
+                    this->hdu_header.template value_of<std::string>("TUNIT" + boost::lexical_cast<std::string>(i + 1))
+                );
+            }
+            catch (std::out_of_range&) {/*Do Nothing*/ }
+
+            try {
+                this->col_metadata_[i].TSCAL(
+                    this->hdu_header.template value_of<double>("TSCAL" + boost::lexical_cast<std::string>(i + 1))
+                );
+            }
+            catch (std::out_of_range&) {/*Do Nothing*/ }
+
+            try {
+                this->col_metadata_[i].TZERO(
+                    this->hdu_header.template value_of<double>("TZERO" + boost::lexical_cast<std::string>(i + 1))
+                );
+            }
+            catch (std::out_of_range&) {/*Do Nothing*/ }
+
+            this->col_metadata_[i].total_elements_per_field(0);
+
+        }
+    }
+
+    /**
      * @brief  Initializes the current object with  column metadata and table data
      * @param[in] data_buffer Data of the ASCII table
     */
@@ -261,7 +239,7 @@ private:
         auto total_characters_per_row = this->hdu_header.naxis(1);
 
         // Initialize table data matrix with total_rows * total_columns elements of type string
-        tb_data = table_data(total_rows, std::vector<std::string>(total_fields, std::string()));
+        this->tb_data = typename table_extension<CardPolicy>::table_data(total_rows, std::vector<std::string>(total_fields, std::string()));
 
         auto current_row = 0;
         auto current_column = 0;
@@ -281,7 +259,6 @@ private:
     }
 };
 
-using ascii_table = basic_ascii_table<card_policy,ascii_converter>;
 
 
 }}} //namespace boost::astronomy::io

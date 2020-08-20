@@ -24,8 +24,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/table_extension.hpp>
 #include <boost/astronomy/io/column.hpp>
 #include <boost/astronomy/io/column_data.hpp>
-#include <boost/astronomy/io/default_card_policy.hpp>
-#include <boost/astronomy/io/data_conversions.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
 
 
@@ -43,41 +41,37 @@ struct basic_binary_table_extension : table_extension<CardPolicy>
 
     mutable std::unordered_map<std::string,
         boost::variant<
-        column_view<bool, data_conversions>,
-        column_view<std::vector<bool>, data_conversions>,
+        column_view<bool, Converter>,
+        column_view<std::vector<bool>, Converter>,
 
-        column_view<boost::int16_t, data_conversions>,
-        column_view<std::vector<boost::int16_t>, data_conversions>,
+        column_view<boost::int16_t, Converter>,
+        column_view<std::vector<boost::int16_t>, Converter>,
 
-        column_view<boost::int32_t, data_conversions>,
-        column_view<std::vector<boost::int32_t>, data_conversions>,
+        column_view<boost::int32_t, Converter>,
+        column_view<std::vector<boost::int32_t>, Converter>,
 
-        column_view<boost::float32_t, data_conversions>,
-        column_view<std::vector<boost::float32_t>, data_conversions>,
+        column_view<boost::float32_t, Converter>,
+        column_view<std::vector<boost::float32_t>, Converter>,
 
-        column_view<boost::float64_t, data_conversions>,
-        column_view<std::vector<boost::float64_t>, data_conversions>,
+        column_view<boost::float64_t, Converter>,
+        column_view<std::vector<boost::float64_t>, Converter>,
 
-        column_view<std::pair<boost::int32_t, boost::int32_t>, data_conversions>,
-        column_view<std::vector<std::pair<boost::int32_t, boost::int32_t>>, data_conversions>,
+        column_view<std::pair<boost::int32_t, boost::int32_t>, Converter>,
+        column_view<std::vector<std::pair<boost::int32_t, boost::int32_t>>, Converter>,
 
-        column_view<std::complex<boost::float32_t>, data_conversions>,
-        column_view<std::vector<std::complex<boost::float32_t>>, data_conversions>,
+        column_view<std::complex<boost::float32_t>, Converter>,
+        column_view<std::vector<std::complex<boost::float32_t>>, Converter>,
 
-        column_view<std::complex<boost::float64_t>, data_conversions>,
-        column_view<std::vector<std::complex<boost::float64_t>>, data_conversions>,
+        column_view<std::complex<boost::float64_t>, Converter>,
+        column_view<std::vector<std::complex<boost::float64_t>>, Converter>,
 
-        column_view<std::uint8_t, data_conversions>,
-        column_view<std::vector<std::uint8_t>, data_conversions>,
+        column_view<std::uint8_t, Converter>,
+        column_view<std::vector<std::uint8_t>, Converter>,
 
-        column_view<char, data_conversions>,
-        column_view<std::vector<char>, data_conversions>
+        column_view<char, Converter>,
+        column_view<std::vector<char>, Converter>
          >
     > cached_columns;
-
-
-    typedef std::vector<std::vector<std::string>> table_data;
-    mutable table_data tb_data;
 
 public:
 
@@ -99,96 +93,18 @@ public:
     }
 
     
-    /**
-     * @brief    Populates the metadata information for all fields of binary_table_extension
-     * @details  This method populates the metadata information for all fields in a table
-     *           for easy access to the data of binary_table_extention
-     * @note     After the reading the file pointer/cursor will be set to the end of logical HDU unit
-    */
-    void populate_column_data()
-    {
-        std::size_t start = 0;
-        for (std::size_t i = 0; i < this->tfields_; i++)
-        {
-            this->col_metadata_[i].index(i + 1);
-
-            this->col_metadata_[i].TFORM(
-                this->hdu_header.template value_of<std::string>("TFORM" + boost::lexical_cast<std::string>(i + 1))
-            );
-
-            this->col_metadata_[i].TBCOL(start);
-
-            start += column_size(this->col_metadata_[i].TFORM());
-
-            try {
-                this->col_metadata_[i].TTYPE(
-                    this->hdu_header.template value_of<std::string>("TTYPE" + boost::lexical_cast<std::string>(i + 1))
-                );
-
-                this->col_metadata_[i].comment(
-                    this->hdu_header.template value_of<std::string>(this->col_metadata_[i].TTYPE())
-                );
-            }
-            catch (std::out_of_range&) {/*Do Nothing*/ }
-
-            try {
-                this->col_metadata_[i].TUNIT(
-                    this->hdu_header.template value_of<std::string>("TUNIT" + boost::lexical_cast<std::string>(i + 1))
-                );
-            }
-            catch (std::out_of_range&) {/*Do Nothing*/ }
-
-            try {
-                this->col_metadata_[i].TSCAL(
-                    this->hdu_header.template value_of<double>("TSCAL" + boost::lexical_cast<std::string>(i + 1))
-                );
-            }
-            catch (std::out_of_range&) {/*Do Nothing*/ }
-
-            try {
-                this->col_metadata_[i].TZERO(
-                    this->hdu_header.template value_of<double>("TZERO" + boost::lexical_cast<std::string>(i + 1))
-                );
-            }
-            catch (std::out_of_range&) {/*Do Nothing*/ }
-
-            try {
-                this->col_metadata_[i].TDISP(
-                    this->hdu_header.template value_of<std::string>("TDISP" + boost::lexical_cast<std::string>(i + 1))
-                );
-            }
-            catch (std::out_of_range&) {/*Do Nothing*/ }
-
-            try {
-                this->col_metadata_[i].TDIM(
-                    this->hdu_header.template value_of<std::string>("TDIM" + boost::lexical_cast<std::string>(i + 1))
-                );
-            }
-            catch (std::out_of_range&) {/*Do Nothing*/ }
-        }
-    }
-
-    
 
     template<typename ColDataType>
-    column_view<ColDataType, Converter> get_column(const std::string& column_name) {
+    column_view<ColDataType, Converter>& get_column(const std::string& column_name) {
         auto cache_entry = this->cached_columns.find(column_name);
 
         if (cache_entry != this->cached_columns.end()) {
             return boost::get<column_view<ColDataType, Converter>>(this->cached_columns[column_name]);
         }
         else {
-            auto column_info = std::find_if(this->col_metadata_.begin(), this->col_metadata_.end(), [&column_name](const column& col) {
-                return column_name == col.TTYPE();
-                });
-
-            if (column_info != this->col_metadata_.end()) {
-                this->cached_columns.emplace(column_name, column_view<ColDataType, Converter>(column_info->index() - static_cast<std::size_t>(1), &tb_data,element_count(column_info->TFORM())));
+                this->cached_columns.emplace(column_name, this->template make_column_view<ColDataType, Converter>(column_name));
                 return boost::get<column_view<ColDataType, Converter>>(this->cached_columns[column_name]);
-            }
         }
-
-        throw column_not_found_exception(column_name);
     }
 
 
@@ -202,7 +118,7 @@ public:
             std::string row_temp_buffer = "";
 
             for (int col = 0; col < this->tb_data[row].size(); col++) {
-                row_temp_buffer += tb_data[row][col];
+                row_temp_buffer += this->tb_data[row][col];
             }
 
             file_writer.write(row_temp_buffer);
@@ -212,17 +128,6 @@ public:
 
         file_writer.write(std::string(logical_record_end_pos - current_write_pos, ' '));
     }
-
-
-    /**
-     * @brief       Returns the data of Binary Table
-    */
-    table_data& get_data() { return this->tb_data; }
-
-    /**
-     * @brief       Returns the data of Binary table (const version)
-    */
-    const table_data& get_data() const { return this->tb_data; }
 
     /**
      * @brief      Sets the data of Binary Table from data_buffer
@@ -318,16 +223,88 @@ public:
 
  
     column& get_column_metadata(const std::string& column_name) {
-        auto pos = std::find_if(this->col_metadata_.begin(), col_metadata_.end(), [&](const column& col) {return column_name == col.TTYPE(); });
+        auto pos = std::find_if(this->col_metadata_.begin(), this->col_metadata_.end(), [&](const column& col) {return column_name == col.TTYPE(); });
             if (pos != this->col_metadata_.end()) {
                 return (*pos);
             }
-        throw  column_exception();
+        throw column_not_found_exception(column_name);
     }
 
 private:
    
 
+    /**
+     * @brief    Populates the metadata information for all fields of binary_table_extension
+     * @details  This method populates the metadata information for all fields in a table
+     *           for easy access to the data of binary_table_extention
+     * @note     After the reading the file pointer/cursor will be set to the end of logical HDU unit
+    */
+    void populate_column_data()
+    {
+        std::size_t start = 0;
+        for (std::size_t i = 0; i < this->tfields_; i++)
+        {
+            this->col_metadata_[i].index(i + 1);
+
+            this->col_metadata_[i].TFORM(
+                this->hdu_header.template value_of<std::string>("TFORM" + boost::lexical_cast<std::string>(i + 1))
+            );
+
+            this->col_metadata_[i].TBCOL(start);
+
+            start += column_size(this->col_metadata_[i].TFORM());
+
+            try {
+                this->col_metadata_[i].TTYPE(
+                    this->hdu_header.template value_of<std::string>("TTYPE" + boost::lexical_cast<std::string>(i + 1))
+                );
+
+                this->col_metadata_[i].comment(
+                    this->hdu_header.template value_of<std::string>(this->col_metadata_[i].TTYPE())
+                );
+            }
+            catch (std::out_of_range&) {/*Do Nothing*/ }
+
+            try {
+                this->col_metadata_[i].TUNIT(
+                    this->hdu_header.template value_of<std::string>("TUNIT" + boost::lexical_cast<std::string>(i + 1))
+                );
+            }
+            catch (std::out_of_range&) {/*Do Nothing*/ }
+
+            try {
+                this->col_metadata_[i].TSCAL(
+                    this->hdu_header.template value_of<double>("TSCAL" + boost::lexical_cast<std::string>(i + 1))
+                );
+            }
+            catch (std::out_of_range&) {/*Do Nothing*/ }
+
+            try {
+                this->col_metadata_[i].TZERO(
+                    this->hdu_header.template value_of<double>("TZERO" + boost::lexical_cast<std::string>(i + 1))
+                );
+            }
+            catch (std::out_of_range&) {/*Do Nothing*/ }
+
+            try {
+                this->col_metadata_[i].TDISP(
+                    this->hdu_header.template value_of<std::string>("TDISP" + boost::lexical_cast<std::string>(i + 1))
+                );
+            }
+            catch (std::out_of_range&) {/*Do Nothing*/ }
+
+            try {
+                this->col_metadata_[i].TDIM(
+                    this->hdu_header.template value_of<std::string>("TDIM" + boost::lexical_cast<std::string>(i + 1))
+                );
+            }
+            catch (std::out_of_range&) {/*Do Nothing*/ }
+
+            this->col_metadata_[i].total_elements_per_field(element_count(this->col_metadata_[i].TFORM()));
+        }
+    }
+
+    
     /**
      * @brief  Initializes the current object with  column metadata and table data
      * @param[in] data_buffer Data of the Binary table
@@ -348,7 +325,7 @@ private:
         auto total_characters_per_row = this->hdu_header.naxis(1);
 
         // Initialize table data matrix with total_rows * total_columns elements of type string
-        tb_data = table_data(total_rows, std::vector<std::string>(total_fields, std::string()));
+        this->tb_data = typename table_extension<CardPolicy>::table_data(total_rows, std::vector<std::string>(total_fields, std::string()));
 
         auto current_row = 0;
         auto current_column = 0;
@@ -371,8 +348,6 @@ private:
         }
     }
 };
-
-using binary_table = basic_binary_table_extension<card_policy, data_conversions>;
 
 
 }}} //namespace boost::astronomy::io

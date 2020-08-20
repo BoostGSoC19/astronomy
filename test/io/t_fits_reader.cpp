@@ -25,7 +25,7 @@ namespace fits_test {
         std::string samples_directory;
     public:
         std::string sample1_path;
-        fits_reader<fits_stream, default_hdu_manager<card_policy,ascii_converter,data_conversions>> reader;
+        fits_io<fits_stream, default_hdu_manager<card_policy,ascii_converter,data_conversions>> reader;
         fits_reader_fixture() {
 
 #ifdef SOURCE_DIR

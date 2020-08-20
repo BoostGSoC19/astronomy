@@ -20,11 +20,23 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 namespace boost { namespace astronomy {namespace io {
 
+
+    template<typename FileWriter>
+    struct fits_writer_visitor :public boost::static_visitor<> {
+
+        FileWriter& writer;
+
+        fits_writer_visitor(FileWriter& file_writer) :writer(file_writer) {}
+
+        void operator()(boost::blank) {}
+        template<typename Hdu>
+        void operator()(Hdu& hdu) { hdu.write_to(writer); }
+    };
+
     /**
      * @brief           Contains factory methods for constructing different type of HDU's
      * @author          Gopi Krishna Menon
      */
-
     template<typename CardPolicy,typename AsciiConverter,typename BinaryConverter>
     struct default_hdu_manager{
 
@@ -36,6 +48,8 @@ namespace boost { namespace astronomy {namespace io {
 
         >  Extension;
 
+        template<typename FileWriter>
+        using writer_visitor = fits_writer_visitor<FileWriter>;
         typedef header<CardPolicy> header_type;
 
         /**
