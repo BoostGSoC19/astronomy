@@ -11,7 +11,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <iostream>
 #include <utility>
 #include <cmath>
-#include <math.h>
 
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -28,6 +27,8 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <boost/astronomy/coordinate/coord_sys/coord_sys.hpp>
+
+#define PI        3.14159265358979323846264338327950288
 
 using namespace std;
 namespace bu = boost::units;
@@ -298,7 +299,7 @@ struct obliquity_of_ecliptic{
 
     double e_degrees =  23.439292 - DE;
 
-    e = (e_degrees * M_PI / 180.0) * bu::si::radian;
+    e = (e_degrees * PI / 180.0) * bu::si::radian;
   }
 
   angle_radian get(){
