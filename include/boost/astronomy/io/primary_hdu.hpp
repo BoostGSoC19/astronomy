@@ -80,7 +80,11 @@ public:
     template<bitpix DT>
     image<DT> get_data() const { return *boost::get<image<DT>>(&this->data); }
 
-
+    /**
+     * @brief Writes the entire HDU ( header, image_data ) into the file
+     * @param[in,out] file_writer Provides operations for writing data into the file
+     * @tparam FileWriter Type of file_writer object.
+    */
     template<typename FileWriter>
     void write_to(FileWriter& file_writer) {
         

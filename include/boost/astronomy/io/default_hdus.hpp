@@ -20,15 +20,32 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 namespace boost { namespace astronomy {namespace io {
 
-
+    /**
+     * @brief Visitor for writing the Header and Data of all types of HDU's
+     * @tparam FileWriter Type of writer object to write data to
+    */
     template<typename FileWriter>
     struct fits_writer_visitor :public boost::static_visitor<> {
-
+    private:
         FileWriter& writer;
+    public:
 
+        /**
+         * @brief Constructs a visitor object with an associated file_writer to write data to
+         * @param[in,out] file_writer Object for facilitating the writing of data to the file
+        */
         fits_writer_visitor(FileWriter& file_writer) :writer(file_writer) {}
 
+        /**
+         * @breif Special case ( Not to do anything )
+        */
         void operator()(boost::blank) {}
+
+        /**
+         * @brief Calls the write_to function of given hdu to write data to the file_writer
+         * @tparam Hdu  Type of HDU
+         * @param[in] hdu Hdu object to call write_to
+        */
         template<typename Hdu>
         void operator()(Hdu& hdu) { hdu.write_to(writer); }
     };

@@ -162,11 +162,20 @@ namespace boost{namespace astronomy{namespace io{
                 static_cast<std::size_t>(1);
         }
 
+        /**
+         * @brief Deserializes the binary data into the given type
+         * @tparam T Type to deserialize the data to
+        */
         template<typename T>
         static T deserialize_to(const std::string&, int) {
             return T();
         }
 
+        /**
+         * @brief Used to serialize the data to string
+         * @param[in] data Data to be serialized
+         * @tparam T Type of Data to be serialized
+        */
         template<typename T>
         static std::string serialize(T data) {
             boost::endian::native_to_big_inplace(data);
@@ -175,10 +184,18 @@ namespace boost{namespace astronomy{namespace io{
             return std::string(start_pos, end_pos);
 
         }
+
+        /**
+         * @brief Overloaded case for Array Descriptors
+        */
         template<typename T>
         static std::string serialize(std::pair<T, T> data) {
             return serialize(data.first) + serialize(data.second);
         }
+
+        /**
+         * @brief Overloaded case for Complex Numbers
+        */
         template<typename T>
         static std::string serialize(std::complex<T>&data) {
             T real_part = data.real();
@@ -186,6 +203,9 @@ namespace boost{namespace astronomy{namespace io{
             return serialize(real_part) + serialize(imag_part);
         }
 
+        /**
+         * @brief Overloaded case for data containing multiple elements
+        */
         template<typename T>
         static std::string serialize(const std::vector<T>& data) {
 

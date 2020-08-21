@@ -17,12 +17,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/column_data.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
 
-/**
- * @file    table_extension.hpp
- * @author  Pranam Lashkari
- * @details Contains definition for table_extension
- */
-
 namespace boost { namespace astronomy { namespace io {
 
 /**
@@ -66,6 +60,10 @@ public:
         return this->hdu_header;
     }
 
+    /**
+     * @brief Returns a copy of the metadata associated with the perticular column ( indicated by column_name )
+     * @param[in] column_name Name of column whose metadata needs to be returned
+    */
     column get_column_metadata(const std::string& column_name) const {
         auto pos = std::find_if(this->col_metadata_.begin(), col_metadata_.end(), [&](const column& col) {return column_name == col.TTYPE(); });
         if (pos != this->col_metadata_.end()) {
@@ -74,18 +72,32 @@ public:
         throw column_not_found_exception(column_name);
     }
 
+    /**
+     * @brief Constructs a column view of a perticular column/field
+     * @tparam ColDataType The data type of elements in the column
+     * @tparam Converter Policy to serialize and deserialize data
+    */
     template<typename ColDataType, typename Converter>
     column_view<ColDataType, Converter> make_column_view(const std::string& column_name) const {
             return column_view<ColDataType,Converter>(get_column_metadata(column_name), &tb_data);
     
     }
 
+    /**
+     * @brief Returns the non editable internal table data of the HDU
+    */
     const table_data& get_data() const { return this->tb_data; }
 
+    /**
+     * @brief Returns the internal table data of the HDU
+    */
     table_data& get_data() { return this->tb_data; }
 
-
     private:
+
+    /**
+     * @brief Sets the information associated with the table extension
+    */
     void set_table_extension_info() {
         this->tfields_ = this->hdu_header.template value_of<std::size_t>("TFIELDS");
         this->col_metadata_.resize(this->tfields_);

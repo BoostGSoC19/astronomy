@@ -89,7 +89,9 @@ public:
     T parse_to(const std::string& value, boost::type <T>) const {
         return ascii_converter::deserialize_to<T>(value,0);
     }
-
+    /**
+     * @brief Overloaded case for boolean
+    */
     bool parse_to(const std::string& value, boost::type<bool>) const {
 
         if (value == "T") { return true; }
@@ -132,6 +134,10 @@ public:
         return val;
     }
 
+    /**
+     * @brief Pads the string according to the requirements in FITS standard
+     * @param[in] value Value to be serialized and padded according to requirements
+    */
     std::string serialize_to_fits_format(const std::string& value) const {
         std::string generated_string="";
         generated_string += '\'';
@@ -140,28 +146,54 @@ public:
         return generated_string;
     }
 
+    /**
+     * @brief Serializes a boolean to string and pads it according to requirements in FITS standard
+     * @param[in] value Boolean value to serialize to
+    */
     std::string serialize_to_fits_format(bool value) const {
 
         return std::string(value == true ? "T" : "F").insert(0, 19, ' ');
     }
 
+    /**
+     * @brief Serializes a long long value to string and pads it according to requirements in FITS standard
+     * @param[in] value long long value to serialize to
+    */
     std::string serialize_to_fits_format(long long value)const {
         std::string val = std::to_string(value);
         return val.insert(0, 20 - val.length(), ' ');
     }
 
+    /**
+     * @brief Serializes a complex number to string and pads it according to requirements in FITS standard
+     * @param[in] value complex number to serialize to
+     * @tparam Type of complex number
+    */
     template<typename T>
     std::string serialize_to_fits_format(std::complex<T> value)const {
         return serialize_to_fits_format(value.real())+ serialize_to_fits_format(value.imag());        
     }
 
+    /**
+     * @brief Extracts the key from the fits_card
+     * @param[in] The card from which the keyword needs to be extracted
+    */
     std::string extract_keyword(const std::string& fits_card)const {
         return fits_card.substr(0, 8);
     }
 
+    /**
+     * @brief Formats the keyword according to the requirements of FITS standard
+     * @param[in] keyword Keyword to format
+    */
     std::string format_keyword(const std::string& keyword) const {
         return std::string(keyword).append(8 - keyword.length(), ' ');
     }
+
+    /**
+     * @brief Returns the value associated with keyword from the fits_card
+     * @param[in] fits_card fits card from where the value needs to be extracted
+    */
     std::string extract_value(const std::string& fits_card) const {
         return fits_card.substr(9, fits_card.find('/') - 10);
     }

@@ -126,7 +126,11 @@ public:
 
     }
 
-
+    /**
+     * @brief Writes the entire HDU header into the file
+     * @param[in] file_writer  File Writer object for facilitating the writing of data
+     * @tparam FileWriter Type of file_writer object
+    */
     template<typename FileWriter>
     void write_header(FileWriter& file_writer) {
         std::string temp_buffer;
@@ -158,6 +162,10 @@ public:
         return "primary_hdu";
     }
 
+    /**
+     * @brief Searches for the given keyword  is present in the Header
+     * @param[in] keyword Keyword to be searched for 
+    */
     bool contains_keyword(const std::string& keyword) {
         auto keyword_found = std::find_if(cards.begin(), cards.end(), [&keyword](const card<CardPolicy>& h_card) {
             return h_card.keyword() == keyword;

@@ -127,6 +127,11 @@ namespace boost { namespace astronomy { namespace io {
             }
         }
 
+        /**
+         * @brief Writes all the HDU's Header and Data information to the file
+         * @param[in] file_path Path where the file resides
+         * @note The HDUs are written in the order they are stored
+        */
         void write_to(const std::string& file_path) {
             FileReader file_writer;
             file_writer.create_file(file_path);

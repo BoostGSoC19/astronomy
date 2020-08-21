@@ -135,6 +135,11 @@ public:
         return form[0];
     }
 
+    /**
+     * @brief Writes the entire HDU ( header, data ) into the file
+     * @param[in,out] file_writer Provides operations for writing data into the file
+     * @tparam FileWriter Type of file_writer object.
+    */
     template<typename FileWriter>
     void write_to(FileWriter& file_writer) {
 
@@ -211,7 +216,7 @@ private:
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
 
-            this->col_metadata_[i].total_elements_per_field(0);
+            this->col_metadata_[i].total_elements(0);
 
         }
     }

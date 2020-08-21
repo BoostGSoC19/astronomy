@@ -93,7 +93,12 @@ public:
     }
 
     
-
+    /**
+     * @brief       Returns a editable view of the column
+     * @param[in]   name Name of the field
+     * @return      Returns a view of the column for reading or writing data
+     * @tparam  ColDataType Data type of the column data stored
+    */
     template<typename ColDataType>
     column_view<ColDataType, Converter>& get_column(const std::string& column_name) {
         auto cache_entry = this->cached_columns.find(column_name);
@@ -107,7 +112,11 @@ public:
         }
     }
 
-
+    /**
+     * @brief Writes the entire HDU ( header, data ) into the file
+     * @param[in,out] file_writer Provides operations for writing data into the file
+     * @tparam FileWriter Type of file_writer object.
+    */
     template<typename FileWriter>
     void write_to(FileWriter& file_writer) {
 
@@ -221,15 +230,6 @@ public:
         }
     }
 
- 
-    column& get_column_metadata(const std::string& column_name) {
-        auto pos = std::find_if(this->col_metadata_.begin(), this->col_metadata_.end(), [&](const column& col) {return column_name == col.TTYPE(); });
-            if (pos != this->col_metadata_.end()) {
-                return (*pos);
-            }
-        throw column_not_found_exception(column_name);
-    }
-
 private:
    
 
@@ -300,7 +300,7 @@ private:
             }
             catch (std::out_of_range&) {/*Do Nothing*/ }
 
-            this->col_metadata_[i].total_elements_per_field(element_count(this->col_metadata_[i].TFORM()));
+            this->col_metadata_[i].total_elements(element_count(this->col_metadata_[i].TFORM()));
         }
     }
 
@@ -317,7 +317,9 @@ private:
     }
 
 
-    
+    /**
+     * @brief Converts the data_buffer into table_data format (2D matrix )
+    */
     void set_table_data(const std::string& data_buffer) {
 
         auto total_rows = this->hdu_header.naxis(2);

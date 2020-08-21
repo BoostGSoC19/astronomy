@@ -43,7 +43,7 @@ public:
      * @brief     Constructs an extention_hdu from the hduobject passed as an argument
      * @details   This constructor accepts a hdu_object as argument and creates a extention_hdu
      *            by copying the header information from hdu_object
-     * @param[in] other hdu object containing the header information
+     * @param[in] other Header information
     */
     extension_hdu(header<CardPolicy> const& other) :hdu_header(other)
     {

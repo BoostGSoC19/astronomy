@@ -1,5 +1,6 @@
 /*=============================================================================
 Copyright 2019 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2020 Gopi Krishna Menon <krishnagopi487.github@outlook.com>
 
 Distributed under the Boost Software License, Version 1.0. (See accompanying
 file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
@@ -12,12 +13,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <cstddef>
 
 #include <boost/static_assert.hpp>
-
-/**
- * @file    column.hpp
- * @author  Pranam Lashkari
- * @details Contains definition for column structure
- */
 
 namespace boost { namespace astronomy { namespace io {
 /**
@@ -270,12 +265,18 @@ public:
         dimension = tdim;
     }
 
-
-    void total_elements_per_field(std::size_t count) {
+    /**
+     * @brief Sets the total elements present in a perticular field
+     * @param[in] count Number of elements present in a perticular field
+    */
+    void total_elements(std::size_t count) {
         total_elem_field = count;
     }
 
-    std::size_t total_elements_per_field() {
+    /**
+     * @brief Returns the total number of elements present in a perticular field
+    */
+    std::size_t total_elements() {
         return total_elem_field;
     }
 
