@@ -15,6 +15,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <complex>
 #include <boost/lexical_cast.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
+#include <boost/astronomy/io/string_conversion_utility.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
 namespace boost{namespace astronomy{namespace io{
@@ -86,13 +87,7 @@ public:
      */
     template<typename T>
     T parse_to(const std::string& value, boost::type <T>) const {
-
-        try {
-            return boost::lexical_cast<T>(value);
-        }
-        catch (boost::bad_lexical_cast& exception) {
-            throw boost::astronomy::invalid_cast(exception.what());
-        }
+        return ascii_converter::deserialize_to<T>(value,0);
     }
 
     bool parse_to(const std::string& value, boost::type<bool>) const {

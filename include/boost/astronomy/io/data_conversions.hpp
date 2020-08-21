@@ -13,6 +13,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include<string>
 #include<cstring>
 #include<complex>
+#include<algorithm>
 #include<boost/cstdint.hpp>
 #include<boost/algorithm/string.hpp>
 #include<boost/cstdfloat.hpp>
@@ -26,10 +27,9 @@ namespace boost{namespace astronomy{namespace io{
   * @brief           Provides convenience methods for deserializing Binary data
   * @author          Gopi Krishna Menon
  */
-    class data_conversions {
+    struct data_conversions {
 
-    public:
-
+    
         /**
          * @brief  Deserializes single element in binary form to its original type
          * @tparam NumericType Original Type in which element is to be returned
@@ -162,6 +162,41 @@ namespace boost{namespace astronomy{namespace io{
                 static_cast<std::size_t>(1);
         }
 
+        template<typename T>
+        static T deserialize_to(const std::string&, int) {
+            return T();
+        }
+
+        template<typename T>
+        static std::string serialize(T data) {
+            boost::endian::native_to_big_inplace(data);
+            char* start_pos = reinterpret_cast<char*>(&data);
+            char* end_pos = reinterpret_cast<char*>(start_pos + sizeof(T));
+            return std::string(start_pos, end_pos);
+
+        }
+        template<typename T>
+        static std::string serialize(std::pair<T, T> data) {
+            return serialize(data.first) + serialize(data.second);
+        }
+        template<typename T>
+        static std::string serialize(std::complex<T>&data) {
+            T real_part = data.real();
+            T imag_part = data.imag();
+            return serialize(real_part) + serialize(imag_part);
+        }
+
+        template<typename T>
+        static std::string serialize(const std::vector<T>& data) {
+
+            std::string serialized_data = "";
+            for (auto element : data) {
+                serialized_data += serialize(element);
+            }
+            return serialized_data;
+        }
+
+
         /**
         * @brief  Dispatcher method whose specializations perform deserialization of data
        */
@@ -170,6 +205,140 @@ namespace boost{namespace astronomy{namespace io{
             return T();
         }
     };
+
+    template<>
+    bool data_conversions::deserialize_to(const std::string& element, int) {
+        return element[0] == 'T';
+    }
+    template<>
+    std::vector<bool> data_conversions::deserialize_to(const std::string& elements,int) {
+        std::vector<bool> values;
+        for (auto element : elements) {
+            values.emplace_back(element == 'T');
+        }
+        return values;
+    }
+
+    template<>
+    boost::int16_t data_conversions::deserialize_to(const std::string& element, int) {
+        return element_to_numeric<boost::int16_t>(element);
+    }
+
+    template<>
+    std::vector<boost::int16_t> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+        return elements_to_numeric_collection<boost::int16_t>(
+            elements, num_elements);
+    }
+
+    template<>
+    boost::int32_t data_conversions::deserialize_to(const std::string& element, int) {
+        return element_to_numeric<boost::int32_t>(element);
+    }
+    template<>
+    std::vector<boost::int32_t> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+        return data_conversions::elements_to_numeric_collection<boost::int32_t>(
+            elements, num_elements);
+    }
+
+    template<>
+    boost::float32_t data_conversions::deserialize_to(const std::string& element,int) {
+        return element_to_numeric<boost::float32_t, boost::int32_t>(element);
+    }
+    template<>
+    std::vector<boost::float32_t> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+        return elements_to_numeric_collection<boost::float32_t, boost::int32_t>(
+            elements, num_elements);
+    }
+    template<>
+    boost::float64_t data_conversions::deserialize_to(const std::string& element, int) {
+        return data_conversions::element_to_numeric<boost::float64_t, boost::int64_t>(element);
+    }
+    template<>
+    std::vector<boost::float64_t> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+        return data_conversions::elements_to_numeric_collection<boost::float64_t, boost::int64_t>(
+            elements, num_elements);
+    }
+    template<>
+    std::pair<boost::int32_t, boost::int32_t> data_conversions::deserialize_to(const std::string& element,int) {
+        auto x = boost::endian::big_to_native(
+            *reinterpret_cast<const boost::int32_t*>(element.c_str()));
+        auto y = boost::endian::big_to_native(
+            *(reinterpret_cast<const boost::int32_t*>(element.c_str()) + 1));
+        return std::make_pair(x, y);
+    }
+    template<>
+    std::vector<std::pair<boost::int32_t, boost::int32_t>> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+        std::vector<std::pair<boost::int32_t, boost::int32_t>> values;
+        values.reserve(num_elements);
+        for (std::size_t i = 0; i < num_elements; i++) {
+            values.emplace_back(
+                boost::endian::big_to_native(
+                    *(reinterpret_cast<const boost::int32_t*>(elements.c_str()) + i)),
+                boost::endian::big_to_native(
+                    *(reinterpret_cast<const boost::int32_t*>(elements.c_str()) + i +
+                        1)));
+        }
+        return values;
+    }
+    template<>
+    std::complex<boost::float32_t> data_conversions::deserialize_to(const std::string& element,int) {
+        return element_to_complex<boost::float32_t, boost::int32_t>(element);
+    }
+    template<>
+    std::vector<std::complex<boost::float32_t>> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+        return elements_to_complex_collection<boost::float32_t, boost::int32_t>(
+            elements, num_elements);
+    }
+    template<>
+    std::complex<boost::float64_t>data_conversions::deserialize_to(const std::string& element,int) {
+        return element_to_complex<boost::float64_t, boost::int64_t>(element);
+    }
+    template<>
+    std::vector<std::complex<boost::float64_t>> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+        return elements_to_complex_collection<boost::float64_t, boost::int64_t>(
+            elements,num_elements);
+    }
+    template<>
+    std::uint8_t data_conversions::deserialize_to(const std::string& element, int) {
+        return element_to_byte<std::uint8_t>(element);
+    }
+    template<>
+    std::vector<std::uint8_t> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+        return elements_to_byte_collection<std::uint8_t>(
+            elements, num_elements);
+    }
+    template<>
+    char data_conversions::deserialize_to(const std::string& element, int) {
+        return data_conversions::element_to_byte<char>(element);
+    }
+    template<>
+    std::vector<char> data_conversions::deserialize_to(const std::string& elements,int num_elements) {
+        return data_conversions::elements_to_byte_collection<char>(
+            elements, num_elements);
+    }
+
+
+
+
+    template<>
+    std::string data_conversions::serialize(bool value) {
+        return value ? std::string(1,'T') : std::string(1,'F');
+    }
+
+    template<>
+    std::string data_conversions::serialize(const std::vector<bool>& values) {
+        std::string data;
+        data.resize(values.size());
+
+        std::transform(values.begin(), values.end(), data.begin(), [](bool value) {return value ? 'T' : 'F'; });
+        return data;
+    }
+
+
+
+
+
+
 
     template<>
     bool data_conversions::convert(const std::string& element, const column&) {

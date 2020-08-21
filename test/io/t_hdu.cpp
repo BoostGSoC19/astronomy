@@ -8,16 +8,17 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #define BOOST_TEST_MODULE hdu_test
 
 #include <boost/astronomy/io/hdu.hpp>
-#include <boost/astronomy/io/stream_reader.hpp>
+#include <boost/astronomy/io/fits_stream.hpp>
 #include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/test/unit_test.hpp>
 #include "base_fixture.hpp"
 #include <map>
+#include <stdio.h>
 
 using namespace boost::astronomy::io;
 namespace fits_test {
 
-    class hdu_fixture :public base_fixture<fits_stream_reader,card_policy> {
+    class hdu_fixture :public base_fixture<fits_stream,card_policy> {
     public:
         header<card_policy> sample_1;
         hdu_fixture() {
@@ -49,6 +50,29 @@ BOOST_AUTO_TEST_SUITE(hdu_methods)
 BOOST_FIXTURE_TEST_CASE(read_from_filereader,fits_test::hdu_fixture) {
     BOOST_REQUIRE_EQUAL(sample_1.card_count(), static_cast<std::size_t>(262));
 }
+
+BOOST_FIXTURE_TEST_CASE(write_header_to_file, fits_test::hdu_fixture) {
+
+    fits_stream test_file;
+    std::string file_path = get_absolute_path("test_file_hdu.fits");
+    test_file.create_file(file_path);
+
+    sample_1.write_header(test_file);
+
+    // Reopen for reading
+    test_file.set_file(file_path);
+    header<card_policy> test_header;
+    test_header.read_header(test_file);
+
+
+    BOOST_CHECK(test_header == get_raw_hdu("fits_sample1", "primary_hdu")->hdu_header);
+
+
+    test_file.close();
+    remove(file_path.c_str());
+}
+
+
 
 BOOST_FIXTURE_TEST_CASE(bitpix_func, fits_test::hdu_fixture) {
     BOOST_CHECK_MESSAGE(sample_1.bitpix() == bitpix::_B32,

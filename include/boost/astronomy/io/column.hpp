@@ -38,6 +38,7 @@ private:
     std::string display;    //TDISP
     std::string dimension;   //TDIM
     std::string comment_;
+    std::size_t total_elem_field;  // ASCII table 0 
 
 public:
     /**
@@ -51,13 +52,33 @@ public:
      * @param[in]   tbcol Starting column of the current field value
      * @param[in]   tform The format in which the value of a field in encoded
     */
-    column(std::size_t tbcol, std::string tform): start(tbcol), format(tform) {}
+    column(std::size_t tbcol, std::string tform):
+        start(tbcol),
+        format(tform),
+        index_(-1),name(""),
+        unit(""),
+        scale(-1),
+        zero(-1),
+        display(""),
+        dimension(""),
+        comment_("")
+    {}
 
     /**
      * @brief       Constructs a column object and sets the format in which the value is encoded
      * @param[in]   tform The format in which the value of a field in encoded
     */
-    column(std::string tform) : format(tform) {}
+    column(std::string tform) :
+        start(-1),
+        format(tform),
+        index_(-1), name(""),
+        unit(""),
+        scale(-1),
+        zero(-1),
+        display(""),
+        dimension(""),
+        comment_("")
+    {}
 
     /**
      * @brief       Sets the index/position of a perticular field
@@ -249,10 +270,15 @@ public:
         dimension = tdim;
     }
 
-    /**
-     * @brief       Allows column to acts as a polymorphic base for other class ( column_data)
-    */
-    virtual ~column() {}
+
+    void total_elements_per_field(std::size_t count) {
+        total_elem_field = count;
+    }
+
+    std::size_t total_elements_per_field() {
+        return total_elem_field;
+    }
+
 };
 
 }}}

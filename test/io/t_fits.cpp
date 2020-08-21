@@ -14,7 +14,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include<fstream>
 #include<stdexcept>
 
-#include<boost/astronomy/io/stream_reader.hpp>
+#include<boost/astronomy/io/fits_stream.hpp>
 #include<boost/astronomy/io/default_hdus.hpp>
 #include<boost/astronomy/io/default_card_policy.hpp>
 #include<boost/astronomy/io/fits.hpp>
@@ -24,7 +24,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 namespace fits_test {
 
-    class fits_fixture:public base_fixture<fits_stream_reader> {
+    class fits_fixture:public base_fixture<fits_stream> {
     public:
         std::string sample_1_path;
         std::string sample_2_path;

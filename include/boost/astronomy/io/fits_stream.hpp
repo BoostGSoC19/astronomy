@@ -18,7 +18,7 @@ namespace boost {namespace astronomy {namespace io {
     * @note  file is a pointer in this class due to a bug in GCC 4.9 which does not
     *        implement move constructor for fstream class
     */
-    struct fits_stream_reader {
+    struct fits_stream {
     private:
         std::fstream* file;
 
@@ -27,12 +27,12 @@ namespace boost {namespace astronomy {namespace io {
          * @brief Constructs a new FITS stream reader object
 
         */
-        fits_stream_reader():file(new std::fstream) {}
+        fits_stream():file(new std::fstream) {}
 
         /**
          * @brief Default copy constructor
         */
-        fits_stream_reader(fits_stream_reader && other):file(other.file) {
+        fits_stream(fits_stream && other):file(other.file) {
             other.file = nullptr;
         }
 
@@ -42,16 +42,25 @@ namespace boost {namespace astronomy {namespace io {
          * @throw file_reading_exception
         */
         void set_file(const std::string& path) {
-            file->close();
+            this->file->close();
             file->clear();
-            this->file->exceptions(std::fstream::failbit | std::fstream::badbit);
-            try {
-                this->file->open(path, std::ios::binary | std::ios::in);
-            }
-            catch (std::fstream::failure& fstream_faliure) {
-                throw file_reading_exception(fstream_faliure.what());
+            this->file->open(path, std::ios::binary | std::ios::in);
+            if (!this->file->good()) {
+                throw file_reading_exception("Cannot Open File");
             }
         }
+
+        /**
+         * @brief Creates an empty file for reading/writing in the path specified
+         * @param[in] path The path where the file needs to be created
+        */
+        bool create_file(const std::string& path) {
+            this->file->close();
+            this->file->clear();
+            this->file->open(path, std::ios::in | std::ios::out | std::ios::trunc);
+            return file->good();
+        }
+
 
         /**
          * @brief Used to check whether the file is open or not
@@ -86,6 +95,28 @@ namespace boost {namespace astronomy {namespace io {
         }
 
         /**
+         * @brief Writes the data to the file at the current file pointer position
+         * @param[in] data Data to be written into file
+        */
+        bool write(const std::string& data) {
+
+            this->file->write(data.c_str(), sizeof(char) * data.size());
+            return this->file->good();
+        }
+
+        /**
+         * @brief Writes the data to the file at the current file pointer position
+         * @param[in] data Data to be written into file
+        */
+        bool write(const std::string& data,std::size_t position) {
+            this->file->seekp(position);
+            if (this->file->good()) {
+                this->file->write(data.c_str(), sizeof(char) * data.size());
+            }
+            return this->file->good();
+        }
+
+        /**
          * @brief Reads num_bytes from the file from current position as a string
          * @param[in] num_bytes Amount of data to be read in bytes
         */
@@ -104,6 +135,13 @@ namespace boost {namespace astronomy {namespace io {
         }
 
         /**
+         * @brief Closes the file if opened
+        */
+        void close() {
+            this->file->close();
+        }
+
+        /**
          * @brief Returns the internal file stream 
         */
         std::fstream& get_internal_stream() { return *file; }
@@ -112,30 +150,28 @@ namespace boost {namespace astronomy {namespace io {
          * @brief Sets the file pointer to the end of current logical record ( or beginning of next record )
         */
         void set_unit_end() {
+            set_reading_pos(find_unit_end());
+        }
+
+        /**
+         * @brief Finds the end of current logical record ( or beginning of next record )
+        */
+        std::size_t find_unit_end() {
             std::size_t current_pos = file->tellg();
             std::size_t logical_record_size = 2880;
 
             std::size_t offset = logical_record_size - (current_pos % logical_record_size);
             std::size_t newpos = (current_pos + offset);
-
-            set_reading_pos(newpos);
+            return newpos;
         }
 
         /**
          * @brief Closes the file and Destroys the internal filestream
         */
-        ~fits_stream_reader() {
+        ~fits_stream() {
 
             if (file != nullptr && file->is_open()) { file->close(); }
             delete file;
-        }
-    private:
-
-        /**
-         * @brief Sets the file exception flag to raise exception if file could not be read
-        */
-        void set_exception_flags() {
-            this->file->exceptions(std::fstream::failbit | std::fstream::badbit);
         }
     };
 

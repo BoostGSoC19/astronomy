@@ -8,7 +8,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #define BOOST_TEST_MODULE primary_hdu_test
 
 #include <boost/astronomy/io/primary_hdu.hpp>
-#include <boost/astronomy/io/stream_reader.hpp>
+#include <boost/astronomy/io/fits_stream.hpp>
 #include "base_fixture.hpp"
 #include <boost/test/unit_test.hpp>
 
@@ -16,7 +16,7 @@ using namespace boost::astronomy::io;
 
 namespace fits_test {
 
-    class primary_hdu_fixture:public base_fixture<fits_stream_reader,card_policy> {
+    class primary_hdu_fixture:public base_fixture<fits_stream,card_policy> {
     public:
         basic_primary_hdu<card_policy> test_p_hdu1;
         primary_hdu_fixture() {

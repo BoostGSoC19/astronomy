@@ -14,6 +14,8 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/hdu.hpp>
 #include <boost/astronomy/io/extension_hdu.hpp>
 #include <boost/astronomy/io/column.hpp>
+#include <boost/astronomy/io/column_data.hpp>
+#include <boost/astronomy/exception/fits_exception.hpp>
 
 /**
  * @file    table_extension.hpp
@@ -33,13 +35,15 @@ struct table_extension : public extension_hdu<CardPolicy>
 protected:
     std::size_t tfields_;
     std::vector<column> col_metadata_;
-    std::vector<char> data_;
+
+    typedef std::vector<std::vector<std::string>> table_data;
+    mutable table_data tb_data;
 
 public:
     /**
      * @brief       Constructs a standalone object of table_extentsion
     */
-    table_extension() {}
+    table_extension():tfields_(-1) {}
 
     
     /**
@@ -62,12 +66,31 @@ public:
         return this->hdu_header;
     }
 
+    column get_column_metadata(const std::string& column_name) const {
+        auto pos = std::find_if(this->col_metadata_.begin(), col_metadata_.end(), [&](const column& col) {return column_name == col.TTYPE(); });
+        if (pos != this->col_metadata_.end()) {
+            return (*pos);
+        }
+        throw column_not_found_exception(column_name);
+    }
+
+    template<typename ColDataType, typename Converter>
+    column_view<ColDataType, Converter> make_column_view(const std::string& column_name) const {
+            return column_view<ColDataType,Converter>(get_column_metadata(column_name), &tb_data);
+    
+    }
+
+    const table_data& get_data() const { return this->tb_data; }
+
+    table_data& get_data() { return this->tb_data; }
+
+
     private:
     void set_table_extension_info() {
         this->tfields_ = this->hdu_header.template value_of<std::size_t>("TFIELDS");
         this->col_metadata_.resize(this->tfields_);
     }
-    
+
 };
 
 }}} //namespace boost::astronomy::io

@@ -83,7 +83,13 @@ public:
     {
         create_card(key, value, comment);
     }
-    
+
+    /**
+     * @brief Checks if contents of two cards with same card policy are equal
+    */
+    bool operator == (const card& other) const {
+        return this->card_ == other.card_;
+    }
     
     /**
      * @brief       Creates/Initializes the card object with a numeric value

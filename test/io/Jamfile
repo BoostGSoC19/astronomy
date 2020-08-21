@@ -11,4 +11,6 @@ run t_stream_reader.cpp : $(CURR_DIR) ;
 run t_fits_reader.cpp : $(CURR_DIR) ;
 run t_data_conversions.cpp : $(CURR_DIR) ;
 run t_card_policy.cpp : $(CURR_DIR) ;
+run t_string_conversions.cpp : $(CURR_DIR) ;
+
 

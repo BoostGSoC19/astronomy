@@ -7,9 +7,10 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #define BOOST_TEST_MODULE stream_reader_test
 
+#include <stdio.h>
 #include <boost/test/unit_test.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
-#include <boost/astronomy/io/stream_reader.hpp>
+#include <boost/astronomy/io/fits_stream.hpp>
 #include "base_fixture.hpp"
 
 using namespace boost::astronomy::io;
@@ -21,7 +22,7 @@ class stream_reader_fixture {
 public:
     std::string samples_directory;
     std::string sample_path;
-    fits_stream_reader sample_reader;
+    fits_stream sample_reader;
     stream_reader_fixture() {
 #ifdef SOURCE_DIR
         samples_directory = std::string((std::string(SOURCE_DIR) +
@@ -45,17 +46,17 @@ public:
 BOOST_AUTO_TEST_SUITE(initialization)
 
 BOOST_FIXTURE_TEST_CASE(initialize_stream_reader,fits_test::stream_reader_fixture) {
-    fits_stream_reader test_reader;
+    fits_stream test_reader;
 
     test_reader.set_file(sample_path);
 
     BOOST_REQUIRE_EQUAL(test_reader.is_open(), true);
 }
 
-BOOST_FIXTURE_TEST_CASE(raise_exception_on_bad_path, fits_test::stream_reader_fixture) {
-    fits_stream_reader test_reader;
+BOOST_FIXTURE_TEST_CASE(return_false_on_bad_path, fits_test::stream_reader_fixture) {
+    fits_stream test_reader;
 
-    BOOST_REQUIRE_THROW(test_reader.set_file("GarbagePath"),boost::astronomy::file_reading_exception);
+    BOOST_REQUIRE_THROW(test_reader.set_file("GarbagePath"), boost::astronomy::file_reading_exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -88,4 +89,34 @@ BOOST_FIXTURE_TEST_CASE(file_ptr_at_endoffile, fits_test::stream_reader_fixture)
 
     BOOST_REQUIRE_EQUAL(sample_reader.at_end(), true);
 }
+
+BOOST_FIXTURE_TEST_CASE(create_file, fits_test::stream_reader_fixture) {
+
+    sample_reader.create_file("test.txt");
+    sample_reader.get_internal_stream() << "Hello World";
+
+    sample_reader.set_file("test.txt");
+
+    bool file_successfully_opened = sample_reader.is_open();
+    BOOST_REQUIRE_EQUAL(file_successfully_opened, true);
+    BOOST_REQUIRE_EQUAL(sample_reader.read(5), "Hello");
+
+    sample_reader.close();
+    remove("test.txt");
+
+}
+
+
+BOOST_FIXTURE_TEST_CASE(write_to_file, fits_test::stream_reader_fixture) {
+
+    sample_reader.create_file("test_w.txt");
+    sample_reader.write("Astronomy");
+
+    sample_reader.set_file("test_w.txt");
+    BOOST_REQUIRE_EQUAL(sample_reader.read(9), "Astronomy");
+
+    sample_reader.close();
+    remove("test.txt");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

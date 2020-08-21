@@ -44,6 +44,7 @@ protected:
 
     data_type data;
     header<CardPolicy> hdu_header;
+    std::string data_buff; // TODO: This needs to be removed
 public:
     /**
      * @brief   Default Constructor used to create a standalone object of primary_hdu
@@ -58,6 +59,7 @@ public:
     basic_primary_hdu( const header<CardPolicy> & other,const std::string& data_buffer):hdu_header(other) {
 
         instantiate_primary_hdu(hdu_header.bitpix());
+        data_buff = data_buffer;
         read_image_visitor read_image_visit(data_buffer);
         boost::apply_visitor(read_image_visit, data);
         init_primary_hdu();
@@ -77,6 +79,19 @@ public:
 
     template<bitpix DT>
     image<DT> get_data() const { return *boost::get<image<DT>>(&this->data); }
+
+
+    template<typename FileWriter>
+    void write_to(FileWriter& file_writer) {
+        
+        this->hdu_header.write_header(file_writer);
+        file_writer.write(data_buff); // Just for temporary use
+        auto current_write_pos = file_writer.get_current_pos();
+        auto logical_record_end_pos = file_writer.find_unit_end();
+
+        file_writer.write(std::string(logical_record_end_pos - current_write_pos, ' '));
+
+    }
 
 
     /**
@@ -136,9 +151,6 @@ private:
         }
     }
 };
-
-using primary_hdu = basic_primary_hdu<card_policy>;
-
 }}} //namespace boost::astronomy::io
 
 

@@ -56,7 +56,7 @@ namespace boost { namespace astronomy { namespace io {
      * @tparam ExtensionsSupported Contains the list of extensions along with their construction methods   
     */
     template<typename FileReader, typename ExtensionsSupported>
-    struct fits_reader {
+    struct fits_io {
     private:
         FileReader file_reader;
         std::vector<typename ExtensionsSupported::Extension> hdu_list;
@@ -65,13 +65,13 @@ namespace boost { namespace astronomy { namespace io {
         /**
          * @brief Creates a default object of fits_reader
         */
-        fits_reader() {}
+        fits_io() {}
 
         /**
          * @brief Creates a fits_reader object and initializes it with the location of the file
          * @param[in] filepath Location of file
         */
-        fits_reader(const std::string& filepath) {
+        fits_io(const std::string& filepath) {
             initialize(filepath);
         }
 
@@ -126,6 +126,19 @@ namespace boost { namespace astronomy { namespace io {
                 hdu_list.push_back(hdu_instance);
             }
         }
+
+        void write_to(const std::string& file_path) {
+            FileReader file_writer;
+            file_writer.create_file(file_path);
+            typename ExtensionsSupported::template writer_visitor<FileReader> writer_visitor(file_writer);
+
+            for (auto& hdu : hdu_list) {
+            boost::apply_visitor(writer_visitor, hdu);
+            }
+        }
+
+
+
 
         /**
          * @brief Returns the HDU at given index

@@ -11,17 +11,18 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/pointer_cast.hpp>
 #include <boost/test/unit_test.hpp>
 #include <sstream>
-#include <boost/astronomy/io/stream_reader.hpp>
+#include <boost/astronomy/io/fits_stream.hpp>
 #include <boost/astronomy/io/default_card_policy.hpp>
+#include <boost/astronomy/io/string_conversion_utility.hpp>
 #include "base_fixture.hpp"
 
 using namespace boost::astronomy::io;
 
 namespace fits_test {
 
-    class ascii_table_fixture:public base_fixture<fits_stream_reader,card_policy> {
+    class ascii_table_fixture:public base_fixture<fits_stream,card_policy> {
     public:
-        basic_ascii_table<card_policy> ascii_hdu1;
+        basic_ascii_table<card_policy,ascii_converter> ascii_hdu1;
     
         ascii_table_fixture() {
 #ifdef SOURCE_DIR
@@ -39,10 +40,10 @@ namespace fits_test {
         }
     private:
          
-        void initialize_ascii_hdu(basic_ascii_table<card_policy>& ascii_hdu, const std::string& sample_name) {
+        void initialize_ascii_hdu(basic_ascii_table<card_policy,ascii_converter>& ascii_hdu, const std::string& sample_name) {
             hdu_store<card_policy>* raw_ascii_sample = get_raw_hdu(sample_name, "TABLE");
             if (raw_ascii_sample != nullptr) {
-                ascii_hdu = basic_ascii_table<card_policy>(raw_ascii_sample->hdu_header, raw_ascii_sample->hdu_data_buffer);
+                ascii_hdu = basic_ascii_table<card_policy,ascii_converter>(raw_ascii_sample->hdu_header, raw_ascii_sample->hdu_data_buffer);
             }
         }
     };
@@ -51,34 +52,54 @@ namespace fits_test {
 BOOST_AUTO_TEST_SUITE(convenience_methods)
 
 BOOST_FIXTURE_TEST_CASE(ascii_table_get_data, fits_test::ascii_table_fixture) {
-    BOOST_REQUIRE_EQUAL(ascii_hdu1.get_data().size(), 3184);
+    auto total_rows = ascii_hdu1.get_data().size();
+    auto total_columns = ascii_hdu1.get_data()[0].size();
+
+    BOOST_REQUIRE_EQUAL(total_rows, 4);
+    BOOST_REQUIRE_EQUAL(total_columns, 49);
+
  }
 
 BOOST_FIXTURE_TEST_CASE(ascii_table_set_data, fits_test::ascii_table_fixture) {
     fits_test::hdu_store<card_policy>* raw_ascii_hdu = get_raw_hdu("fits_sample1", "TABLE");
-    basic_ascii_table<card_policy> test_hdu(raw_ascii_hdu->hdu_header,"");
+    basic_ascii_table<card_policy,ascii_converter> test_hdu(raw_ascii_hdu->hdu_header,"");
 
     test_hdu.set_data(raw_ascii_hdu->hdu_data_buffer);
 
+    auto total_rows = test_hdu.get_data().size();
+    auto total_columns = test_hdu.get_data()[0].size();
 
-    BOOST_REQUIRE_EQUAL(test_hdu.get_data().size(), 3184);
+    BOOST_REQUIRE_EQUAL(total_rows, 4);
+    BOOST_REQUIRE_EQUAL(total_columns, 49);
+
     auto mean_c200_col = ascii_hdu1.get_column<boost::float32_t>("MEANC200");
-    BOOST_REQUIRE_CLOSE(mean_c200_col->get_data()[0], 0.3115222f, 0.001);
+    BOOST_REQUIRE_CLOSE(static_cast<float>(mean_c200_col[0]), 0.3115222f, 0.001);
 }
 
 BOOST_FIXTURE_TEST_CASE(ascii_table_get_column,fits_test::ascii_table_fixture) {
-    boost::float32_t mean_c200_data[] = { 0.3115222f, 0.6534808f, 0.7027547f, 0.9687142f };
+    boost::float32_t backgrnd_col_data[] = { -0.367635f, 0.210143f, 0.476156f, 0.346646f };
 
-    auto mean_c200_col = ascii_hdu1.get_column<boost::float32_t>("MEANC200");
-    for(int i=0 ; i<4; i++)
-    BOOST_REQUIRE_CLOSE(mean_c200_col->get_data()[i], mean_c200_data[i],0.001);
+    auto backgrnd_col = ascii_hdu1.get_column<boost::float32_t>("BACKGRND");
+    for (int i = 0; i < 4; i++)
+    BOOST_REQUIRE_CLOSE(static_cast<float>(backgrnd_col[i]), backgrnd_col_data[i], 0.001);
 }
+
+
+BOOST_FIXTURE_TEST_CASE(ascii_table_invalid_column_name, fits_test::ascii_table_fixture) {
+
+    BOOST_REQUIRE_THROW(ascii_hdu1.get_column<boost::float32_t>("GARBAGE"),boost::astronomy::column_not_found_exception);  
+}
+
 
 BOOST_AUTO_TEST_CASE(ascii_table_get_column_size) {
-    BOOST_REQUIRE_EQUAL(basic_ascii_table<card_policy>::column_size("D25.17"), 25);
+    auto column_size = basic_ascii_table<card_policy, ascii_converter>::column_size("D25.17");
+
+    BOOST_REQUIRE_EQUAL(column_size, 25);
 }
 BOOST_AUTO_TEST_CASE(ascii_table_get_column_type) {
-    BOOST_REQUIRE_EQUAL(basic_ascii_table<card_policy>::get_type("D25.17"), 'D');
+    auto column_type = basic_ascii_table<card_policy, ascii_converter>::get_type("D25.17");
+
+    BOOST_REQUIRE_EQUAL(column_type, 'D');
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -11,64 +11,93 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <string>
 #include <cstddef>
 #include <vector>
-
+#include <unordered_map>
+#include <sstream>
 #include <boost/static_assert.hpp>
-
 #include <boost/astronomy/io/column.hpp>
 
-/**
- * @file    column_data.hpp
- * @author  Pranam Lashkari
- * @details Contains definition for column_data structure
- */
-
 namespace boost { namespace astronomy { namespace io {
-/**
- * @brief   Stores the collection of current field value for every row in the specified type.
- * @details This class in addition to holding the current field information also stores
- *          the current field value for every row in the table as a collection
- * @tparam  Type Type for storing the field values
-*/
-template <typename Type>
-struct column_data: public column
-{
+
+
+// Forward declaration for proxy
+template<typename DataType,typename Converter>
+struct column_view; 
+
+
+template<typename DataType,typename Converter>
+struct Proxy {
 private:
-    std::vector<Type> column_data_;
-
+    int index;
+    DataType value;
+    column_view<DataType,Converter>* callback_ptr;
 public:
+    Proxy(DataType val, column_view<DataType,Converter>* callbck_ptr, int row) : value(val), callback_ptr(callbck_ptr),index(row){}
 
-    /**
-     * @brief   Creates a standalone object of column_data
-    */
-    column_data() {}
-    /**
-     * @brief   Copy Constructor for  initializing column metadata and column_data
-     * @param   other column_data object from where the metadata and column data are copied 
-    */
-    column_data(const column_data& other) : column(other), column_data_(other.column_data_) {}
+    operator DataType () const  { return value; }
 
-    /**
-     * @brief  Creates a column_data object by copying column metadata from the given argument
-     * @param  other column object that contains column metadata
-    */
-    column_data(const column& other) : column(other) {}
-
-    /**
-     * @brief   Returns the collection of current field value for every row in the table
-     * @return  A vector<Type> containing the field value for all rows
-    */
-    const std::vector<Type>& get_data() const
-    {
-        return column_data_;
+    DataType operator = (DataType value)  {
+        this->callback_ptr->update_value(index, value);
+        return value;
     }
 
-    /**
-     * @brief   Returns the collection of current field value for every row in the table
-     * @return  A vector<Type> containing the field value for all rows
-    */
-    std::vector<Type>& get_data()
-    {
-        return column_data_;
+
+};
+
+
+template<typename DataType,typename Converter>
+struct column_view:column{
+private:
+    std::vector<std::vector<std::string>>* table_ref;
+    std::unordered_map<int, DataType> cached_index;
+public:
+    // For storage purpose
+    column_view() {}
+    int get_column_number() { return this->index(); }
+    std::size_t get_row_count() { return table_ref->size(); }
+
+    class iterator {
+        int index;
+        column_view<DataType,Converter>& col_view;
+    public:
+        iterator(column_view<DataType,Converter>& col,int indx) :col_view(col),index(indx){}
+        iterator operator ++() {
+            index++;
+            return *this;
+        }
+        bool operator != (const iterator& other) {
+            return index != other.index;
+        }
+        Proxy<DataType,Converter> operator* () {
+            return col_view[index];
+        }
+
+    };
+
+    column_view(const column& column_metadata, std::vector<std::vector<std::string>>* tb_ref):
+        column( column_metadata),
+        table_ref(tb_ref)
+        {}
+
+    iterator begin() { return iterator(*this,0); }
+    iterator end() { return iterator(*this, get_row_count()); }
+
+    void update_value(int row, DataType new_value){
+        cached_index[row] = new_value;
+        (*table_ref)[row][this->index()-1] = Converter::serialize(new_value);
+    }
+
+  
+    Proxy<DataType,Converter> operator [](int row_number) {
+
+        auto cached_iter = cached_index.find(row_number);
+        
+        if (cached_iter != cached_index.end()) {
+            return Proxy<DataType,Converter>(cached_iter->second, this,row_number);
+        }
+
+        auto raw_data_str = (*table_ref)[row_number][this->index()-1];
+        cached_index.emplace(row_number, Converter::template deserialize_to<DataType>(raw_data_str,this->total_elements_per_field()));
+        return Proxy<DataType,Converter>(cached_index.find(row_number)->second, this,row_number);
     }
 
 };

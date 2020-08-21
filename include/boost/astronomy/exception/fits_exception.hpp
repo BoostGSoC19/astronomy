@@ -109,6 +109,24 @@ namespace boost
             }
 
         };
+        class column_not_found_exception : public fits_exception {
+            std::string message;
+        public:
+            column_not_found_exception(const std::string& column_name) {
+                message = "Could not find Column : " + column_name;
+            }
+            const char* what() const noexcept override {
+                return message.c_str();
+            }
+
+        };
+
+        class column_exception :public fits_exception {
+        public:
+            const char* what() const noexcept override {
+                return "Column operation failed";
+            }
+        };
 
 
     } //namespace astronomy
