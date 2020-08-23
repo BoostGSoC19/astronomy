@@ -369,9 +369,6 @@ namespace boost{namespace astronomy{namespace io{
             elements, num_elements);
     }
 
-
-
-
     template<>
     std::string data_conversions::serialize(bool value) {
         return value ? std::string(1,'T') : std::string(1,'F');
@@ -387,121 +384,6 @@ namespace boost{namespace astronomy{namespace io{
     }
 
 
-
-
-
-
-
-    template<>
-    bool data_conversions::convert(const std::string& element, const column&) {
-        return element[0] == 'T';
-    }
-    template<>
-    std::vector<bool> data_conversions::convert(const std::string& elements, const column&) {
-        std::vector<bool> values;
-        for (auto element : elements) {
-            values.emplace_back(element == 'T');
-        }
-        return values;
-    }
-    template<>
-    boost::int16_t data_conversions::convert(const std::string& element, const column&) {
-        return element_to_numeric<boost::int16_t>(element);
-    }
-
-    template<>
-    std::vector<boost::int16_t> data_conversions::convert(const std::string& elements, const column& column_metadata) {
-        return elements_to_numeric_collection<boost::int16_t>(
-            elements, element_count(column_metadata.TFORM()));
-    }
-
-    template<>
-    boost::int32_t data_conversions::convert(const std::string& element, const column&) {
-        return element_to_numeric<boost::int32_t>(element);
-    }
-    template<>
-    std::vector<boost::int32_t> data_conversions::convert(const std::string& elements, const column& column_metadata) {
-        return data_conversions::elements_to_numeric_collection<boost::int32_t>(
-            elements, element_count(column_metadata.TFORM()));
-    }
-
-    template<>
-    boost::float32_t data_conversions::convert(const std::string& element, const column&) {
-        return element_to_numeric<boost::float32_t, boost::int32_t>(element);
-    }
-    template<>
-    std::vector<boost::float32_t> data_conversions::convert(const std::string& elements, const column& column_metadata) {
-        return elements_to_numeric_collection<boost::float32_t, boost::int32_t>(
-            elements, element_count(column_metadata.TFORM()));
-    }
-    template<>
-    boost::float64_t data_conversions::convert(const std::string& element, const column&) {
-        return data_conversions::element_to_numeric<boost::float64_t, boost::int64_t>(element);
-    }
-    template<>
-    std::vector<boost::float64_t> data_conversions::convert(const std::string& elements, const column& column_metadata) {
-        return data_conversions::elements_to_numeric_collection<boost::float64_t, boost::int64_t>(
-            elements, element_count(column_metadata.TFORM()));
-    }
-    template<>
-    std::pair<boost::int32_t, boost::int32_t> data_conversions::convert(const std::string& element, const column&) {
-        auto x = boost::endian::big_to_native(
-            *reinterpret_cast<const boost::int32_t*>(element.c_str()));
-        auto y = boost::endian::big_to_native(
-            *(reinterpret_cast<const boost::int32_t*>(element.c_str()) + 1));
-        return std::make_pair(x, y);
-    }
-    template<>
-    std::vector<std::pair<boost::int32_t, boost::int32_t>> data_conversions::convert(const std::string& elements, const column& column_metadata) {
-        std::vector<std::pair<boost::int32_t, boost::int32_t>> values;
-        auto no_elements = element_count(column_metadata.TFORM());
-        values.reserve(element_count(column_metadata.TFORM()));
-        for (std::size_t i = 0; i < no_elements; i++) {
-            values.emplace_back(
-                boost::endian::big_to_native(
-                    *(reinterpret_cast<const boost::int32_t*>(elements.c_str()) + i)),
-                boost::endian::big_to_native(
-                    *(reinterpret_cast<const boost::int32_t*>(elements.c_str()) + i +
-                        1)));
-        }
-        return values;
-    }
-    template<>
-    std::complex<boost::float32_t> data_conversions::convert(const std::string& element, const column&) {
-        return element_to_complex<boost::float32_t, boost::int32_t>(element);
-    }
-    template<>
-    std::vector<std::complex<boost::float32_t>> data_conversions::convert(const std::string& elements, const column& column_metadata) {
-        return elements_to_complex_collection<boost::float32_t, boost::int32_t>(
-            elements, element_count(column_metadata.TFORM()));
-    }
-    template<>
-    std::complex<boost::float64_t>data_conversions::convert(const std::string& element, const column&) {
-        return element_to_complex<boost::float64_t, boost::int64_t>(element);
-    }
-    template<>
-    std::vector<std::complex<boost::float64_t>> data_conversions::convert(const std::string& elements, const column& column_metadata) {
-        return elements_to_complex_collection<boost::float64_t, boost::int64_t>(
-            elements, element_count(column_metadata.TFORM()));
-    }
-    template<>
-    std::uint8_t data_conversions::convert(const std::string& element, const column&) {
-        return element_to_byte<std::uint8_t>(element);
-    }
-    template<>
-    std::vector<std::uint8_t> data_conversions::convert(const std::string& elements, const column& column_metadata) {
-        return elements_to_byte_collection<std::uint8_t>(
-            elements, element_count(column_metadata.TFORM()));
-    }
-    template<>
-    char data_conversions::convert(const std::string& element, const column&) {
-        return data_conversions::element_to_byte<char>(element);
-    }
-    template<>
-    std::vector<char> data_conversions::convert(const std::string& elements, const column& column_metadata) {
-        return data_conversions::elements_to_byte_collection<char>(
-            elements, element_count(column_metadata.TFORM()));
-    }
 } } }
 
 #endif
