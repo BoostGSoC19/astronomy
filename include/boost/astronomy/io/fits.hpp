@@ -20,6 +20,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/ascii_table.hpp>
 #include <boost/astronomy/io/binary_table.hpp>
 #include <boost/astronomy/io/primary_hdu.hpp>
+#include <boost/astronomy/io/image_extension.hpp>
 #include <boost/astronomy/io/binary_data_converter.hpp>
 #include <boost/astronomy/io/string_conversion_utility.hpp>
 
@@ -86,6 +87,8 @@ namespace boost { namespace astronomy {namespace io {
     using ascii_table = basic_ascii_table<card_policy, ascii_converter>;
     using binary_table = basic_binary_table_extension<card_policy, binary_data_converter>;
     using primary_hdu = basic_primary_hdu<card_policy,binary_data_converter>;
+    using image_extension = basic_image_extension<card_policy, binary_data_converter>;
+
 
 
         }

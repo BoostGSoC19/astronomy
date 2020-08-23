@@ -57,7 +57,7 @@ public:
      * @brief Returns the header associated with the currently held primary hdu
     */
     header<CardPolicy> get_header() const {
-        return hdu_header;
+        return this->hdu_header;
     }
 
     /**
@@ -66,7 +66,7 @@ public:
     */
 
     template<bitpix DT>
-    image<DT,Converter> get_data() const { return *boost::get<image<DT>>(&this->data); }
+    image<DT,Converter> get_data() const { return *boost::get<image<DT,Converter>>(&this->data); }
 
 
 
@@ -126,7 +126,6 @@ private:
     }
 };
 
-using image_extension = basic_image_extension<card_policy>;
 
 
 }}} //namespace boost::astronomy::io
