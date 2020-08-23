@@ -11,7 +11,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <cstddef>
 #include <fstream>
 #include <string>
-#include <boost/astronomy/io/hdu.hpp>
+#include <boost/astronomy/io/header.hpp>
 #include <boost/astronomy/io/extension_hdu.hpp>
 #include <boost/astronomy/io/column.hpp>
 #include <boost/astronomy/io/column_data.hpp>

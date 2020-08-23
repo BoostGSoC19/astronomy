@@ -1,5 +1,5 @@
 foreach(_name
-        t_hdu
+        t_header
         t_card
         t_primary_hdu
         t_ascii_table

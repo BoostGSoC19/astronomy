@@ -15,12 +15,12 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/fits_stream.hpp>
 #include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/astronomy/io/string_conversion_utility.hpp>
-#include <boost/astronomy/io/data_conversions.hpp>
+#include <boost/astronomy/io/binary_data_converter.hpp>
 #include <boost/astronomy/io/default_hdus.hpp>
 #include <boost/astronomy/io/ascii_table.hpp>
 #include <boost/astronomy/io/binary_table.hpp>
 #include <boost/astronomy/io/primary_hdu.hpp>
-#include <boost/astronomy/io/data_conversions.hpp>
+#include <boost/astronomy/io/binary_data_converter.hpp>
 #include <boost/astronomy/io/string_conversion_utility.hpp>
 
 
@@ -82,10 +82,10 @@ namespace boost { namespace astronomy {namespace io {
     };
 
     // Some common aliases for easy use
-    using fits = basic_fits<fits_stream, default_hdu_manager<card_policy,ascii_converter,data_conversions>>;
+    using fits = basic_fits<fits_stream, default_hdu_manager<card_policy,ascii_converter,binary_data_converter>>;
     using ascii_table = basic_ascii_table<card_policy, ascii_converter>;
-    using binary_table = basic_binary_table_extension<card_policy, data_conversions>;
-    using primary_hdu = basic_primary_hdu<card_policy,data_conversions>;
+    using binary_table = basic_binary_table_extension<card_policy, binary_data_converter>;
+    using primary_hdu = basic_primary_hdu<card_policy,binary_data_converter>;
 
 
         }

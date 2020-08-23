@@ -7,7 +7,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #define BOOST_TEST_MODULE hdu_test
 
-#include <boost/astronomy/io/hdu.hpp>
+#include <boost/astronomy/io/header.hpp>
 #include <boost/astronomy/io/fits_stream.hpp>
 #include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/test/unit_test.hpp>

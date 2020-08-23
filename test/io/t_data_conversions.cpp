@@ -10,7 +10,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include<limits>
 #include<complex>
 #include<boost/test/unit_test.hpp>
-#include<boost/astronomy/io/data_conversions.hpp>
+#include<boost/astronomy/io/binary_data_converter.hpp>
 
 
 
@@ -105,7 +105,7 @@ BOOST_FIXTURE_TEST_CASE(raw_serial_data_to_boost_int8_t,data_conversion_fixture)
 
     std::string serialized_data = serialize(reverse_endianess<boost::int8_t>(std::numeric_limits<boost::int8_t>::max()));
 
-    boost::int8_t deserialized_data = data_conversions::element_to_numeric<boost::int8_t>(serialized_data);
+    boost::int8_t deserialized_data = binary_data_converter::element_to_numeric<boost::int8_t>(serialized_data);
 
     BOOST_REQUIRE_EQUAL(deserialized_data, std::numeric_limits<boost::int8_t>::max());
 }
@@ -114,7 +114,7 @@ BOOST_FIXTURE_TEST_CASE(raw_serial_data_to_boost_int16_t, data_conversion_fixtur
 
     std::string serialized_data = serialize(reverse_endianess<boost::int16_t>(std::numeric_limits<boost::int16_t>::max()));
 
-    boost::int16_t deserialized_data = data_conversions::element_to_numeric<boost::int16_t>(serialized_data);
+    boost::int16_t deserialized_data = binary_data_converter::element_to_numeric<boost::int16_t>(serialized_data);
 
     BOOST_REQUIRE_EQUAL(deserialized_data, std::numeric_limits<boost::int16_t>::max());
 }
@@ -123,7 +123,7 @@ BOOST_FIXTURE_TEST_CASE(raw_serial_data_to_boost_int32_t, data_conversion_fixtur
 
     std::string serialized_data = serialize(reverse_endianess<boost::int32_t>(std::numeric_limits<boost::int32_t>::max()));
 
-    boost::int32_t deserialized_data = data_conversions::element_to_numeric<boost::int32_t>(serialized_data);
+    boost::int32_t deserialized_data = binary_data_converter::element_to_numeric<boost::int32_t>(serialized_data);
 
     BOOST_REQUIRE_EQUAL(deserialized_data, std::numeric_limits<boost::int32_t>::max());
 }
@@ -132,7 +132,7 @@ BOOST_FIXTURE_TEST_CASE(raw_serial_data_to_boost_int64_t, data_conversion_fixtur
 
     std::string serialized_data = serialize(reverse_endianess<boost::int64_t>(std::numeric_limits<boost::int64_t>::max()));
 
-    boost::int64_t deserialized_data = data_conversions::element_to_numeric<boost::int64_t>(serialized_data);
+    boost::int64_t deserialized_data = binary_data_converter::element_to_numeric<boost::int64_t>(serialized_data);
  
     BOOST_REQUIRE_EQUAL(deserialized_data, std::numeric_limits<boost::int64_t>::max());
 }
@@ -145,7 +145,7 @@ BOOST_FIXTURE_TEST_CASE(raw_serial_data_to_boost_float32_t, data_conversion_fixt
 
     std::string serialized_data = serialize(reverse_endianess<boost::float32_t,boost::int32_t>(std::numeric_limits<boost::float32_t>::max()));
 
-    boost::float32_t deserialized_data = data_conversions::element_to_numeric<boost::float32_t, boost::int32_t>(serialized_data);
+    boost::float32_t deserialized_data = binary_data_converter::element_to_numeric<boost::float32_t, boost::int32_t>(serialized_data);
 
     BOOST_REQUIRE_CLOSE(deserialized_data, std::numeric_limits<boost::float32_t>::max(),0.001);
 }
@@ -154,7 +154,7 @@ BOOST_FIXTURE_TEST_CASE(raw_serial_data_to_boost_float64_t, data_conversion_fixt
 
     std::string serialized_data = serialize(reverse_endianess<boost::float64_t,boost::int64_t>(std::numeric_limits<boost::float64_t>::max()));
 
-    boost::float64_t deserialized_data = data_conversions::element_to_numeric<boost::float64_t, boost::int64_t>(serialized_data);
+    boost::float64_t deserialized_data = binary_data_converter::element_to_numeric<boost::float64_t, boost::int64_t>(serialized_data);
 
     BOOST_REQUIRE_CLOSE(deserialized_data, std::numeric_limits<boost::float64_t>::max(),0.001);
 }
@@ -168,7 +168,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_complex_8, data_conversion_fixture) {
     std::complex<boost::int8_t> test_data(std::numeric_limits<boost::int8_t>::max(), std::numeric_limits<boost::int8_t>::max());
     std::string serialized_data = serialize(reverse_endianess<boost::int8_t>(test_data));
 
-    std::complex<boost::int8_t> deserialized_data = data_conversions::element_to_complex<boost::int8_t>(serialized_data);
+    std::complex<boost::int8_t> deserialized_data = binary_data_converter::element_to_complex<boost::int8_t>(serialized_data);
 
     BOOST_REQUIRE_EQUAL(deserialized_data, test_data);
 }
@@ -177,7 +177,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_complex_16, data_conversion_fixture) {
     std::complex<boost::int16_t> test_data(std::numeric_limits<boost::int16_t>::max(), std::numeric_limits<boost::int16_t>::max());
     std::string serialized_data = serialize(reverse_endianess<boost::int16_t>(test_data));
 
-    std::complex<boost::int16_t> deserialized_data = data_conversions::element_to_complex<boost::int16_t>(serialized_data);
+    std::complex<boost::int16_t> deserialized_data = binary_data_converter::element_to_complex<boost::int16_t>(serialized_data);
 
     BOOST_REQUIRE_EQUAL(deserialized_data, test_data);
 }
@@ -186,7 +186,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_complex_32, data_conversion_fixture) {
     std::complex<boost::int32_t> test_data(std::numeric_limits<boost::int32_t>::max(), std::numeric_limits<boost::int32_t>::max());
     std::string serialized_data = serialize(reverse_endianess<boost::int32_t>(test_data));
 
-    std::complex<boost::int32_t> deserialized_data = data_conversions::element_to_complex<boost::int32_t>(serialized_data);
+    std::complex<boost::int32_t> deserialized_data = binary_data_converter::element_to_complex<boost::int32_t>(serialized_data);
 
     BOOST_REQUIRE_EQUAL(deserialized_data, test_data);
 }
@@ -195,7 +195,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_complex_64, data_conversion_fixture) {
     std::complex<boost::int64_t> test_data(std::numeric_limits<boost::int64_t>::max(), std::numeric_limits<boost::int64_t>::max());
     std::string serialized_data = serialize(reverse_endianess<boost::int64_t>(test_data));
 
-    std::complex<boost::int64_t> deserialized_data = data_conversions::element_to_complex<boost::int64_t>(serialized_data);
+    std::complex<boost::int64_t> deserialized_data = binary_data_converter::element_to_complex<boost::int64_t>(serialized_data);
 
     BOOST_REQUIRE_EQUAL(deserialized_data, test_data);
 }
@@ -209,7 +209,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_complex_float_32, data_conversion_fixture
     std::complex<boost::float32_t> test_data(std::numeric_limits<boost::float32_t>::max(), std::numeric_limits<boost::float32_t>::max());
     std::string serialized_data = serialize(reverse_endianess<boost::float32_t,boost::int32_t>(test_data));
 
-    std::complex<boost::float32_t> deserialized_data = data_conversions::element_to_complex<boost::float32_t,boost::int32_t>(serialized_data);
+    std::complex<boost::float32_t> deserialized_data = binary_data_converter::element_to_complex<boost::float32_t,boost::int32_t>(serialized_data);
 
     BOOST_REQUIRE_EQUAL(deserialized_data, test_data);
 }
@@ -218,7 +218,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_complex_float_64, data_conversion_fixture
     std::complex<boost::float64_t> test_data(std::numeric_limits<boost::float64_t>::max(), std::numeric_limits<boost::float64_t>::max());
     std::string serialized_data = serialize(reverse_endianess<boost::float64_t, boost::int64_t>(test_data));
 
-    std::complex<boost::float64_t> deserialized_data = data_conversions::element_to_complex<boost::float64_t,boost::int64_t>(serialized_data);
+    std::complex<boost::float64_t> deserialized_data = binary_data_converter::element_to_complex<boost::float64_t,boost::int64_t>(serialized_data);
 
     BOOST_REQUIRE_EQUAL(deserialized_data, test_data);
 }
@@ -229,12 +229,12 @@ BOOST_AUTO_TEST_SUITE(raw_serial_data_to_byte)
 
 BOOST_FIXTURE_TEST_CASE(serial_data_to_char, data_conversion_fixture) {
     // Well its just a direct cast so the code shown below is really a joke
-    BOOST_REQUIRE_EQUAL(data_conversions::element_to_byte<char>("A"),65);
+    BOOST_REQUIRE_EQUAL(binary_data_converter::element_to_byte<char>("A"),65);
 }
 
 BOOST_FIXTURE_TEST_CASE(serial_data_to_int8_t, data_conversion_fixture) {
 
-    BOOST_REQUIRE_EQUAL(data_conversions::element_to_byte<boost::int8_t>("D"), 68);
+    BOOST_REQUIRE_EQUAL(binary_data_converter::element_to_byte<boost::int8_t>("D"), 68);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -249,7 +249,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_int8_collection, data_conversion_fixture)
     std::vector<boost::int8_t> sample_data{ 1,2,3,4,5,6,7,8,9 };
     std::string serialized_data = serialize(sample_data);
 
-    std::vector<boost::int8_t> deserialized_data = data_conversions::elements_to_numeric_collection<boost::int8_t>(serialized_data,sample_data.size());
+    std::vector<boost::int8_t> deserialized_data = binary_data_converter::elements_to_numeric_collection<boost::int8_t>(serialized_data,sample_data.size());
 
     BOOST_CHECK_EQUAL_COLLECTIONS(deserialized_data.begin(), deserialized_data.end(),
                                   sample_data.begin(), sample_data.end());
@@ -260,7 +260,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_int16_collection, data_conversion_fixture
     std::vector<boost::int16_t> sample_data{ 2,4,3,1,2,3,54,23,3 };
     std::string serialized_data = serialize(reverse_endianess(sample_data));
 
-    std::vector<boost::int16_t> deserialized_data = data_conversions::elements_to_numeric_collection<boost::int16_t>(serialized_data, sample_data.size());
+    std::vector<boost::int16_t> deserialized_data = binary_data_converter::elements_to_numeric_collection<boost::int16_t>(serialized_data, sample_data.size());
 
     BOOST_CHECK_EQUAL_COLLECTIONS(deserialized_data.begin(), deserialized_data.end(),
         sample_data.begin(), sample_data.end());
@@ -271,7 +271,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_int32_collection, data_conversion_fixture
     std::vector<boost::int32_t> sample_data{ 34324332,432,324,3244,324,421,33 };
     std::string serialized_data = serialize(reverse_endianess(sample_data));
 
-    std::vector<boost::int32_t> deserialized_data = data_conversions::elements_to_numeric_collection<boost::int32_t>(serialized_data, sample_data.size());
+    std::vector<boost::int32_t> deserialized_data = binary_data_converter::elements_to_numeric_collection<boost::int32_t>(serialized_data, sample_data.size());
 
     BOOST_CHECK_EQUAL_COLLECTIONS(deserialized_data.begin(), deserialized_data.end(),
         sample_data.begin(), sample_data.end());
@@ -283,7 +283,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_int64_collection, data_conversion_fixture
     reverse_endianess(sample_data);
     std::string serialized_data = serialize(reverse_endianess(sample_data));
 
-    std::vector<boost::int64_t> deserialized_data = data_conversions::elements_to_numeric_collection<boost::int64_t>(serialized_data, sample_data.size());
+    std::vector<boost::int64_t> deserialized_data = binary_data_converter::elements_to_numeric_collection<boost::int64_t>(serialized_data, sample_data.size());
 
     BOOST_CHECK_EQUAL_COLLECTIONS(deserialized_data.begin(), deserialized_data.end(),
         sample_data.begin(), sample_data.end());
@@ -298,7 +298,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_float32_collection, data_conversion_fixtu
     std::vector<boost::float32_t> sample_data{ 34324.2f,4.32f,3.24f,324.4f,32.4f,4.21f,3.3f};
     std::string serialized_data = serialize(reverse_endianess<boost::float32_t,boost::int32_t>(sample_data));
 
-    std::vector<boost::float32_t> deserialized_data = data_conversions::elements_to_numeric_collection<boost::float32_t,boost::int32_t>(serialized_data, sample_data.size());
+    std::vector<boost::float32_t> deserialized_data = binary_data_converter::elements_to_numeric_collection<boost::float32_t,boost::int32_t>(serialized_data, sample_data.size());
 
     for (std::size_t i = 0; i < sample_data.size(); i++) {
         BOOST_REQUIRE_CLOSE(sample_data[i], deserialized_data[i],0.001);
@@ -310,7 +310,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_float64_collection, data_conversion_fixtu
     std::vector<boost::float64_t> sample_data{ 3433232324.2232,423.3223,323.23224,32234.4,233232.4,234.2321,3222.3 };
     std::string serialized_data = serialize(reverse_endianess<boost::float64_t, boost::int64_t>(sample_data));
 
-    std::vector<boost::float64_t> deserialized_data = data_conversions::elements_to_numeric_collection<boost::float64_t, boost::int64_t>(serialized_data, sample_data.size());
+    std::vector<boost::float64_t> deserialized_data = binary_data_converter::elements_to_numeric_collection<boost::float64_t, boost::int64_t>(serialized_data, sample_data.size());
 
     for (std::size_t i = 0; i < sample_data.size(); i++) {
         BOOST_REQUIRE_CLOSE(sample_data[i], deserialized_data[i], 0.001);
@@ -328,7 +328,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_complex_int_8_collection, data_conversion
    
     std::string serialized_data = serialize(reverse_endianess <boost::int8_t>(sample_data));
 
-    std::vector<std::complex<boost::int8_t>> deserialized_data = data_conversions::elements_to_complex_collection<boost::int8_t>(serialized_data, sample_data.size());
+    std::vector<std::complex<boost::int8_t>> deserialized_data = binary_data_converter::elements_to_complex_collection<boost::int8_t>(serialized_data, sample_data.size());
 
     BOOST_CHECK_EQUAL_COLLECTIONS(deserialized_data.begin(), deserialized_data.end(),
         sample_data.begin(), sample_data.end());
@@ -343,7 +343,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_complex_int_16_collection, data_conversio
 
     std::string serialized_data = serialize(reverse_endianess<boost::int16_t>(sample_data));
 
-    std::vector<std::complex<boost::int16_t>> deserialized_data = data_conversions::elements_to_complex_collection<boost::int16_t>(serialized_data, sample_data.size());
+    std::vector<std::complex<boost::int16_t>> deserialized_data = binary_data_converter::elements_to_complex_collection<boost::int16_t>(serialized_data, sample_data.size());
 
     BOOST_CHECK_EQUAL_COLLECTIONS(deserialized_data.begin(), deserialized_data.end(),
         sample_data.begin(), sample_data.end());
@@ -358,7 +358,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_complex_int_32_collection, data_conversio
 
     std::string serialized_data = serialize(reverse_endianess <boost::int32_t>(sample_data));
 
-    std::vector<std::complex<boost::int32_t>> deserialized_data = data_conversions::elements_to_complex_collection<boost::int32_t>(serialized_data, sample_data.size());
+    std::vector<std::complex<boost::int32_t>> deserialized_data = binary_data_converter::elements_to_complex_collection<boost::int32_t>(serialized_data, sample_data.size());
 
     BOOST_CHECK_EQUAL_COLLECTIONS(deserialized_data.begin(), deserialized_data.end(),
         sample_data.begin(), sample_data.end());
@@ -373,7 +373,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_complex_int_64_collection, data_conversio
 
     std::string serialized_data = serialize(reverse_endianess <boost::int64_t>(sample_data));
 
-    std::vector<std::complex<boost::int64_t>> deserialized_data = data_conversions::elements_to_complex_collection<boost::int64_t>(serialized_data, sample_data.size());
+    std::vector<std::complex<boost::int64_t>> deserialized_data = binary_data_converter::elements_to_complex_collection<boost::int64_t>(serialized_data, sample_data.size());
 
     BOOST_CHECK_EQUAL_COLLECTIONS(deserialized_data.begin(), deserialized_data.end(),
         sample_data.begin(), sample_data.end());
@@ -391,7 +391,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_complex_float32_collection, data_conversi
 
     std::string serialized_data = serialize(reverse_endianess<boost::float32_t, boost::int32_t>(sample_data));
 
-    std::vector<std::complex<boost::float32_t>> deserialized_data = data_conversions::elements_to_complex_collection<boost::float32_t, boost::int32_t>(serialized_data, sample_data.size());
+    std::vector<std::complex<boost::float32_t>> deserialized_data = binary_data_converter::elements_to_complex_collection<boost::float32_t, boost::int32_t>(serialized_data, sample_data.size());
 
     for (std::size_t i = 0; i < sample_data.size(); i++) {
         BOOST_REQUIRE_CLOSE(deserialized_data[i].real(), sample_data[i].real(), 0.001);
@@ -408,7 +408,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_complex_float64_collection, data_conversi
 
     std::string serialized_data = serialize(reverse_endianess<boost::float64_t, boost::int64_t>(sample_data));
 
-    std::vector<std::complex<boost::float64_t>> deserialized_data = data_conversions::elements_to_complex_collection<boost::float64_t, boost::int64_t>(serialized_data, sample_data.size());
+    std::vector<std::complex<boost::float64_t>> deserialized_data = binary_data_converter::elements_to_complex_collection<boost::float64_t, boost::int64_t>(serialized_data, sample_data.size());
 
     for (std::size_t i = 0; i < sample_data.size(); i++) {
         BOOST_REQUIRE_CLOSE(deserialized_data[i].real(), sample_data[i].real(), 0.001);
@@ -424,7 +424,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_int8_t_collection,data_conversion_fixture
     std::vector<boost::int8_t> sample_data{ 1,2,3,4 };
     std::string serialized_data = serialize(reverse_endianess(sample_data));
 
-    std::vector<boost::int8_t> deserialized_data = data_conversions::elements_to_byte_collection<boost::int8_t>(serialized_data, sample_data.size());
+    std::vector<boost::int8_t> deserialized_data = binary_data_converter::elements_to_byte_collection<boost::int8_t>(serialized_data, sample_data.size());
 
     BOOST_REQUIRE_EQUAL_COLLECTIONS(deserialized_data.begin(), deserialized_data.end(), sample_data.begin(), sample_data.end());
 
@@ -435,7 +435,7 @@ BOOST_FIXTURE_TEST_CASE(serial_data_to_char_t_collection, data_conversion_fixtur
     std::vector<char> sample_data{ 2,23,32,41 };
     std::string serialized_data = serialize(reverse_endianess(sample_data));
 
-    std::vector<char> deserialized_data = data_conversions::elements_to_byte_collection<char>(serialized_data, sample_data.size());
+    std::vector<char> deserialized_data = binary_data_converter::elements_to_byte_collection<char>(serialized_data, sample_data.size());
 
     BOOST_REQUIRE_EQUAL_COLLECTIONS(deserialized_data.begin(), deserialized_data.end(), sample_data.begin(), sample_data.end());
 }

@@ -10,7 +10,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/primary_hdu.hpp>
 #include <boost/astronomy/io/fits_stream.hpp>
 #include "base_fixture.hpp"
-#include <boost/astronomy/io/data_conversions.hpp>
+#include <boost/astronomy/io/binary_data_converter.hpp>
 #include <boost/test/unit_test.hpp>
 
 
@@ -20,7 +20,7 @@ namespace fits_test {
 
     class primary_hdu_fixture:public base_fixture<fits_stream,card_policy> {
     public:
-        basic_primary_hdu<card_policy,data_conversions> test_p_hdu1;
+        basic_primary_hdu<card_policy,binary_data_converter> test_p_hdu1;
         primary_hdu_fixture() {
 #ifdef SOURCE_DIR
             samples_directory =
@@ -34,10 +34,10 @@ namespace fits_test {
             initialize_primary_hdu(test_p_hdu1, "fits_sample1");
         }
     private:
-        void initialize_primary_hdu(basic_primary_hdu<card_policy,data_conversions>& prime_hdu, const std::string& sample_name) {
+        void initialize_primary_hdu(basic_primary_hdu<card_policy,binary_data_converter>& prime_hdu, const std::string& sample_name) {
             hdu_store<card_policy>* raw_primary_hdu_sample = get_raw_hdu(sample_name, "primary_hdu");
             if (raw_primary_hdu_sample != nullptr) {
-                prime_hdu = basic_primary_hdu<card_policy,data_conversions>(raw_primary_hdu_sample->hdu_header, raw_primary_hdu_sample->hdu_data_buffer);
+                prime_hdu = basic_primary_hdu<card_policy,binary_data_converter>(raw_primary_hdu_sample->hdu_header, raw_primary_hdu_sample->hdu_data_buffer);
             }
         }
     };
@@ -50,7 +50,7 @@ BOOST_FIXTURE_TEST_CASE(primary_hdu_ctor, fits_test::primary_hdu_fixture) {
 
     fits_test::hdu_store<card_policy>* raw_prime_hdu = get_raw_hdu("fits_sample1", "primary_hdu");
    
-    basic_primary_hdu<card_policy,data_conversions> prime_hdu_1(raw_prime_hdu->hdu_header,raw_prime_hdu->hdu_data_buffer);
+    basic_primary_hdu<card_policy,binary_data_converter> prime_hdu_1(raw_prime_hdu->hdu_header,raw_prime_hdu->hdu_data_buffer);
     BOOST_REQUIRE_EQUAL(prime_hdu_1.get_header().card_count(), 262);     
     BOOST_REQUIRE_EQUAL(prime_hdu_1.get_data<bitpix::_B32>().size(), 200 * 200 * 4);
 

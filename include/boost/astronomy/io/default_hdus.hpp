@@ -10,7 +10,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #define BOOST_ASTRONOMY_IO_DEFAULT_HDUS_HPP
 
 
-#include<boost/astronomy/io/hdu.hpp>
+#include<boost/astronomy/io/header.hpp>
 #include<boost/astronomy/io/primary_hdu.hpp>
 #include<boost/astronomy/io/binary_table.hpp>
 #include<boost/astronomy/io/ascii_table.hpp>

@@ -53,7 +53,7 @@ namespace boost{namespace astronomy{namespace io{
   * @brief           Provides convenience methods for deserializing Binary data
   * @author          Gopi Krishna Menon
  */
-    struct data_conversions {
+    struct binary_data_converter {
 
     
         /**
@@ -259,11 +259,11 @@ namespace boost{namespace astronomy{namespace io{
     };
 
     template<>
-    bool data_conversions::deserialize_to(const std::string& element, int) {
+    bool binary_data_converter::deserialize_to(const std::string& element, int) {
         return element[0] == 'T';
     }
     template<>
-    std::vector<bool> data_conversions::deserialize_to(const std::string& elements,int) {
+    std::vector<bool> binary_data_converter::deserialize_to(const std::string& elements,int) {
         std::vector<bool> values;
         for (auto element : elements) {
             values.emplace_back(element == 'T');
@@ -272,46 +272,46 @@ namespace boost{namespace astronomy{namespace io{
     }
 
     template<>
-    boost::int16_t data_conversions::deserialize_to(const std::string& element, int) {
+    boost::int16_t binary_data_converter::deserialize_to(const std::string& element, int) {
         return element_to_numeric<boost::int16_t>(element);
     }
 
     template<>
-    std::vector<boost::int16_t> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+    std::vector<boost::int16_t> binary_data_converter::deserialize_to(const std::string& elements, int num_elements) {
         return elements_to_numeric_collection<boost::int16_t>(
             elements, num_elements);
     }
 
     template<>
-    boost::int32_t data_conversions::deserialize_to(const std::string& element, int) {
+    boost::int32_t binary_data_converter::deserialize_to(const std::string& element, int) {
         return element_to_numeric<boost::int32_t>(element);
     }
     template<>
-    std::vector<boost::int32_t> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
-        return data_conversions::elements_to_numeric_collection<boost::int32_t>(
+    std::vector<boost::int32_t> binary_data_converter::deserialize_to(const std::string& elements, int num_elements) {
+        return binary_data_converter::elements_to_numeric_collection<boost::int32_t>(
             elements, num_elements);
     }
 
     template<>
-    boost::float32_t data_conversions::deserialize_to(const std::string& element,int) {
+    boost::float32_t binary_data_converter::deserialize_to(const std::string& element,int) {
         return element_to_numeric<boost::float32_t, boost::int32_t>(element);
     }
     template<>
-    std::vector<boost::float32_t> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+    std::vector<boost::float32_t> binary_data_converter::deserialize_to(const std::string& elements, int num_elements) {
         return elements_to_numeric_collection<boost::float32_t, boost::int32_t>(
             elements, num_elements);
     }
     template<>
-    boost::float64_t data_conversions::deserialize_to(const std::string& element, int) {
-        return data_conversions::element_to_numeric<boost::float64_t, boost::int64_t>(element);
+    boost::float64_t binary_data_converter::deserialize_to(const std::string& element, int) {
+        return binary_data_converter::element_to_numeric<boost::float64_t, boost::int64_t>(element);
     }
     template<>
-    std::vector<boost::float64_t> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
-        return data_conversions::elements_to_numeric_collection<boost::float64_t, boost::int64_t>(
+    std::vector<boost::float64_t> binary_data_converter::deserialize_to(const std::string& elements, int num_elements) {
+        return binary_data_converter::elements_to_numeric_collection<boost::float64_t, boost::int64_t>(
             elements, num_elements);
     }
     template<>
-    std::pair<boost::int32_t, boost::int32_t> data_conversions::deserialize_to(const std::string& element,int) {
+    std::pair<boost::int32_t, boost::int32_t> binary_data_converter::deserialize_to(const std::string& element,int) {
         auto x = boost::endian::big_to_native(
             *reinterpret_cast<const boost::int32_t*>(element.c_str()));
         auto y = boost::endian::big_to_native(
@@ -319,7 +319,7 @@ namespace boost{namespace astronomy{namespace io{
         return std::make_pair(x, y);
     }
     template<>
-    std::vector<std::pair<boost::int32_t, boost::int32_t>> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+    std::vector<std::pair<boost::int32_t, boost::int32_t>> binary_data_converter::deserialize_to(const std::string& elements, int num_elements) {
         std::vector<std::pair<boost::int32_t, boost::int32_t>> values;
         values.reserve(num_elements);
         for (std::size_t i = 0; i < num_elements; i++) {
@@ -333,49 +333,49 @@ namespace boost{namespace astronomy{namespace io{
         return values;
     }
     template<>
-    std::complex<boost::float32_t> data_conversions::deserialize_to(const std::string& element,int) {
+    std::complex<boost::float32_t> binary_data_converter::deserialize_to(const std::string& element,int) {
         return element_to_complex<boost::float32_t, boost::int32_t>(element);
     }
     template<>
-    std::vector<std::complex<boost::float32_t>> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+    std::vector<std::complex<boost::float32_t>> binary_data_converter::deserialize_to(const std::string& elements, int num_elements) {
         return elements_to_complex_collection<boost::float32_t, boost::int32_t>(
             elements, num_elements);
     }
     template<>
-    std::complex<boost::float64_t>data_conversions::deserialize_to(const std::string& element,int) {
+    std::complex<boost::float64_t>binary_data_converter::deserialize_to(const std::string& element,int) {
         return element_to_complex<boost::float64_t, boost::int64_t>(element);
     }
     template<>
-    std::vector<std::complex<boost::float64_t>> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+    std::vector<std::complex<boost::float64_t>> binary_data_converter::deserialize_to(const std::string& elements, int num_elements) {
         return elements_to_complex_collection<boost::float64_t, boost::int64_t>(
             elements,num_elements);
     }
     template<>
-    std::uint8_t data_conversions::deserialize_to(const std::string& element, int) {
+    std::uint8_t binary_data_converter::deserialize_to(const std::string& element, int) {
         return element_to_byte<std::uint8_t>(element);
     }
     template<>
-    std::vector<std::uint8_t> data_conversions::deserialize_to(const std::string& elements, int num_elements) {
+    std::vector<std::uint8_t> binary_data_converter::deserialize_to(const std::string& elements, int num_elements) {
         return elements_to_byte_collection<std::uint8_t>(
             elements, num_elements);
     }
     template<>
-    char data_conversions::deserialize_to(const std::string& element, int) {
-        return data_conversions::element_to_byte<char>(element);
+    char binary_data_converter::deserialize_to(const std::string& element, int) {
+        return binary_data_converter::element_to_byte<char>(element);
     }
     template<>
-    std::vector<char> data_conversions::deserialize_to(const std::string& elements,int num_elements) {
-        return data_conversions::elements_to_byte_collection<char>(
+    std::vector<char> binary_data_converter::deserialize_to(const std::string& elements,int num_elements) {
+        return binary_data_converter::elements_to_byte_collection<char>(
             elements, num_elements);
     }
 
     template<>
-    std::string data_conversions::serialize(bool value) {
+    std::string binary_data_converter::serialize(bool value) {
         return value ? std::string(1,'T') : std::string(1,'F');
     }
 
     template<>
-    std::string data_conversions::serialize(const std::vector<bool>& values) {
+    std::string binary_data_converter::serialize(const std::vector<bool>& values) {
         std::string data;
         data.resize(values.size());
 

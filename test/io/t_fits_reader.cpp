@@ -15,7 +15,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/io/primary_hdu.hpp>
 #include <boost/astronomy/io/fits.hpp>
 #include <boost/astronomy/io/string_conversion_utility.hpp>
-#include <boost/astronomy/io/data_conversions.hpp>
+#include <boost/astronomy/io/binary_data_converter.hpp>
 
 using namespace boost::astronomy::io;
 
@@ -25,7 +25,7 @@ namespace fits_test {
         std::string samples_directory;
     public:
         std::string sample1_path;
-        fits_io<fits_stream, default_hdu_manager<card_policy,ascii_converter,data_conversions>> reader;
+        fits_io<fits_stream, default_hdu_manager<card_policy,ascii_converter,binary_data_converter>> reader;
         fits_reader_fixture() {
 
 #ifdef SOURCE_DIR
@@ -53,7 +53,7 @@ namespace fits_test {
         return 0;
     }
     template<>
-     std::size_t fits_test::fetch_data_size::operator()(const basic_primary_hdu<card_policy,data_conversions>& prime_hdu)const {
+     std::size_t fits_test::fetch_data_size::operator()(const basic_primary_hdu<card_policy,binary_data_converter>& prime_hdu)const {
         return prime_hdu.get_data<bitpix::_B32>().size();
     }
 }
@@ -82,7 +82,7 @@ BOOST_FIXTURE_TEST_CASE(get_hdu_by_index, fits_test::fits_reader_fixture) {
     reader.read_only_headers();
 
     BOOST_NOEXCEPT_OR_NOTHROW(
-        fits::convert_to<basic_primary_hdu<card_policy,data_conversions>>(reader[0])
+        fits::convert_to<basic_primary_hdu<card_policy,binary_data_converter>>(reader[0])
     );
 }
 BOOST_FIXTURE_TEST_CASE(invalid_index, fits_test::fits_reader_fixture) {
@@ -94,7 +94,7 @@ BOOST_FIXTURE_TEST_CASE(get_hdu_by_name, fits_test::fits_reader_fixture) {
     reader.read_only_headers();
 
     BOOST_NOEXCEPT_OR_NOTHROW(
-        fits::convert_to<basic_primary_hdu<card_policy,data_conversions>>(reader["primary_hdu"])
+        fits::convert_to<basic_primary_hdu<card_policy,binary_data_converter>>(reader["primary_hdu"])
     );
 }
 BOOST_FIXTURE_TEST_CASE(invalid_name, fits_test::fits_reader_fixture) {

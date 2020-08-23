@@ -1,6 +1,6 @@
 
 #include<map>
-#include<boost/astronomy/io/hdu.hpp>
+#include<boost/astronomy/io/header.hpp>
 #include<boost/astronomy/io/default_card_policy.hpp>
 
 

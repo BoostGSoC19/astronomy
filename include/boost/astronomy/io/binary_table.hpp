@@ -17,7 +17,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/endian/conversion.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/cstdfloat.hpp>
 
