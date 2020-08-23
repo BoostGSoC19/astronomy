@@ -28,16 +28,16 @@ namespace boost { namespace astronomy { namespace io {
  *              <A href="http://archive.stsci.edu/fits/users_guide/node41.html#SECTION00550000000000000000"> IMAGE_EXTENSION</A>
  * @author      Pranam Lashkari
 */
-template <typename CardPolicy>
+template <typename CardPolicy,typename Converter>
 struct basic_image_extension : public boost::astronomy::io::extension_hdu<CardPolicy>
 {
 
     typedef boost::variant<
-        image<bitpix::B8>,
-        image<bitpix::B16>,
-        image<bitpix::B32>,
-        image<bitpix::_B32>,
-        image<bitpix::_B64>
+        image<bitpix::B8,Converter>,
+        image<bitpix::B16,Converter>,
+        image<bitpix::B32,Converter>,
+        image<bitpix::_B32,Converter>,
+        image<bitpix::_B64,Converter>
     > data_type;
     data_type data;
     
@@ -51,7 +51,43 @@ public:
     basic_image_extension(const header<CardPolicy>& other, const std::string& data_buffer) :extension_hdu<CardPolicy>(other) {
         instantiate_image(other.bitpix());
         set_image_data(data_buffer);
-    } 
+    }
+
+    /**
+     * @brief Returns the header associated with the currently held primary hdu
+    */
+    header<CardPolicy> get_header() const {
+        return hdu_header;
+    }
+
+    /**
+     * @brief   Gets the image data associated with the primary HDU
+     * @see     image.hpp
+    */
+
+    template<bitpix DT>
+    image<DT,Converter> get_data() const { return *boost::get<image<DT>>(&this->data); }
+
+
+
+
+    /**
+    * @brief Writes the entire HDU ( header, image_data ) into the file
+    * @param[in,out] file_writer Provides operations for writing data into the file
+    * @tparam FileWriter Type of file_writer object.
+   */
+    template<typename FileWriter>
+    void write_to(FileWriter& file_writer) {
+
+        this->hdu_header.write_header(file_writer);
+        write_image_visitor write_image_visit;
+        auto image_data = boost::apply_visitor(write_image_visit, data);
+        file_writer.write(image_data);
+        auto current_write_pos = file_writer.get_current_pos();
+        auto logical_record_end_pos = file_writer.find_unit_end();
+        file_writer.write(std::string(logical_record_end_pos - current_write_pos, ' '));
+    }
+
 private:
     /**
      * @brief Sets the image data
@@ -70,19 +106,19 @@ private:
         switch (element_type)
         {
         case boost::astronomy::io::bitpix::B8:
-            data = image<bitpix::B8>();
+            data = image<bitpix::B8,Converter>();
             break;
         case boost::astronomy::io::bitpix::B16:
-            data = image<bitpix::B16>();
+            data = image<bitpix::B16,Converter>();
             break;
         case boost::astronomy::io::bitpix::B32:
-            data = image<bitpix::B32>();
+            data = image<bitpix::B32,Converter>();
             break;
         case boost::astronomy::io::bitpix::_B32:
-            data = image<bitpix::_B32>();
+            data = image<bitpix::_B32,Converter>();
             break;
         case boost::astronomy::io::bitpix::_B64:
-            data = image<bitpix::_B64>();
+            data = image<bitpix::_B64,Converter>();
             break;
         default:
             break;

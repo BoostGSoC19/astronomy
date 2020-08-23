@@ -85,7 +85,7 @@ namespace boost { namespace astronomy {namespace io {
     using fits = basic_fits<fits_stream, default_hdu_manager<card_policy,ascii_converter,data_conversions>>;
     using ascii_table = basic_ascii_table<card_policy, ascii_converter>;
     using binary_table = basic_binary_table_extension<card_policy, data_conversions>;
-    using primary_hdu = basic_primary_hdu<card_policy>;
+    using primary_hdu = basic_primary_hdu<card_policy,data_conversions>;
 
 
         }

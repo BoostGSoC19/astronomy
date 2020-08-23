@@ -20,9 +20,35 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include<boost/endian/conversion.hpp>
 #include<boost/astronomy/io/column.hpp>
 #include<boost/lexical_cast.hpp>
+#include<type_traits>
 
 
 namespace boost{namespace astronomy{namespace io{
+
+    /**
+     *@brief Provides an endian acceptable type for floating point
+    */
+    template<typename T>
+    struct endianess_acceptible { typedef T acceptible_type; };
+    template<>
+    struct endianess_acceptible<boost::float32_t> { typedef boost::int32_t acceptible_type; };
+    template<>
+    struct endianess_acceptible<boost::float64_t> { typedef boost::int64_t acceptible_type; };
+
+    /**
+     * @brief Checks whether the type is boost endian acceptible
+    */
+    template<typename T>
+    struct is_type_endianess_acceptible:std::true_type {};
+    template<>
+    struct is_type_endianess_acceptible<boost::float32_t> :std::false_type {};
+    template<>
+    struct is_type_endianess_acceptible<boost::float64_t> :std::false_type {};
+
+
+
+
+
  /**
   * @brief           Provides convenience methods for deserializing Binary data
   * @author          Gopi Krishna Menon
@@ -178,7 +204,13 @@ namespace boost{namespace astronomy{namespace io{
         */
         template<typename T>
         static std::string serialize(T data) {
-            boost::endian::native_to_big_inplace(data);
+
+            typename endianess_acceptible<T>::acceptible_type temp_holder;
+            std::memcpy(&temp_holder, &data, sizeof(data));
+            boost::endian::native_to_big_inplace(temp_holder);
+            std::memcpy(&data, &temp_holder, sizeof(data));
+
+
             char* start_pos = reinterpret_cast<char*>(&data);
             char* end_pos = reinterpret_cast<char*>(start_pos + sizeof(T));
             return std::string(start_pos, end_pos);

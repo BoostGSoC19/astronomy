@@ -59,7 +59,7 @@ namespace boost { namespace astronomy {namespace io {
 
         typedef boost::variant<
             boost::blank,
-            basic_primary_hdu<CardPolicy>,   
+            basic_primary_hdu<CardPolicy,BinaryConverter>,   
             basic_binary_table_extension<CardPolicy,BinaryConverter>,
             basic_ascii_table<CardPolicy,AsciiConverter>
 
@@ -104,7 +104,7 @@ namespace boost { namespace astronomy {namespace io {
         */
         static Extension generate_primary_hdu(header<CardPolicy>& prime_header, const std::string& buffer) {
             Extension prime_hdu;
-            prime_hdu = basic_primary_hdu<CardPolicy>(prime_header, buffer);
+            prime_hdu = basic_primary_hdu<CardPolicy,BinaryConverter>(prime_header, buffer);
             return prime_hdu;
         }
     };

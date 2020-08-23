@@ -24,18 +24,9 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/astronomy/io/bitpix.hpp>
 
-/**
- * @file    image.hpp
- * @author  Pranam Lashkari
- * @details Contains definition for image_buffer and image structure
- */
 
 namespace boost { namespace astronomy { namespace io {
 
-/**
- * @brief   Provides utility functions for working with image and is used to stores image data
- * @author  Pranam Lashkari
-*/
 template <typename PixelType>
 struct image_buffer
 {
@@ -166,7 +157,9 @@ public:
 
 
 
-
+/**
+ * @brief Visitor used for reading image from data buffer for image variants
+*/
 struct read_image_visitor :public boost::static_visitor<> {
 
     const std::string& data_buffer;
@@ -178,12 +171,23 @@ struct read_image_visitor :public boost::static_visitor<> {
 };
 
 /**
+ * @brief Visitor used for writing image data from the image variants onto a buffer
+*/
+
+struct write_image_visitor : public boost::static_visitor<std::string> {
+
+    template<typename Image_Type>
+    std::string operator()(Image_Type& type) { return type.write_image(); }
+
+};
+
+/**
  * @brief   Stores image data associated with the perticular HDU
  * @tparam  args Specifies the number of bits that represents a data value in image.
  * @author  Pranam Lashkari, Gopi Krishna Menon
  * @see     image_buffer
 */
-template<bitpix bitpix_val>
+template<bitpix bitpix_val,typename Converter>
 struct image:public image_buffer<typename bitpix_type<bitpix_val>::underlying_type> {
 
 public:
@@ -203,15 +207,30 @@ public:
 
         for (auto& element : this->data_) {
             std::string data(raw_data_iter, raw_data_iter + element_size);
-            //Boost allows only endian  conversion with integral types
-            // This is a workaround ( Largest integral type for storing all other types data temporarily)
-            boost::int64_t temp_holder = 0;
-            std::memcpy(&temp_holder, data.c_str(), element_size);
-            temp_holder = boost::endian::big_to_native(temp_holder);
-            std::memcpy(&element, &temp_holder, element_size);
+            element = Converter::template deserialize_to<typename std::remove_reference<decltype(element)>::type>(data,0);
             raw_data_iter += element_size;
         }
     }
+
+    /**
+     * @brief Creates a temporary buffer and writes all image data to it
+    */
+    std::string write_image() {
+
+
+        if (this->data_.size() != 0) {
+
+            std::string temp_buffer;
+
+            for (auto& element : this->data_) {
+                temp_buffer += Converter::template serialize(element);
+            }
+            return temp_buffer;
+        }
+
+        return "";
+    }
+
 };
 }}} //namespace boost::astronomy::io
 

@@ -53,7 +53,7 @@ namespace fits_test {
         return 0;
     }
     template<>
-     std::size_t fits_test::fetch_data_size::operator()(const basic_primary_hdu<card_policy>& prime_hdu)const {
+     std::size_t fits_test::fetch_data_size::operator()(const basic_primary_hdu<card_policy,data_conversions>& prime_hdu)const {
         return prime_hdu.get_data<bitpix::_B32>().size();
     }
 }
@@ -82,7 +82,7 @@ BOOST_FIXTURE_TEST_CASE(get_hdu_by_index, fits_test::fits_reader_fixture) {
     reader.read_only_headers();
 
     BOOST_NOEXCEPT_OR_NOTHROW(
-        fits::convert_to<basic_primary_hdu<card_policy>>(reader[0])
+        fits::convert_to<basic_primary_hdu<card_policy,data_conversions>>(reader[0])
     );
 }
 BOOST_FIXTURE_TEST_CASE(invalid_index, fits_test::fits_reader_fixture) {
@@ -94,7 +94,7 @@ BOOST_FIXTURE_TEST_CASE(get_hdu_by_name, fits_test::fits_reader_fixture) {
     reader.read_only_headers();
 
     BOOST_NOEXCEPT_OR_NOTHROW(
-        fits::convert_to<basic_primary_hdu<card_policy>>(reader["primary_hdu"])
+        fits::convert_to<basic_primary_hdu<card_policy,data_conversions>>(reader["primary_hdu"])
     );
 }
 BOOST_FIXTURE_TEST_CASE(invalid_name, fits_test::fits_reader_fixture) {
