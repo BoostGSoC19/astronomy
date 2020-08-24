@@ -113,8 +113,8 @@ BOOST_AUTO_TEST_CASE(hour_angle_declination_horizon) {
 BOOST_AUTO_TEST_CASE(hour_angle_declination_right_ascension_declination) {
 
   /**
-   * What was the Right Ascension of a star whose Local Hour Angle
-   * was 9h 52m 23.66s on local calendar date 22 April 1980 when
+   * What was the Local Hour Angle of a star whose Right Ascension
+   * was 18h 32m 21s on local calendar date 22 April 1980 when
    * observed in time zone −4 h from
    * Longitude 64◦ W at local time 14h 36m 51.67s?
    */
@@ -142,6 +142,33 @@ BOOST_AUTO_TEST_CASE(hour_angle_declination_right_ascension_declination) {
   //Hour Angle converted from degree to hour
   BOOST_CHECK_CLOSE((theta1.value() * 180.0 / PI) / 15.0, 9.873239, 1);
   BOOST_CHECK_CLOSE(gama1.value() * 180.0 / PI, 23.219444, 0.001);
+
+  /**
+   * What was the Right Ascension of a star whose Local Hour Angle
+   * was 9h 52m 23.66s on local calendar date 22 April 1980 when
+   * observed in time zone −4 h from
+   * Longitude 64◦ W at local time 14h 36m 51.67s?
+   */
+  double hour_angle = decimal_hour(9,52,23.66).get() * 15.0;
+  deb(hour_angle);
+  equatorial_ha_coord<double, quantity<bud::plane_angle>, quantity<bud::plane_angle>>
+      eha(hour_angle * bud::degrees, declination * bud::degrees);
+
+  bac::column_vector<double, quantity<bud::plane_angle>, double> vec2(eha.get_ha(),eha.get_dec());
+
+  matrix<double> resultant_vector2 = prod(bac::hour_angle_declination_right_ascension_declination<double, quantity<bud::plane_angle>, double>(ST).get(),vec2.get());
+
+  auto coordinates2 = bac::extract_coordinates(resultant_vector2).get_coordinates();
+  auto theta2 = coordinates2.first;
+  auto gama2 = coordinates2.second;
+
+  // Right Ascension converted from degree to hour
+  // If Right Ascension negative, add 24.
+  long double ra = (theta2.value() * 180.0 / PI) / 15.0;
+  long double result_ra = ( ra ) < 0 ? ra + 24.0 : ra;
+
+  BOOST_CHECK_CLOSE(result_ra, 18.539165, 1);
+  BOOST_CHECK_CLOSE(gama2.value() * 180.0 / PI, 23.219444, 0.001);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
