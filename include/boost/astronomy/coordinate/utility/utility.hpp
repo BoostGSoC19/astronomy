@@ -76,7 +76,11 @@ struct column_vector
 };
 
 template
-    <typename ElementType = double>
+<
+  typename CoordinateType = double,
+  typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
+  typename ElementType = double
+>
 struct hour_angle_declination_horizon
 {
  public:
@@ -84,16 +88,18 @@ struct hour_angle_declination_horizon
 
   hour_angle_declination_horizon() {}
 
-  hour_angle_declination_horizon(ElementType phi){
-    conv(0,0) = -std::sin(phi);
+  hour_angle_declination_horizon(Angle phi){
+    double _phi = static_cast<bu::quantity<bu::si::plane_angle>>(phi).value();
+
+    conv(0,0) = -std::sin(_phi);
     conv(0,1) = 0;
-    conv(0,2) = std::cos(phi);
+    conv(0,2) = std::cos(_phi);
     conv(1,0) = 0;
     conv(1,1) = -1;
     conv(1,2) = 0;
-    conv(2,0) = std::cos(phi);
+    conv(2,0) = std::cos(_phi);
     conv(2,1) = 0;
-    conv(2,2) = std::sin(phi);
+    conv(2,2) = std::sin(_phi);
   }
 
   matrix<ElementType> get(){

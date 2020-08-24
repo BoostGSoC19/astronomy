@@ -11,3 +11,5 @@ run galactic_coord.cpp ;
 run ecliptic_coord.cpp ;
 run equatorial_ra_coord.cpp ;
 run equatorial_ha_coord.cpp ;
+run utility.cpp ;
+
