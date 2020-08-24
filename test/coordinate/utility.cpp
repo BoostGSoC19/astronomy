@@ -11,21 +11,20 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/units/io.hpp>
 #include <boost/units/systems/angle/degrees.hpp>
 
-#include <boost/astronomy/coordinate/coord_sys/equatorial_ha_coord.hpp>
-#include <boost/astronomy/coordinate/coord_sys/ecliptic_coord.hpp>
-#include <boost/astronomy/coordinate/coord_sys/equatorial_ra_coord.hpp>
-#include <boost/astronomy/coordinate/coord_sys/galactic_coord.hpp>
 #include <boost/astronomy/coordinate/coord_sys/horizon_coord.hpp>
+#include <boost/astronomy/coordinate/coord_sys/ecliptic_coord.hpp>
+#include <boost/astronomy/coordinate/coord_sys/galactic_coord.hpp>
+#include <boost/astronomy/coordinate/coord_sys/equatorial_ra_coord.hpp>
+#include <boost/astronomy/coordinate/coord_sys/equatorial_ha_coord.hpp>
 
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/astronomy/coordinate/utility/utility.hpp>
 
 #include <boost/astronomy/time/parser.hpp>
-
 #include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/astronomy/time/time_conversions.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -41,8 +40,6 @@ namespace bnu = boost::numeric::ublas;
 
 using namespace boost::gregorian;
 using namespace boost::posix_time;
-
-#define deb(x)          std::cout << #x << "=" << x << std::endl
 
 BOOST_AUTO_TEST_SUITE(utility)
 
@@ -150,7 +147,7 @@ BOOST_AUTO_TEST_CASE(hour_angle_declination_right_ascension_declination) {
    * Longitude 64◦ W at local time 14h 36m 51.67s?
    */
   double hour_angle = decimal_hour(9,52,23.66).get() * 15.0;
-  deb(hour_angle);
+
   equatorial_ha_coord<double, quantity<bud::plane_angle>, quantity<bud::plane_angle>>
       eha(hour_angle * bud::degrees, declination * bud::degrees);
 
@@ -169,6 +166,98 @@ BOOST_AUTO_TEST_CASE(hour_angle_declination_right_ascension_declination) {
 
   BOOST_CHECK_CLOSE(result_ra, 18.539165, 1);
   BOOST_CHECK_CLOSE(gama2.value() * 180.0 / PI, 23.219444, 0.001);
+}
+
+BOOST_AUTO_TEST_CASE(ecliptic_to_right_ascension_declination) {
+
+  /**
+   * What were the Right Ascension and the declination of a planet
+   * whose ecliptic coordinates were longitude 139◦ 41′ 10′′ and
+   * latitude 4◦ 52′ 31′′ on 6 July 2009?
+   */
+  double longitude = 139.6861111;
+  double latitude = 4.87527778;
+
+  std::string s("2009-07-6");
+  date d(from_simple_string(s));
+
+  auto obliquity = obliquity_of_ecliptic(d).get();
+  BOOST_CHECK_CLOSE(obliquity.value() * 180.0 / PI, 23.43805531 , 0.001);
+
+  ecliptic_coord<double, quantity<bud::plane_angle>, quantity<bud::plane_angle>>
+      ec(longitude * bud::degrees, latitude * bud::degrees);
+
+  bac::column_vector<double, quantity<bud::plane_angle>, double> vec(ec.get_lat(),ec.get_lon());
+
+  matrix<double> resultant_vector1 = prod(bac::ecliptic_to_right_ascension_declination<>(obliquity).get(),vec.get());
+
+  auto coordinates = bac::extract_coordinates(resultant_vector1).get_coordinates();
+  auto theta = coordinates.first;
+  auto gama = coordinates.second;
+
+  BOOST_CHECK_CLOSE((theta.value() * 180.0 / PI), 143.722173, 0.001);
+  BOOST_CHECK_CLOSE(gama.value() * 180.0 / PI, 19.535003, 0.001);
+}
+
+BOOST_AUTO_TEST_CASE(right_ascension_declination_to_ecliptic) {
+  /**
+   * What are the Ecliptic Coordinates of a planet whose
+   * Right Ascension and Declination are given as
+   * α = 9h 34m 53.32s and δ = 19◦ 32′ 6.01′′
+   * when the Greenwich calendar date is 6July2009?
+   */
+
+  double right_ascension = decimal_hour(9,34,53.32).get() * 15.0;
+  double declination = 19.535003;
+
+  std::string s("2009-07-6");
+  date d(from_simple_string(s));
+
+  auto obliquity = obliquity_of_ecliptic(d).get();
+  BOOST_CHECK_CLOSE(obliquity.value() * 180.0 / PI, 23.43805531 , 0.001);
+
+  equatorial_ra_coord<double, quantity<bud::plane_angle>, quantity<bud::plane_angle>>
+      era(right_ascension * bud::degrees, declination * bud::degrees);
+
+  bac::column_vector<double, quantity<bud::plane_angle>, double> vec(era.get_ra(),era.get_dec());
+
+  matrix<double> resultant_vector = prod(bac::right_ascension_declination_to_ecliptic<>(obliquity).get(),vec.get());
+
+  auto coordinates = bac::extract_coordinates(resultant_vector).get_coordinates();
+  auto theta = coordinates.first;
+  auto gama = coordinates.second;
+
+  BOOST_CHECK_CLOSE((theta.value() * 180.0 / PI), 139.686106, 0.001);
+  BOOST_CHECK_CLOSE(gama.value() * 180.0 / PI, 4.875276, 0.001);
+}
+
+BOOST_AUTO_TEST_CASE(right_ascension_declination_to_galactic) {
+
+  /**
+   * What are the Galactic Coordinates of a star whose
+   * right ascension and declination are
+   * α = 10h 21m 00s and δ = 10◦ 03′ 11′′?
+   */
+
+  double right_ascension = decimal_hour(10,21,0).get() * 15.0;
+  double declination = 10.053056;
+
+  equatorial_ra_coord<double, quantity<bud::plane_angle>, quantity<bud::plane_angle>>
+      era(right_ascension * bud::degrees, declination * bud::degrees);
+
+  bac::column_vector<double, quantity<bud::plane_angle>, double> vec(era.get_ra(),era.get_dec());
+
+  matrix<double> resultant_vector = prod(bac::right_ascension_declination_to_galactic<double>().get(),vec.get());
+
+  auto coordinates = bac::extract_coordinates(resultant_vector).get_coordinates();
+  auto theta = coordinates.first;
+  auto gama = coordinates.second;
+
+  long double longitude_result = theta.value() * 180.0 / PI;
+  long double longitude = ( longitude_result ) < 0 ? longitude_result + 360.0 : longitude_result;
+
+  BOOST_CHECK_CLOSE(longitude, 232.247881, 0.001);
+  BOOST_CHECK_CLOSE(gama.value() * 180.0 / PI, 51.122268, 0.001);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

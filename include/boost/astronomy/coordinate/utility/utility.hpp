@@ -148,7 +148,11 @@ struct hour_angle_declination_right_ascension_declination
 };
 
 template
-    <typename ElementType = double>
+<
+  typename CoordinateType = double,
+  typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
+  typename ElementType = double
+>
 struct ecliptic_to_right_ascension_declination
 {
  public:
@@ -156,16 +160,18 @@ struct ecliptic_to_right_ascension_declination
 
   ecliptic_to_right_ascension_declination() {}
 
-  ecliptic_to_right_ascension_declination(ElementType obliquity){
+  ecliptic_to_right_ascension_declination(Angle obliquity){
+    double _obliquity = static_cast<bu::quantity<bu::si::plane_angle>>(obliquity).value();
+
     conv(0,0) = 1;
     conv(0,1) = 0;
     conv(0,2) = 0;
     conv(1,0) = 0;
-    conv(1,1) = std::cos(obliquity);
-    conv(1,2) = -std::sin(obliquity);
+    conv(1,1) = std::cos(_obliquity);
+    conv(1,2) = -std::sin(_obliquity);
     conv(2,0) = 0;
-    conv(2,1) = std::sin(obliquity);
-    conv(2,2) = std::cos(obliquity);
+    conv(2,1) = std::sin(_obliquity);
+    conv(2,2) = std::cos(_obliquity);
   }
 
   matrix<ElementType> get(){
@@ -178,7 +184,11 @@ struct ecliptic_to_right_ascension_declination
 };
 
 template
-    <typename ElementType = double>
+<
+  typename CoordinateType = double,
+  typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
+  typename ElementType = double
+>
 struct right_ascension_declination_to_ecliptic
 {
  public:
@@ -186,16 +196,18 @@ struct right_ascension_declination_to_ecliptic
 
   right_ascension_declination_to_ecliptic() {}
 
-  right_ascension_declination_to_ecliptic(ElementType obliquity){
+  right_ascension_declination_to_ecliptic(Angle obliquity){
+    double _obliquity = static_cast<bu::quantity<bu::si::plane_angle>>(obliquity).value();
+
     conv(0,0) = 1;
     conv(0,1) = 0;
     conv(0,2) = 0;
     conv(1,0) = 0;
-    conv(1,1) = std::cos(obliquity);
-    conv(1,2) = -std::sin(obliquity);
+    conv(1,1) = std::cos(_obliquity);
+    conv(1,2) = std::sin(_obliquity);
     conv(2,0) = 0;
-    conv(2,1) = std::sin(obliquity);
-    conv(2,2) = std::cos(obliquity);
+    conv(2,1) = -std::sin(_obliquity);
+    conv(2,2) = std::cos(_obliquity);
   }
 
   matrix<ElementType> get(){
@@ -216,13 +228,13 @@ struct galactic_to_right_ascension_declination
 
   galactic_to_right_ascension_declination(){
     conv(0,0) = -0.0669887;
-    conv(0,1) = -0.8727558;
+    conv(0,1) = 0.8727558;
     conv(0,2) = -0.4835389;
-    conv(1,0) = 0.4927285;
+    conv(1,0) = -0.4927285;
     conv(1,1) = -0.4503470;
-    conv(1,2) = 0.7445846;
+    conv(1,2) = -0.7445846;
     conv(2,0) = -0.8676008;
-    conv(2,1) = -0.1883746;
+    conv(2,1) = 0.1883746;
     conv(2,2) = 0.4601998;
   }
 
@@ -245,13 +257,13 @@ struct right_ascension_declination_to_galactic
   right_ascension_declination_to_galactic()
   {
     conv(0,0) = -0.0669887;
-    conv(0,1) = 0.8727558;
+    conv(0,1) = -0.8727558;
     conv(0,2) = -0.4835389;
-    conv(1,0) = -0.4927285;
+    conv(1,0) = 0.4927285;
     conv(1,1) = -0.4503470;
-    conv(1,2) = -0.7445846;
+    conv(1,2) = 0.7445846;
     conv(2,0) = -0.8676008;
-    conv(2,1) = 0.1883746;
+    conv(2,1) = -0.1883746;
     conv(2,2) = 0.4601998;
   }
 
