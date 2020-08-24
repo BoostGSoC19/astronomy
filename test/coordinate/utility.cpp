@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(column_vector) {
   BOOST_CHECK_CLOSE(vec.get()(2,0), -0.306658, 0.001);
 }
 
-BOOST_AUTO_TEST_CASE(hour_angle_declination_horizon) {
+BOOST_AUTO_TEST_CASE(ha_declination_horizon) {
 
   /**
    * What are the Horizon Coordinated (Altitude and Azimuth)
@@ -64,16 +64,16 @@ BOOST_AUTO_TEST_CASE(hour_angle_declination_horizon) {
    * The observer’s latitude is 52◦ N.
    */
 
-  double hour_angle = decimal_hour(5,51,44).get() * 15.0;
+  double ha = decimal_hour(5,51,44).get() * 15.0;
   double declination = 23.21944444;
   quantity<bud::plane_angle, double> phi1 = 52.0 * bud::degree;
 
   equatorial_ha_coord<double, quantity<bud::plane_angle>, quantity<bud::plane_angle>>
-      eha(hour_angle * bud::degrees, declination * bud::degrees);
+      eha(ha * bud::degrees, declination * bud::degrees);
 
   bac::column_vector<double, quantity<bud::plane_angle>, double> vec1(eha.get_ha(),eha.get_dec());
 
-  matrix<double> resultant_vector1 = prod(bac::hour_angle_declination_horizon<double, quantity<bud::plane_angle>, double>(phi1).get(),vec1.get());
+  matrix<double> resultant_vector1 = prod(bac::ha_declination_horizon<double, quantity<bud::plane_angle>, double>(phi1).get(),vec1.get());
 
   auto coordinates1 = bac::extract_coordinates(resultant_vector1).get_coordinates();
   auto theta1 = coordinates1.first;
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(hour_angle_declination_horizon) {
 
   bac::column_vector<double, quantity<bud::plane_angle>, double> vec2(hc.get_azimuth(),hc.get_altitude());
 
-  matrix<double> resultant_vector2 = prod(bac::hour_angle_declination_horizon<double, quantity<bud::plane_angle>, double>(phi2).get(),vec2.get());
+  matrix<double> resultant_vector2 = prod(bac::ha_declination_horizon<double, quantity<bud::plane_angle>, double>(phi2).get(),vec2.get());
 
   auto coordinates2 = bac::extract_coordinates(resultant_vector2).get_coordinates();
   auto theta2 = coordinates2.first;
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(hour_angle_declination_horizon) {
   BOOST_CHECK_CLOSE(gama2.value() * 180.0 / PI, 23.219444, 0.001);
 }
 
-BOOST_AUTO_TEST_CASE(hour_angle_declination_right_ascension_declination) {
+BOOST_AUTO_TEST_CASE(ha_declination_ra_declination) {
 
   /**
    * What was the Local Hour Angle of a star whose Right Ascension
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(hour_angle_declination_right_ascension_declination) {
    * observed in time zone −4 h from
    * Longitude 64◦ W at local time 14h 36m 51.67s?
    */
-  double right_ascension = decimal_hour(18,32,21).get() * 15.0;
+  double ra = decimal_hour(18,32,21).get() * 15.0;
   double declination = 23.21944444;
 
   std::string ts1("1980-04-22 14:36:51.67");
@@ -126,11 +126,11 @@ BOOST_AUTO_TEST_CASE(hour_angle_declination_right_ascension_declination) {
   quantity<bud::plane_angle, double> ST = (d1.get() + 4) * 15 * bud::degree;
 
   equatorial_ra_coord<double, quantity<bud::plane_angle>, quantity<bud::plane_angle>>
-      era(right_ascension * bud::degrees, declination * bud::degrees);
+      era(ra * bud::degrees, declination * bud::degrees);
 
   bac::column_vector<double, quantity<bud::plane_angle>, double> vec1(era.get_ra(),era.get_dec());
 
-  matrix<double> resultant_vector1 = prod(bac::hour_angle_declination_right_ascension_declination<double, quantity<bud::plane_angle>, double>(ST).get(),vec1.get());
+  matrix<double> resultant_vector1 = prod(bac::ha_declination_ra_declination<double, quantity<bud::plane_angle>, double>(ST).get(),vec1.get());
 
   auto coordinates1 = bac::extract_coordinates(resultant_vector1).get_coordinates();
   auto theta1 = coordinates1.first;
@@ -146,14 +146,14 @@ BOOST_AUTO_TEST_CASE(hour_angle_declination_right_ascension_declination) {
    * observed in time zone −4 h from
    * Longitude 64◦ W at local time 14h 36m 51.67s?
    */
-  double hour_angle = decimal_hour(9,52,23.66).get() * 15.0;
+  double ha = decimal_hour(9,52,23.66).get() * 15.0;
 
   equatorial_ha_coord<double, quantity<bud::plane_angle>, quantity<bud::plane_angle>>
-      eha(hour_angle * bud::degrees, declination * bud::degrees);
+      eha(ha * bud::degrees, declination * bud::degrees);
 
   bac::column_vector<double, quantity<bud::plane_angle>, double> vec2(eha.get_ha(),eha.get_dec());
 
-  matrix<double> resultant_vector2 = prod(bac::hour_angle_declination_right_ascension_declination<double, quantity<bud::plane_angle>, double>(ST).get(),vec2.get());
+  matrix<double> resultant_vector2 = prod(bac::ha_declination_ra_declination<double, quantity<bud::plane_angle>, double>(ST).get(),vec2.get());
 
   auto coordinates2 = bac::extract_coordinates(resultant_vector2).get_coordinates();
   auto theta2 = coordinates2.first;
@@ -161,14 +161,14 @@ BOOST_AUTO_TEST_CASE(hour_angle_declination_right_ascension_declination) {
 
   // Right Ascension converted from degree to hour
   // If Right Ascension negative, add 24.
-  long double ra = (theta2.value() * 180.0 / PI) / 15.0;
-  long double result_ra = ( ra ) < 0 ? ra + 24.0 : ra;
+  long double theta = (theta2.value() * 180.0 / PI) / 15.0;
+  long double ra_result = ( theta ) < 0 ? theta + 24.0 : theta;
 
-  BOOST_CHECK_CLOSE(result_ra, 18.539165, 1);
+  BOOST_CHECK_CLOSE(ra_result, 18.539165, 1);
   BOOST_CHECK_CLOSE(gama2.value() * 180.0 / PI, 23.219444, 0.001);
 }
 
-BOOST_AUTO_TEST_CASE(ecliptic_to_right_ascension_declination) {
+BOOST_AUTO_TEST_CASE(ecliptic_to_ra_declination) {
 
   /**
    * What were the Right Ascension and the declination of a planet
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(ecliptic_to_right_ascension_declination) {
 
   bac::column_vector<double, quantity<bud::plane_angle>, double> vec(ec.get_lat(),ec.get_lon());
 
-  matrix<double> resultant_vector1 = prod(bac::ecliptic_to_right_ascension_declination<>(obliquity).get(),vec.get());
+  matrix<double> resultant_vector1 = prod(bac::ecliptic_to_ra_declination<>(obliquity).get(),vec.get());
 
   auto coordinates = bac::extract_coordinates(resultant_vector1).get_coordinates();
   auto theta = coordinates.first;
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(ecliptic_to_right_ascension_declination) {
   BOOST_CHECK_CLOSE(gama.value() * 180.0 / PI, 19.535003, 0.001);
 }
 
-BOOST_AUTO_TEST_CASE(right_ascension_declination_to_ecliptic) {
+BOOST_AUTO_TEST_CASE(ra_declination_to_ecliptic) {
   /**
    * What are the Ecliptic Coordinates of a planet whose
    * Right Ascension and Declination are given as
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(right_ascension_declination_to_ecliptic) {
    * when the Greenwich calendar date is 6July2009?
    */
 
-  double right_ascension = decimal_hour(9,34,53.32).get() * 15.0;
+  double ra = decimal_hour(9,34,53.32).get() * 15.0;
   double declination = 19.535003;
 
   std::string s("2009-07-6");
@@ -217,11 +217,11 @@ BOOST_AUTO_TEST_CASE(right_ascension_declination_to_ecliptic) {
   BOOST_CHECK_CLOSE(obliquity.value() * 180.0 / PI, 23.43805531 , 0.001);
 
   equatorial_ra_coord<double, quantity<bud::plane_angle>, quantity<bud::plane_angle>>
-      era(right_ascension * bud::degrees, declination * bud::degrees);
+      era(ra * bud::degrees, declination * bud::degrees);
 
   bac::column_vector<double, quantity<bud::plane_angle>, double> vec(era.get_ra(),era.get_dec());
 
-  matrix<double> resultant_vector = prod(bac::right_ascension_declination_to_ecliptic<>(obliquity).get(),vec.get());
+  matrix<double> resultant_vector = prod(bac::ra_declination_to_ecliptic<>(obliquity).get(),vec.get());
 
   auto coordinates = bac::extract_coordinates(resultant_vector).get_coordinates();
   auto theta = coordinates.first;
@@ -231,7 +231,7 @@ BOOST_AUTO_TEST_CASE(right_ascension_declination_to_ecliptic) {
   BOOST_CHECK_CLOSE(gama.value() * 180.0 / PI, 4.875276, 0.001);
 }
 
-BOOST_AUTO_TEST_CASE(right_ascension_declination_to_galactic) {
+BOOST_AUTO_TEST_CASE(ra_declination_to_galactic) {
 
   /**
    * What are the Galactic Coordinates of a star whose
@@ -239,15 +239,15 @@ BOOST_AUTO_TEST_CASE(right_ascension_declination_to_galactic) {
    * α = 10h 21m 00s and δ = 10◦ 03′ 11′′?
    */
 
-  double right_ascension = decimal_hour(10,21,0).get() * 15.0;
+  double ra = decimal_hour(10,21,0).get() * 15.0;
   double declination = 10.053056;
 
   equatorial_ra_coord<double, quantity<bud::plane_angle>, quantity<bud::plane_angle>>
-      era(right_ascension * bud::degrees, declination * bud::degrees);
+      era(ra * bud::degrees, declination * bud::degrees);
 
   bac::column_vector<double, quantity<bud::plane_angle>, double> vec(era.get_ra(),era.get_dec());
 
-  matrix<double> resultant_vector = prod(bac::right_ascension_declination_to_galactic<double>().get(),vec.get());
+  matrix<double> resultant_vector = prod(bac::ra_declination_to_galactic<double>().get(),vec.get());
 
   auto coordinates = bac::extract_coordinates(resultant_vector).get_coordinates();
   auto theta = coordinates.first;

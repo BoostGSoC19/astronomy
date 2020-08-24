@@ -76,19 +76,19 @@ struct column_vector
 };
 
 template
-<
-  typename CoordinateType = double,
-  typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
-  typename ElementType = double
->
-struct hour_angle_declination_horizon
+    <
+        typename CoordinateType = double,
+        typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
+        typename ElementType = double
+    >
+struct ha_declination_horizon
 {
  public:
   matrix<ElementType> conv = matrix<ElementType>(3, 3);
 
-  hour_angle_declination_horizon() {}
+  ha_declination_horizon() {}
 
-  hour_angle_declination_horizon(Angle phi){
+  ha_declination_horizon(Angle phi){
     double _phi = static_cast<bu::quantity<bu::si::plane_angle>>(phi).value();
 
     conv(0,0) = -std::sin(_phi);
@@ -112,19 +112,19 @@ struct hour_angle_declination_horizon
 };
 
 template
-<
-  typename CoordinateType = double,
-  typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
-  typename ElementType = double
->
-struct hour_angle_declination_right_ascension_declination
+    <
+        typename CoordinateType = double,
+        typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
+        typename ElementType = double
+    >
+struct ha_declination_ra_declination
 {
  public:
   matrix<ElementType> conv = matrix<ElementType>(3, 3);
 
-  hour_angle_declination_right_ascension_declination() {}
+  ha_declination_ra_declination() {}
 
-  hour_angle_declination_right_ascension_declination(Angle ST){
+  ha_declination_ra_declination(Angle ST){
     double _ST = static_cast<bu::quantity<bu::si::plane_angle>>(ST).value();
 
     conv(0,0) = std::cos(_ST);
@@ -148,19 +148,19 @@ struct hour_angle_declination_right_ascension_declination
 };
 
 template
-<
-  typename CoordinateType = double,
-  typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
-  typename ElementType = double
->
-struct ecliptic_to_right_ascension_declination
+    <
+        typename CoordinateType = double,
+        typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
+        typename ElementType = double
+    >
+struct ecliptic_to_ra_declination
 {
  public:
   matrix<ElementType> conv = matrix<ElementType>(3, 3);
 
-  ecliptic_to_right_ascension_declination() {}
+  ecliptic_to_ra_declination() {}
 
-  ecliptic_to_right_ascension_declination(Angle obliquity){
+  ecliptic_to_ra_declination(Angle obliquity){
     double _obliquity = static_cast<bu::quantity<bu::si::plane_angle>>(obliquity).value();
 
     conv(0,0) = 1;
@@ -184,19 +184,19 @@ struct ecliptic_to_right_ascension_declination
 };
 
 template
-<
-  typename CoordinateType = double,
-  typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
-  typename ElementType = double
->
-struct right_ascension_declination_to_ecliptic
+    <
+        typename CoordinateType = double,
+        typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
+        typename ElementType = double
+    >
+struct ra_declination_to_ecliptic
 {
  public:
   matrix<ElementType> conv = matrix<ElementType>(3, 3);
 
-  right_ascension_declination_to_ecliptic() {}
+  ra_declination_to_ecliptic() {}
 
-  right_ascension_declination_to_ecliptic(Angle obliquity){
+  ra_declination_to_ecliptic(Angle obliquity){
     double _obliquity = static_cast<bu::quantity<bu::si::plane_angle>>(obliquity).value();
 
     conv(0,0) = 1;
@@ -221,12 +221,12 @@ struct right_ascension_declination_to_ecliptic
 
 template
     <typename ElementType = double>
-struct galactic_to_right_ascension_declination
+struct galactic_to_ra_declination
 {
  public:
   matrix<ElementType> conv = matrix<ElementType>(3, 3);
 
-  galactic_to_right_ascension_declination(){
+  galactic_to_ra_declination(){
     conv(0,0) = -0.0669887;
     conv(0,1) = 0.8727558;
     conv(0,2) = -0.4835389;
@@ -249,12 +249,12 @@ struct galactic_to_right_ascension_declination
 
 template
     <typename ElementType = double>
-struct right_ascension_declination_to_galactic
+struct ra_declination_to_galactic
 {
  public:
   matrix<ElementType> conv = matrix<ElementType>(3, 3);
 
-  right_ascension_declination_to_galactic()
+  ra_declination_to_galactic()
   {
     conv(0,0) = -0.0669887;
     conv(0,1) = -0.8727558;
