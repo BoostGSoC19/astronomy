@@ -67,10 +67,12 @@ decimal_hour GST(ptime t)
 enum class DIRECTION {WEST, EAST};
 
 //Local Sidereal Time (LST)
-decimal_hour LST(double longitude, DIRECTION direction, double GST)
+decimal_hour LST(double longitude, DIRECTION direction, ptime t)
 {
+  double gst = GST(t).get();
+
     if(longitude == 0)
-      return {GST};
+      return {gst};
 
     //Convert longitude to hours
     double long_hours = longitude / 15.0;
@@ -87,7 +89,7 @@ decimal_hour LST(double longitude, DIRECTION direction, double GST)
             break;
     }
 
-    long_hours = long_hours + GST;
+    long_hours = long_hours + gst;
 
     //Bring the result into the range 0 to 24 by adding or subtracting 24 if necessary.
     //This is the local sidereal time (LST).

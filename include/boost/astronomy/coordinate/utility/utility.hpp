@@ -112,7 +112,11 @@ struct hour_angle_declination_horizon
 };
 
 template
-    <typename ElementType = double>
+<
+  typename CoordinateType = double,
+  typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
+  typename ElementType = double
+>
 struct hour_angle_declination_right_ascension_declination
 {
  public:
@@ -120,12 +124,14 @@ struct hour_angle_declination_right_ascension_declination
 
   hour_angle_declination_right_ascension_declination() {}
 
-  hour_angle_declination_right_ascension_declination(ElementType ST){
-    conv(0,0) = std::cos(ST);
-    conv(0,1) = std::sin(ST);
+  hour_angle_declination_right_ascension_declination(Angle ST){
+    double _ST = static_cast<bu::quantity<bu::si::plane_angle>>(ST).value();
+
+    conv(0,0) = std::cos(_ST);
+    conv(0,1) = std::sin(_ST);
     conv(0,2) = 0;
-    conv(1,0) = std::sin(ST);
-    conv(1,1) = -std::cos(ST);
+    conv(1,0) = std::sin(_ST);
+    conv(1,1) = -std::cos(_ST);
     conv(1,2) = 0;
     conv(2,0) = 0;
     conv(2,1) = 0;
