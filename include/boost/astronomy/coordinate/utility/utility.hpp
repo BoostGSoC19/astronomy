@@ -81,14 +81,14 @@ template
         typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
         typename ElementType = double
     >
-struct ha_declination_horizon
+struct ha_dec_horizon
 {
  public:
   matrix<ElementType> conv = matrix<ElementType>(3, 3);
 
-  ha_declination_horizon() {}
+  ha_dec_horizon() {}
 
-  ha_declination_horizon(Angle phi){
+  ha_dec_horizon(Angle phi){
     double _phi = static_cast<bu::quantity<bu::si::plane_angle>>(phi).value();
 
     conv(0,0) = -std::sin(_phi);
@@ -117,14 +117,14 @@ template
         typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
         typename ElementType = double
     >
-struct ha_declination_ra_declination
+struct ha_dec_ra_dec
 {
  public:
   matrix<ElementType> conv = matrix<ElementType>(3, 3);
 
-  ha_declination_ra_declination() {}
+  ha_dec_ra_dec() {}
 
-  ha_declination_ra_declination(Angle ST){
+  ha_dec_ra_dec(Angle ST){
     double _ST = static_cast<bu::quantity<bu::si::plane_angle>>(ST).value();
 
     conv(0,0) = std::cos(_ST);
@@ -153,14 +153,14 @@ template
         typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
         typename ElementType = double
     >
-struct ecliptic_to_ra_declination
+struct ecliptic_to_ra_dec
 {
  public:
   matrix<ElementType> conv = matrix<ElementType>(3, 3);
 
-  ecliptic_to_ra_declination() {}
+  ecliptic_to_ra_dec() {}
 
-  ecliptic_to_ra_declination(Angle obliquity){
+  ecliptic_to_ra_dec(Angle obliquity){
     double _obliquity = static_cast<bu::quantity<bu::si::plane_angle>>(obliquity).value();
 
     conv(0,0) = 1;
@@ -189,14 +189,14 @@ template
         typename Angle = bu::quantity<bu::si::plane_angle, CoordinateType>,
         typename ElementType = double
     >
-struct ra_declination_to_ecliptic
+struct ra_dec_to_ecliptic
 {
  public:
   matrix<ElementType> conv = matrix<ElementType>(3, 3);
 
-  ra_declination_to_ecliptic() {}
+  ra_dec_to_ecliptic() {}
 
-  ra_declination_to_ecliptic(Angle obliquity){
+  ra_dec_to_ecliptic(Angle obliquity){
     double _obliquity = static_cast<bu::quantity<bu::si::plane_angle>>(obliquity).value();
 
     conv(0,0) = 1;
@@ -221,12 +221,12 @@ struct ra_declination_to_ecliptic
 
 template
     <typename ElementType = double>
-struct galactic_to_ra_declination
+struct galactic_to_ra_dec
 {
  public:
   matrix<ElementType> conv = matrix<ElementType>(3, 3);
 
-  galactic_to_ra_declination(){
+  galactic_to_ra_dec(){
     conv(0,0) = -0.0669887;
     conv(0,1) = 0.8727558;
     conv(0,2) = -0.4835389;
@@ -249,12 +249,12 @@ struct galactic_to_ra_declination
 
 template
     <typename ElementType = double>
-struct ra_declination_to_galactic
+struct ra_dec_to_galactic
 {
  public:
   matrix<ElementType> conv = matrix<ElementType>(3, 3);
 
-  ra_declination_to_galactic()
+  ra_dec_to_galactic()
   {
     conv(0,0) = -0.0669887;
     conv(0,1) = -0.8727558;
