@@ -20,21 +20,9 @@ namespace boost {namespace astronomy {namespace io {
     */
     struct fits_stream {
     private:
-        std::fstream* file;
+        std::fstream file;
 
     public:
-        /**
-         * @brief Constructs a new FITS stream reader object
-
-        */
-        fits_stream():file(new std::fstream) {}
-
-        /**
-         * @brief Default copy constructor
-        */
-        fits_stream(fits_stream && other):file(other.file) {
-            other.file = nullptr;
-        }
 
         /**
          * @brief Sets the file on which reading operations will take place
@@ -42,10 +30,10 @@ namespace boost {namespace astronomy {namespace io {
          * @throw file_reading_exception
         */
         void set_file(const std::string& path) {
-            this->file->close();
-            file->clear();
-            this->file->open(path, std::ios::binary | std::ios::in);
-            if (!this->file->good()) {
+            this->file.close();
+            this->file.clear();
+            this->file.open(path, std::ios::binary | std::ios::in);
+            if (!this->file.good()) {
                 throw file_reading_exception("Cannot Open File");
             }
         }
@@ -55,10 +43,10 @@ namespace boost {namespace astronomy {namespace io {
          * @param[in] path The path where the file needs to be created
         */
         bool create_file(const std::string& path) {
-            this->file->close();
-            this->file->clear();
-            this->file->open(path, std::ios::in | std::ios::out | std::ios::trunc);
-            return file->good();
+            this->file.close();
+            this->file.clear();
+            this->file.open(path, std::ios::in | std::ios::out | std::ios::trunc);
+            return this->file.good();
         }
 
 
@@ -66,7 +54,7 @@ namespace boost {namespace astronomy {namespace io {
          * @brief Used to check whether the file is open or not
         */
         bool is_open() {
-            return file->is_open();
+            return this->file.is_open();
         }
 
         /**
@@ -74,7 +62,7 @@ namespace boost {namespace astronomy {namespace io {
          * @param[in] position The position to be set for reading
         */
         void set_reading_pos(std::size_t position) {
-            this->file->seekg(position);
+            this->file.seekg(position);
         }
 
         /**
@@ -82,8 +70,8 @@ namespace boost {namespace astronomy {namespace io {
         */
         unsigned char get() {
 
-            unsigned char byte = static_cast<unsigned char>(this->file->get());
-            if (!this->file->eof()) { return byte; }
+            unsigned char byte = static_cast<unsigned char>(this->file.get());
+            if (!this->file.eof()) { return byte; }
             return 0;
         }
 
@@ -91,7 +79,7 @@ namespace boost {namespace astronomy {namespace io {
          * @brief Gets the current position of file pointer
         */
         std::size_t get_current_pos() {
-            return this->file->tellg();
+            return this->file.tellg();
         }
 
         /**
@@ -100,8 +88,8 @@ namespace boost {namespace astronomy {namespace io {
         */
         bool write(const std::string& data) {
 
-            this->file->write(data.c_str(), sizeof(char) * data.size());
-            return this->file->good();
+            this->file.write(data.c_str(), sizeof(char) * data.size());
+            return this->file.good();
         }
 
         /**
@@ -109,11 +97,11 @@ namespace boost {namespace astronomy {namespace io {
          * @param[in] data Data to be written into file
         */
         bool write(const std::string& data,std::size_t position) {
-            this->file->seekp(position);
-            if (this->file->good()) {
-                this->file->write(data.c_str(), sizeof(char) * data.size());
+            this->file.seekp(position);
+            if (this->file.good()) {
+                this->file.write(data.c_str(), sizeof(char) * data.size());
             }
-            return this->file->good();
+            return this->file.good();
         }
 
         /**
@@ -122,7 +110,7 @@ namespace boost {namespace astronomy {namespace io {
         */
         std::string read(std::size_t num_bytes) {
             std::string data(num_bytes, ' ');
-            file->read(&data[0], num_bytes);
+            this->file.read(&data[0], num_bytes);
             return data;
         }
 
@@ -131,20 +119,20 @@ namespace boost {namespace astronomy {namespace io {
         */
         bool at_end() {
 
-            return (file->peek(), file->eof());
+            return (this->file.peek(), this->file.eof());
         }
 
         /**
          * @brief Closes the file if opened
         */
         void close() {
-            this->file->close();
+            this->file.close();
         }
 
         /**
          * @brief Returns the internal file stream 
         */
-        std::fstream& get_internal_stream() { return *file; }
+        std::fstream& get_internal_stream() { return this->file; }
 
         /**
          * @brief Sets the file pointer to the end of current logical record ( or beginning of next record )
@@ -157,21 +145,12 @@ namespace boost {namespace astronomy {namespace io {
          * @brief Finds the end of current logical record ( or beginning of next record )
         */
         std::size_t find_unit_end() {
-            std::size_t current_pos = file->tellg();
+            std::size_t current_pos = this->file.tellg();
             std::size_t logical_record_size = 2880;
 
             std::size_t offset = logical_record_size - (current_pos % logical_record_size);
             std::size_t newpos = (current_pos + offset);
             return newpos;
-        }
-
-        /**
-         * @brief Closes the file and Destroys the internal filestream
-        */
-        ~fits_stream() {
-
-            if (file != nullptr && file->is_open()) { file->close(); }
-            delete file;
         }
     };
 
