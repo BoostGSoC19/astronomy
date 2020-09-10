@@ -1,5 +1,7 @@
 /*=============================================================================
 Copyright 2018 Pranam Lashkari <plashkari628@gmail.com>
+Copyright 2020 Gopi Krishna Menon <krishnagopi487.github@outlook.com>
+
 
 Distributed under the Boost Software License, Version 1.0. (See accompanying
 file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
@@ -14,15 +16,11 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/type.hpp>
+#include <boost/variant.hpp>
 
 #include <boost/astronomy/io/default_card_policy.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
 
-/**
- * @file    card.hpp
- * @author  Pranam Lashkari
- * @details Contains the definition for <strong>card</strong> structure
- */
 
 
 namespace boost { namespace astronomy { namespace io {
@@ -30,13 +28,15 @@ namespace boost { namespace astronomy { namespace io {
 /**
  * @brief   Represents the concept of <strong>card</strong> associated with the FITS standard.
  * @details This structure provides functions for storage, manipulation and access of FITS cards.
- * @author  Pranam Lashkari
+ * @author  Pranam Lashkari, Gopi Krishna Menon
  */
 template<typename CardPolicy>
 struct card: CardPolicy
 {
 private:
     std::string card_;
+    typedef typename boost::make_variant_over< typename CardPolicy::supported_types>::type cache;
+    mutable cache card_cache;
 
 public:
 
@@ -146,15 +146,15 @@ public:
     /**
      * @brief   Returns the value associated with the card
      * @tparam  ReturnType  The type to which the value should be converted and returned
-     * @pre     The ReturnType can be int, long long( If more than 10 digits) ,double,long double,float ,bool,string
      * @return  The value associated with the card
-     * @throws  boost::bad_lexical_cast If the conversion could not succeed
-     * @todo    Support for complex numbers and date is required
     */
     template <typename ReturnType>
     ReturnType value() const
     {
-        return value_imp(boost::type<ReturnType>());
+        if (!value_cached()) {
+            card_cache =value_imp(boost::type<ReturnType>());
+        }
+        return boost::get<ReturnType>(card_cache); 
     }
 
     /**
@@ -173,7 +173,6 @@ public:
     template<typename DataType>
     void set_value(DataType value)
     {
-
         std::string serialized_value = this->serialize_to_fits_format(value);
 
         if (this->is_card_valid(this->keyword(), serialized_value, "")) { 
@@ -181,6 +180,7 @@ public:
             this->card_.clear();
             this->card_.append(key);
             this->card_.append(serialized_value);
+            card_cache = value;
         }
     }
 
@@ -190,6 +190,11 @@ public:
     const std::string& raw_card() { return card_; }
 
 private:
+    /**
+     * @brief Checks if the value is internally cached
+    */
+    bool value_cached() const { return card_cache.which() != 0; }
+
 
     /**
      * @brief Creates a card from key, value and comment supplied to the method

@@ -17,6 +17,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/exception/fits_exception.hpp>
 #include <boost/astronomy/io/string_conversion_utility.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/mpl/vector.hpp>
 
 namespace boost{namespace astronomy{namespace io{
 
@@ -25,6 +26,22 @@ class card_policy {
     std::vector<std::string> reserved_keywords;
 
 public:
+    typedef boost::mpl::vector<
+        boost::blank,
+        bool,
+        int,
+        float,
+        double,
+        unsigned int,
+        long long,
+        std::size_t,
+        std::string,
+        std::complex<int>,
+        std::complex<double>,
+        std::complex<float>,
+        std::complex<std::size_t>
+    >  supported_types;
+
 
     /**
      * @brief Constructs a default object of card and initializes the reserved keyword list
