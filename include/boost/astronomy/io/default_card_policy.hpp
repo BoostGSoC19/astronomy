@@ -17,6 +17,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/astronomy/exception/fits_exception.hpp>
 #include <boost/astronomy/io/string_conversion_utility.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/blank.hpp>
 #include <boost/mpl/vector.hpp>
 
 namespace boost{namespace astronomy{namespace io{

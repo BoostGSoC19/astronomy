@@ -9,8 +9,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #define BOOST_ASTRONOMY_IO_STRING_CONVERSION_UTILITY_HPP
 
 #include <sstream>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/type.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
 
 
@@ -21,15 +20,6 @@ namespace boost{namespace astronomy{namespace io{
      * @brief Used for serialization and deserialization of ASCII table's data
     */
     struct ascii_converter {
-    private:
-       static boost::spirit::qi::int_type spirit_type(boost::type<int>) { return boost::spirit::qi::int_; }
-       static boost::spirit::qi::uint_type spirit_type(boost::type<unsigned int>) { return boost::spirit::qi::uint_; }
-       static boost::spirit::qi::float_type spirit_type(boost::type<float>) { return boost::spirit::qi::float_; }
-       static boost::spirit::qi::double_type spirit_type(boost::type<double>) { return boost::spirit::qi::double_; }
-       static boost::spirit::qi::long_long_type spirit_type(boost::type<long long>) { return boost::spirit::qi::long_long; }
-       static boost::spirit::qi::ulong_long_type spirit_type(boost::type<long unsigned int>) { return boost::spirit::qi::ulong_long; }
-       static boost::spirit::qi::ulong_long_type spirit_type(boost::type<unsigned long long>) { return boost::spirit::qi::ulong_long; }
-    public:
 
         /**
          * @brief Deserializes the ASCII data to the given type
@@ -41,16 +31,12 @@ namespace boost{namespace astronomy{namespace io{
         */
         template<typename T>
         static T deserialize_to(const std::string& convert_str, int) {
-
-            T converted_value;
-            auto iter_pos = convert_str.begin();
-            boost::spirit::qi::parse(iter_pos, convert_str.end(), spirit_type(boost::type<T>()), converted_value);
-            if (iter_pos != convert_str.end()) {
-
+            try {
+                return boost::lexical_cast<T>(convert_str);
+            }
+            catch (bad_lexical_cast&) {
                 throw invalid_cast("Cannot convert from String to the required Type");
             }
-
-            return converted_value;
         }
 
         /**
@@ -59,7 +45,7 @@ namespace boost{namespace astronomy{namespace io{
          * @tparam T Type of value which needs to be serialized
         */
         template<typename T>
-       static std::string serialize(T value) {
+        static std::string serialize(T value) {
             // Default for now future versions should use overloads for better performance
             std::stringstream serialize_stream;
             serialize_stream << value;
@@ -67,6 +53,7 @@ namespace boost{namespace astronomy{namespace io{
         }
 
     };
+
 
 } } }
 
