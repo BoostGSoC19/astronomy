@@ -9,7 +9,9 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #define BOOST_ASTRONOMY_IO_STRING_CONVERSION_UTILITY_HPP
 
 #include <sstream>
+#include <limits>
 #include <boost/lexical_cast.hpp>
+#include <boost/hana/eval_if.hpp>
 #include <boost/astronomy/exception/fits_exception.hpp>
 
 
@@ -46,10 +48,16 @@ namespace boost{namespace astronomy{namespace io{
         */
         template<typename T>
         static std::string serialize(T value) {
-            // Default for now future versions should use overloads for better performance
-            std::stringstream serialize_stream;
-            serialize_stream << value;
-            return serialize_stream.str();
+            return
+                boost::hana::eval_if(std::numeric_limits<T>::is_integer,
+                    [&value] {return std::to_string(value); },
+                    [&value](auto _) {
+                        //to_string does not maintain the same rep for floating point numbers causing field size problems
+                        //to_string dosent work for custom types as well(although here it is)
+                        std::stringstream conversion_stream;
+                        conversion_stream << value;
+                        return conversion_stream.str();
+                    });
         }
 
     };
