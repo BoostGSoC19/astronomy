@@ -147,14 +147,14 @@ namespace boost { namespace astronomy { namespace io {
         /**
          * @brief Returns the HDU at given index
         */
-        typename ExtensionsSupported::Extension& operator [](int index)  {
+        typename ExtensionsSupported::Extension& operator [](int index) {
             return hdu_list.at(index);
         }
 
         /**
          * @brief Returns the HDU based on the hdu_name 
         */
-        typename ExtensionsSupported::Extension& operator [](const std::string& hdu_name)  {
+        typename ExtensionsSupported::Extension& operator [](const std::string& hdu_name) {
             return hdu_list[hdus_control_block.hdus_info.at(hdu_name).hdu_index];
         }
 
