@@ -1,0 +1,3 @@
+import testing ;
+
+run conversion_graph.cpp ;

@@ -66,36 +66,49 @@ decimal_hour GST(ptime t)
 
 enum class DIRECTION {WEST, EAST};
 
+decimal_hour compute_LST(double longitude, DIRECTION direction, double gst)
+{
+  //Convert longitude to hours
+  double long_hours = longitude / 15.0;
+
+  switch(direction)
+  {
+    case DIRECTION::WEST:
+      //Multiply with direction
+      long_hours = -1 * long_hours;
+      break;
+    case DIRECTION::EAST:
+      //Multiply with direction
+      long_hours = 1 * long_hours;
+      break;
+  }
+
+  long_hours = long_hours + gst;
+
+  //Bring the result into the range 0 to 24 by adding or subtracting 24 if necessary.
+  //This is the local sidereal time (LST).
+  long_hours = long_hours - 24.0 * floor(long_hours/24.0);
+
+  return {long_hours};
+}
+
 //Local Sidereal Time (LST)
 decimal_hour LST(double longitude, DIRECTION direction, ptime t)
 {
   double gst = GST(t).get();
 
-    if(longitude == 0)
-      return {gst};
+  if(longitude == 0)
+    return {gst};
 
-    //Convert longitude to hours
-    double long_hours = longitude / 15.0;
+  return compute_LST(longitude,direction,gst);
+}
 
-    switch(direction)
-    {
-      case DIRECTION::WEST:
-          //Multiply with direction
-          long_hours = -1 * long_hours;
-            break;
-      case DIRECTION::EAST:
-          //Multiply with direction
-          long_hours = 1 * long_hours;
-            break;
-    }
+decimal_hour LST(double longitude, DIRECTION direction, double gst)
+{
+  if(longitude == 0)
+    return {gst};
 
-    long_hours = long_hours + gst;
-
-    //Bring the result into the range 0 to 24 by adding or subtracting 24 if necessary.
-    //This is the local sidereal time (LST).
-    long_hours = long_hours - 24.0 * floor(long_hours/24.0);
-
-    return {long_hours};
+  return compute_LST(longitude,direction,gst);
 }
 
 #endif //BOOST_ASTRONOMY_TIME_CONVERSIONS
