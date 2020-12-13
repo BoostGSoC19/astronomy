@@ -29,9 +29,9 @@ public:
       dh = d;
 
       time = dh;
-      hours = (int)time;
+      hours = (long int)time;
       minutesRemainder = (time - hours) * 60;
-      minutes = (int)minutesRemainder;
+      minutes = (long int)minutesRemainder;
       secondsRemainder = (minutesRemainder - minutes) * 60;
       seconds = secondsRemainder;
     }
