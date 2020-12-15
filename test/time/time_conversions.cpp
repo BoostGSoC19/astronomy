@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(time)
   //when the GST is 4h 40m 5.23s OR
   //at 14h 36m 51.67s UT on Greenwich date 22 April 1980
   //Local Sidereal Time at Longitude 64.00°(W) = 0h 24m 5.23s
-  decimal_hour d2 = LST(64,DIRECTION::WEST, decimal_hour(4,40,5.23).get());
+  decimal_hour d2 = LST(64, DIRECTION::WEST, t1);
 
   BOOST_CHECK_CLOSE(d2.get(), decimal_hour(0,24,5.23).get(), 1);
 
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(time)
   //when the GST is 8h 36m 55.00s OR
   //at 19h 21m 0.00s UT on Greenwich date 10 April 1987
   //Local Sidereal Time at Longitude 82.00° (E) = 14h 05m 42s
-  decimal_hour d4 = LST(82, DIRECTION::EAST, decimal_hour(8,34,57.0896).get());
+  decimal_hour d4 = LST(82, DIRECTION::EAST, t2);
 
   BOOST_CHECK_CLOSE(d4.get(), decimal_hour(14,5,42).get(), 1);
 
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(time)
   //when the GST is 14h 14m 18.136s OR
   //at at 16h 44m 0.0s UT on Greenwich date 13 August 2020
   //Local Sidereal Time at Longitude 37.00° (E) = 16h 42m 19s
-  decimal_hour d6 = LST(37, DIRECTION::EAST, decimal_hour(14, 14, 18.136).get());
+  decimal_hour d6 = LST(37, DIRECTION::EAST, t3);
 
   BOOST_CHECK_CLOSE(d6.get(), decimal_hour(16, 42, 19).get(), 1);
 }
