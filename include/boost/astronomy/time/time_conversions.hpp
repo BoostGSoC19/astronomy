@@ -127,7 +127,7 @@ decimal_hour GST(ptime t)
 enum class DIRECTION {WEST, EAST};
 
 //Local Sidereal Time (LST)
-decimal_hour LST(long double longitude, DIRECTION direction, ptime t)
+decimal_hour LST(double longitude, DIRECTION direction, ptime t)
 {
     double gst = GST(t).get();
 
