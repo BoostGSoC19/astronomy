@@ -50,7 +50,7 @@ decimal_hour GST(ptime t)
     T0 = T0 - 24.0 * floor(T0/24.0);
 
     //Convert UT to decimal hours
-    double UT = ((t.time_of_day().seconds())/60.0 + t.time_of_day().minutes())/60.0 + t.time_of_day().hours();\
+    double UT = ((t.time_of_day().seconds())/60.0 + t.time_of_day().minutes())/60.0 + t.time_of_day().hours();
 
     //Multiply UT by 1.002737909
     double A = UT * 1.002737909;
