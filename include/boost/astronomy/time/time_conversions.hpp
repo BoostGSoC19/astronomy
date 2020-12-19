@@ -98,7 +98,7 @@ decimal_hour GST(ptime t)
     date d = t.date();
 
     //Get Julian Day Number
-    double JD = Julian_date(t); //Ambiguity in Julian precision.
+    double JD = Julian_date(t);
 
     double S = JD - 2451545.0;
 
