@@ -96,7 +96,7 @@ public:
         point = CoordinateSystem(lat, lon, distance);
     }
 
-    //constructing from name of object if available in the calatoge
+    //constructing from name of object if available in the catalogue
     sky_point(std::string const& name);
 
     std::string get_constillation();
