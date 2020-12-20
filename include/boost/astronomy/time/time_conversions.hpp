@@ -9,15 +9,12 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #define BOOST_ASTRONOMY_TIME_CONVERSIONS
 
 #include <string>
-#include <iostream>
 #include <exception>
 #include <boost/astronomy/time/parser.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-using namespace std;
-using namespace boost::gregorian;
-using namespace boost::posix_time;
+namespace boost { namespace astronomy { namespace time {
 
 /**
  * Universal time (UT), and therefore the local civil time in any
@@ -33,10 +30,10 @@ using namespace boost::posix_time;
  * made on the Greenwich meridian, longitude 0◦.
  */
 
-double Julian_date(ptime t)
+double Julian_date(boost::posix_time::ptime t)
 {
     //Get date from UT
-    date dt = t.date();
+    boost::gregorian::date dt = t.date();
 
     //Set y = year, m = month and d = day
     double y = dt.year();
@@ -59,7 +56,7 @@ double Julian_date(ptime t)
 
     //Calculate B, check if the date is later than 1582 October 15
     double B;
-    date dt1(1582, Oct , 1);
+    boost::gregorian::date dt1(1582, boost::gregorian::Oct , 1);
     if ( dt > dt1 )
     {
         double A = floor(yprime / 100);
@@ -92,10 +89,10 @@ double Julian_date(ptime t)
     return JD;
 }
 
-decimal_hour GST(ptime t)
+decimal_hour GST(boost::posix_time::ptime t)
 {
     //Get date from UT
-    date d = t.date();
+    boost::gregorian::date d = t.date();
 
     //Get Julian Day Number
     double JD = Julian_date(t);
@@ -127,7 +124,7 @@ decimal_hour GST(ptime t)
 enum class DIRECTION {WEST, EAST};
 
 //Local Sidereal Time (LST)
-decimal_hour LST(double longitude, DIRECTION direction, ptime t)
+decimal_hour LST(double longitude, DIRECTION direction, boost::posix_time::ptime t)
 {
     double gst = GST(t).get();
 
@@ -158,4 +155,5 @@ decimal_hour LST(double longitude, DIRECTION direction, ptime t)
     return {long_hours};
 }
 
+}}} // namespace::astronomy::time
 #endif //BOOST_ASTRONOMY_TIME_CONVERSIONS

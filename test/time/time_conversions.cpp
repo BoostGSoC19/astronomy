@@ -14,6 +14,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/test/unit_test.hpp>
 
+using namespace boost::astronomy::time;
 namespace tt = boost::test_tools;
 
 BOOST_AUTO_TEST_SUITE(time_conversions)
@@ -26,7 +27,7 @@ BOOST_AUTO_TEST_CASE(time)
   //Verified from Practical Astronomy with your Calculator
   //by Peter Duffett-Smith
   std::string ts1("1980-04-22 14:36:51.67");
-  ptime t1(time_from_string(ts1));
+  boost::posix_time::ptime t1(boost::posix_time::time_from_string(ts1));
 
   decimal_hour d1 = GST(t1);
 
@@ -44,7 +45,7 @@ BOOST_AUTO_TEST_CASE(time)
   //GST = 8h 34m 57.0896s
   //Verified from Astronomical Algorithms 2nd Edition. by. Jean Meeus
   std::string ts2("1987-04-10 19:21:0");
-  ptime t2(time_from_string(ts2));
+  boost::posix_time::ptime t2(boost::posix_time::time_from_string(ts2));
 
   decimal_hour d3 = GST(t2);
 
@@ -62,7 +63,7 @@ BOOST_AUTO_TEST_CASE(time)
   //GST = 14h 14m 18.136s
   //Verified from http://neoprogrammics.com/sidereal_time_calculator/index.php
   std::string ts3("2020-08-13 16:44:0");
-  ptime t3(time_from_string(ts3));
+  boost::posix_time::ptime t3(boost::posix_time::time_from_string(ts3));
 
   decimal_hour d5 = GST(t3);
 
