@@ -91,9 +91,6 @@ double Julian_date(boost::posix_time::ptime t)
 
 decimal_hour GST(boost::posix_time::ptime t)
 {
-    //Get date from UT
-    boost::gregorian::date d = t.date();
-
     //Get Julian Day Number
     double JD = Julian_date(t);
 

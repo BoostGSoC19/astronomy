@@ -7,7 +7,6 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 
 #define BOOST_TEST_MODULE utility
 
-#include <iostream>
 #include <boost/units/io.hpp>
 #include <boost/units/systems/angle/degrees.hpp>
 
@@ -31,6 +30,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 using namespace boost::units;
 using namespace boost::units::si;
 using namespace boost::astronomy::coordinate;
+using namespace boost::astronomy::time;
 
 namespace bud = boost::units::degree;
 namespace bac = boost::astronomy::coordinate;
