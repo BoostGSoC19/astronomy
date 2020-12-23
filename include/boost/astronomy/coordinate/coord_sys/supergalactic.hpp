@@ -97,7 +97,7 @@ public:
     {
         BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
          <boost::astronomy::coordinate::base_representation, OtherRepresentation>::value),
-         "argument type is expected to be a differential class");
+         "argument type is expected to be a representation class");
 
         BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
             <boost::astronomy::coordinate::base_differential, OtherDifferential>::value),
