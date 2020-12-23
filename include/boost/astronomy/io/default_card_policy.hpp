@@ -9,6 +9,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #ifndef BOOST_ASTRONOMY_DEFAULT_CARD_POLICY_HPP
 #define BOOST_ASTRONOMY_DEFAULT_CARD_POLICY_HPP
 
+#include <vector>
 #include <map>
 #include <algorithm>
 #include <sstream>
