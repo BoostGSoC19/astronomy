@@ -23,7 +23,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
  *
  * Declination
  * Declination is analogous to latitude and indicates how far away an object is
- * from the celestial equator. Declination is int the range ±90◦ with positive
+ * from the celestial equator. Declination is in the range ±90◦ with positive
  * angles indicating locations north of the celestial equator and negative angles
  * indicating locations south of the celestial equator. Because declination is
  * measured with respect to the celestial equator, and the celestial equator’s
