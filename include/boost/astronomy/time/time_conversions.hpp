@@ -30,11 +30,8 @@ namespace boost { namespace astronomy { namespace time {
  * made on the Greenwich meridian, longitude 0◦.
  */
 
-double julian_date(boost::posix_time::ptime t)
-{
-    //Get date from UT
-    boost::gregorian::date dt = t.date();
-
+double julian_date(boost::gregorian::date dt)
+{   
     //Set y = year, m = month and d = day
     double y = dt.year();
     double m = dt.month();
@@ -91,8 +88,11 @@ double julian_date(boost::posix_time::ptime t)
 
 decimal_hour GST(boost::posix_time::ptime t)
 {
+    //Get date from UT
+    boost::gregorian::date dt = t.date();
+
     //Get Julian Day Number
-    double JD = julian_date(t);
+    double JD = julian_date(dt);
 
     double S = JD - 2451545.0;
 
