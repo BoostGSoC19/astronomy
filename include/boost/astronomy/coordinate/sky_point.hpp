@@ -132,7 +132,7 @@ public:
             coslat * std::sin(temp_p1) * std::cos(temp_diff);
         double y = std::sin(temp_diff) * coslat;
 
-        return bu::quantity<bu::si::plane_angle>::from_value(std::atan2(x, y));
+        return bu::quantity<bu::si::plane_angle>::from_value(std::atan2(y, x));
     }
 
     //!returns true if both coordinate systems are same else returns false
