@@ -25,6 +25,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 //Time
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/astronomy/time/time_conversions.hpp>
 
 #include <boost/astronomy/coordinate/coord_sys/coord_sys.hpp>
 
@@ -36,7 +37,7 @@ namespace bud = boost::units::degree;
 using namespace boost::numeric::ublas;
 namespace bnu = boost::numeric::ublas;
 
-using namespace boost::gregorian;
+using namespace boost::astronomy::time;
 
 namespace boost { namespace astronomy { namespace coordinate {
 
@@ -309,11 +310,11 @@ struct obliquity_of_ecliptic{
   angle_radian e = 0.0 * bu::si::radian;
 
  public:
-  obliquity_of_ecliptic(date d)
+  obliquity_of_ecliptic(boost::gregorian::date d)
   {
-    double julian_date = d.julian_day();
+    double JD = julian_date(d);
 
-    double modified_julian_date = julian_date - 2451545.0;
+    double modified_julian_date = JD - 2451545.0;
 
     double julian_centuries = modified_julian_date / 36525.0;
 
