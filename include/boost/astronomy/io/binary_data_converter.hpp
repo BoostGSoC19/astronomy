@@ -12,6 +12,7 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include<vector>
 #include<string>
 #include<cstring>
+#include <boost/hana/eval_if.hpp>
 #include<complex>
 #include<algorithm>
 #include<boost/cstdint.hpp>
@@ -53,7 +54,7 @@ namespace boost{namespace astronomy{namespace io{
   * @brief           Provides convenience methods for deserializing Binary data
   * @author          Gopi Krishna Menon
  */
-    struct binary_data_converter {
+    struct binary_data_converter { 
 
     
         /**
@@ -67,7 +68,7 @@ namespace boost{namespace astronomy{namespace io{
             AssumeType temp = boost::endian::big_to_native(
                 *reinterpret_cast<const AssumeType*>(element.c_str()));
 
-            NumericType value;
+                      NumericType value;
             std::memcpy(&value, &temp, sizeof(NumericType));
             return value;
         }
@@ -271,45 +272,52 @@ namespace boost{namespace astronomy{namespace io{
         return values;
     }
 
-    template<>
-    boost::int16_t binary_data_converter::deserialize_to(const std::string& element, int) {
-        return element_to_numeric<boost::int16_t>(element);
-    }
+    struct yes{char a;};
+    struct no{char a[2];};
 
-    template<>
-    std::vector<boost::int16_t> binary_data_converter::deserialize_to(const std::string& elements, int num_elements) {
-        return elements_to_numeric_collection<boost::int16_t>(
-            elements, num_elements);
-    }
+    template<typename T>
+    constexpr yes is_non_primitive(typename T::value_type* x);
 
-    template<>
-    boost::int32_t binary_data_converter::deserialize_to(const std::string& element, int) {
-        return element_to_numeric<boost::int32_t>(element);
-    }
-    template<>
-    std::vector<boost::int32_t> binary_data_converter::deserialize_to(const std::string& elements, int num_elements) {
-        return binary_data_converter::elements_to_numeric_collection<boost::int32_t>(
-            elements, num_elements);
-    }
+    template<typename T>
+    constexpr no is_non_primitive(...);
 
-    template<>
-    boost::float32_t binary_data_converter::deserialize_to(const std::string& element,int) {
-        return element_to_numeric<boost::float32_t, boost::int32_t>(element);
-    }
-    template<>
-    std::vector<boost::float32_t> binary_data_converter::deserialize_to(const std::string& elements, int num_elements) {
-        return elements_to_numeric_collection<boost::float32_t, boost::int32_t>(
-            elements, num_elements);
-    }
-    template<>
-    boost::float64_t binary_data_converter::deserialize_to(const std::string& element, int) {
-        return binary_data_converter::element_to_numeric<boost::float64_t, boost::int64_t>(element);
-    }
-    template<>
-    std::vector<boost::float64_t> binary_data_converter::deserialize_to(const std::string& elements, int num_elements) {
-        return binary_data_converter::elements_to_numeric_collection<boost::float64_t, boost::int64_t>(
-            elements, num_elements);
-    }
+    template<typename T>
+    constexpr bool is_vector(){
+      return sizeof(is_non_primitive<T>(0))== sizeof(yes);
+     }
+
+    template<typename T>
+       static T deserialize_to(const std::string& data, int)
+     {
+       return
+          boost::hana::eval_if(is_vector<std::vector<T>>()
+          [&data]{ return thunk1(boost::type<T>{},data,size); }
+          [&data](auto _){ return thunk2(boost::type<T>{},data); }
+          );
+
+     }
+
+    template<typename T>
+       static void thunk1(boost::type<T>)
+       {
+           return 
+             boost::hana::eval_if(std::numeric_limits<T>::is_integer,
+             [&data]{ return elements_to_numeric_collection<boost::int>(data,size);}
+             [&data](auto _){ return elemets_to_numeric_collection<boost::float>(data,size); }
+             );
+       }
+   
+
+    template<typename T>
+       static void thunk2(boost::type<T>)
+       {
+           return 
+             boost::hana::eval_if(std::numeric_limits<T>::is_integer,
+             [&data]{ return element_to_numeric<boost::int>(data); }
+             [&data](auto _){ return elemet_to_numeric<boost::float>(data); }
+             );
+       }
+   
     template<>
     std::pair<boost::int32_t, boost::int32_t> binary_data_converter::deserialize_to(const std::string& element,int) {
         auto x = boost::endian::big_to_native(
