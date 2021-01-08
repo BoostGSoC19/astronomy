@@ -12,4 +12,4 @@ run ecliptic_coord.cpp ;
 run equatorial_ra_coord.cpp ;
 run equatorial_ha_coord.cpp ;
 run utility.cpp ;
-
+run spherical_coslat_differential.cpp ;
