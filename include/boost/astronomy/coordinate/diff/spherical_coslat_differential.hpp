@@ -427,13 +427,18 @@ make_spherical_coslat_differential
     > const& pointObject
 )
 {
+    bg::model::point<OtherCoordinateType, 3, bg::cs::spherical<radian>> temp;
+    bg::transform(pointObject, temp);
+
+    bg::set<1>(temp, bg::get<1>(temp) * cos(bg::get<0>(temp)));
+
     return spherical_coslat_differential
         <
             CoordinateType,
             LatQuantity,
             LonQuantity,
             DistQuantity
-        >(pointObject);
+        >(temp);
 }
 
 //!constructs object from any type of differential
