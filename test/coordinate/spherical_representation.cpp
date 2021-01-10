@@ -252,6 +252,23 @@ BOOST_AUTO_TEST_CASE(spherical_representation_unit_vector)
     BOOST_TEST((std::is_same<decltype(result.get_dist()), quantity<si::length>>::value));
 }
 
+BOOST_AUTO_TEST_CASE(spherical_representation_two_point_unit_vector)
+{
+    auto point1 = make_spherical_representation(25.0 * bud::degrees, 30.0 * bud::degrees, 90.0*meter);
+    auto point2 = make_spherical_representation(30.0 * bud::degrees, 35.0 * bud::degrees, 90.0*meter);
+
+    auto result = boost::astronomy::coordinate::unit_vector(point1,point2);
+
+    BOOST_CHECK_CLOSE(result.get_lat().value(), -120, 0.001);
+    BOOST_CHECK_CLOSE(result.get_lon().value(), 61.7281, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dist().value(), 1, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_lat()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_lon()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dist()), quantity<si::length>>::value));
+}
+
 BOOST_AUTO_TEST_CASE(spherical_representation_magnitude)
 {
     auto point1 = make_spherical_representation(25.0 * bud::degrees, 36.0 * bud::degrees, 9.0 * meters);
@@ -281,6 +298,24 @@ BOOST_AUTO_TEST_CASE(spherical_representation_sum)
     BOOST_TEST((std::is_same<decltype(result.get_lon()), quantity<bud::plane_angle>>::value));
     BOOST_TEST((std::is_same<decltype(result.get_dist()), quantity<si::length>>::value));
 }
+
+BOOST_AUTO_TEST_CASE(spherical_representation_difference)
+{
+    auto point1 = make_spherical_representation(15.0 * bud::degrees, 30.0 * bud::degrees, 10.0 * meters);
+    auto point2 = make_spherical_representation(30.0 * bud::degrees, 45.0 * bud::degrees, 20.0 * meters);
+
+    auto result = boost::astronomy::coordinate::difference(point1, point2);
+
+    BOOST_CHECK_CLOSE(result.get_lat().value(), -142.089, 0.001);
+    BOOST_CHECK_CLOSE(result.get_lon().value(), 120.245, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dist().value(), 10.8834, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_lat()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_lon()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dist()), quantity<si::length>>::value));
+}
+
 
 BOOST_AUTO_TEST_CASE(spherical_representation_mean)
 {

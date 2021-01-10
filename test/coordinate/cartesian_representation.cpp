@@ -261,6 +261,23 @@ BOOST_AUTO_TEST_CASE(cartesian_representation_unit_vector)
     BOOST_TEST((std::is_same<decltype(result.get_z()), quantity<si::length>>::value));
 }
 
+BOOST_AUTO_TEST_CASE(cartesian_representation_two_point_unit_vector)
+{
+    auto point1 = make_cartesian_representation(25.0*meter, 36.0*meter, 90.0*meter);
+    auto point2 = make_cartesian_representation(24.0*meter,35.0*meter,89.0*meter);
+
+    auto result = boost::astronomy::coordinate::unit_vector(point1,point2);
+
+    BOOST_CHECK_CLOSE(result.get_x().value(), 0.5773502691896258, 0.001);
+    BOOST_CHECK_CLOSE(result.get_y().value(), 0.5773502691896258, 0.001);
+    BOOST_CHECK_CLOSE(result.get_z().value(), 0.5773502691896258, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_x()), quantity<si::length>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_y()), quantity<si::length>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_z()), quantity<si::length>>::value));
+}
+
 BOOST_AUTO_TEST_CASE(cartesian_representation_magnitude)
 {
     auto point1 = make_cartesian_representation
@@ -287,6 +304,25 @@ BOOST_AUTO_TEST_CASE(cartesian_representation_sum)
     BOOST_CHECK_CLOSE(result.get_x().value(), 10.5, 0.001);
     BOOST_CHECK_CLOSE(result.get_y().value(), 20.06, 0.001);
     BOOST_CHECK_CLOSE(result.get_z().value(), 60, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_x()), quantity<si::length>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_y()), quantity<decltype(si::kilo*meter)>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_z()), quantity<si::length>>::value));
+}
+
+BOOST_AUTO_TEST_CASE(cartesian_representation_difference)
+{
+    auto point1 = make_cartesian_representation
+        (10.0 * meter, 20.0 * si::kilo * meters, 30.0 * meter);
+    auto point2 = make_cartesian_representation
+        (50.0 * si::centi * meter, 60.0 * meter, 30.0 * meter);
+
+    auto result = boost::astronomy::coordinate::difference(point1, point2);
+
+    BOOST_CHECK_CLOSE(result.get_x().value(), 9.5, 0.001);
+    BOOST_CHECK_CLOSE(result.get_y().value(), 19.94, 0.001);
+    BOOST_CHECK_CLOSE(result.get_z().value(), 0, 0.001);
 
     //checking whether quantity stored is as expected or not
     BOOST_TEST((std::is_same<decltype(result.get_x()), quantity<si::length>>::value));

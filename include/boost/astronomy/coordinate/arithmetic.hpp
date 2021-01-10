@@ -368,6 +368,25 @@ auto unit_vector(Coordinate const& vector)
     return tempVector;
 }
 
+//! Returns unit vector directing from representation2 to representation1
+template<typename Representation1, typename Representation2>
+Representation1 unit_vector
+(
+    Representation1 const& representation1,
+    Representation2 const& representation2
+)
+{   
+    /*!first difference of both representation gets calaculated
+    then unit_vector of difference vector and further unit_vector
+    is returned into requested type*/
+
+    auto diff = difference(representation1,representation2);
+
+    //calculating unit_vector towards vector diff
+    
+    auto result = unit_vector(diff);
+    return Representation1(result);
+}
 
 //! Returns sum of representation1 and representation2
 template<typename Representation1, typename Representation2>
@@ -426,6 +445,62 @@ Representation1 sum
     return Representation1(result);
 }
 
+//! Returns difference of representation1 and representation2 (difference vector towards representation1)
+template<typename Representation1, typename Representation2>
+Representation1 difference
+(
+    Representation1 const& representation1,
+    Representation2 const& representation2
+)
+{
+    /*!both the coordinates/vector are first converted into
+    cartesian coordinate system then difference of cartesian
+    vectors is converted into the type of first argument and returned*/
+
+    /*checking types if it is not subclass of
+    base_representaion then compile time erorr is generated*/
+    //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+    //    <
+    //        boost::astronomy::coordinate::base_representation,
+    //        Representation1
+    //    >::value),
+    //    "First argument type is expected to be a representation class");
+    //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+    //    <
+    //        boost::astronomy::coordinate::base_representation,
+    //        Representation2
+    //    >::value),
+    //    "Second argument type is expected to be a representation class");
+
+    /*converting both coordinates/vector into cartesian system*/
+    bg::model::point
+    <
+        typename std::conditional
+        <
+            sizeof(typename Representation2::type) >=
+                sizeof(typename Representation1::type),
+            typename Representation2::type,
+            typename Representation1::type
+        >::type,
+        3,
+        bg::cs::cartesian
+    > result;
+
+    auto cartesian1 = make_cartesian_representation(representation1);
+    auto cartesian2 = make_cartesian_representation(representation2);
+
+    typedef decltype(cartesian1) cartesian1_type;
+
+    //performing calculation to find the sum
+    bg::set<0>(result, (cartesian1.get_x().value() -
+        static_cast<typename cartesian1_type::quantity1>(cartesian2.get_x()).value()));
+    bg::set<1>(result, (cartesian1.get_y().value() -
+        static_cast<typename cartesian1_type::quantity2>(cartesian2.get_y()).value()));
+    bg::set<2>(result, (cartesian1.get_z().value() -
+        static_cast<typename cartesian1_type::quantity3>(cartesian2.get_z()).value()));
+
+    return Representation1(result);
+}
 
 //! Returns mean of representation1 and representation2
 template<typename Representation1, typename Representation2>
