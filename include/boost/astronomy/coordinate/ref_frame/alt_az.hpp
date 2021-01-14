@@ -400,4 +400,3 @@ public:
 };
 }}} //namespace boost::astronomy::cordinate
 #endif // !BOOST_ASTRONOMY_COORDINATE_ALT_AZ_HPP
-

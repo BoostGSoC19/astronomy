@@ -258,4 +258,3 @@ public:
 }}} //namespace boost::astronomy::coordinate
 
 #endif // !BOOST_ASTRONOMY_COORDINATE_SUPERGALACTIC_HPP
-
