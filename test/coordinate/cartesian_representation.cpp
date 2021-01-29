@@ -245,6 +245,22 @@ BOOST_AUTO_TEST_CASE(cartesian_representation_dot_product)
         <bu::multiply_typeof_helper<decltype(si::milli*meters), si::length>::type>>::value));
 }
 
+BOOST_AUTO_TEST_CASE(cartesian_representation_scalar_multiplication)
+{
+    auto point1 = make_cartesian_representation(25.0 * meter, 36.0 * si::centi * meter, 90.0 * si::kilo * meter);
+
+    auto result = boost::astronomy::coordinate::multiply(point1, 2);
+
+    BOOST_CHECK_CLOSE(result.get_x().value(), 50.0, 0.001);
+    BOOST_CHECK_CLOSE(result.get_y().value(), 72.0, 0.001);
+    BOOST_CHECK_CLOSE(result.get_z().value(), 180.0, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_x()), quantity<si::length>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_y()), quantity<decltype(si::centi*meter)>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_z()), quantity<decltype(si::kilo*meter)>>::value));
+}
+
 BOOST_AUTO_TEST_CASE(cartesian_representation_unit_vector)
 {
     auto point1 = make_cartesian_representation(25.0*meter, 36.0*meter, 90.0*meter);
@@ -294,6 +310,25 @@ BOOST_AUTO_TEST_CASE(cartesian_representation_sum)
     BOOST_TEST((std::is_same<decltype(result.get_z()), quantity<si::length>>::value));
 }
 
+BOOST_AUTO_TEST_CASE(cartesian_representation_difference)
+{
+    auto point1 = make_cartesian_representation
+        (10.0 * meter, 20.0 * si::kilo * meters, 30.0 * meter);
+    auto point2 = make_cartesian_representation
+        (50.0 * si::centi * meter, 60.0 * meter, 30.0 * meter);
+
+    auto result = boost::astronomy::coordinate::difference(point1, point2);
+
+    BOOST_CHECK_CLOSE(result.get_x().value(), 9.5, 0.001);
+    BOOST_CHECK_CLOSE(result.get_y().value(), 19.94, 0.001);
+    BOOST_CHECK_CLOSE(result.get_z().value(), 0, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_x()), quantity<si::length>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_y()), quantity<decltype(si::kilo*meter)>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_z()), quantity<si::length>>::value));
+}
+
 BOOST_AUTO_TEST_CASE(cartesian_representation_mean)
 {
     auto point1 = make_cartesian_representation
@@ -311,6 +346,28 @@ BOOST_AUTO_TEST_CASE(cartesian_representation_mean)
     BOOST_TEST((std::is_same<decltype(result.get_x()), quantity<si::length>>::value));
     BOOST_TEST((std::is_same<decltype(result.get_y()), quantity<decltype(si::kilo*meter)>>::value));
     BOOST_TEST((std::is_same<decltype(result.get_z()), quantity<si::length>>::value));
+}
+
+BOOST_AUTO_TEST_CASE(cartesian_representation_matrix_multiplication)
+{
+    auto point = make_cartesian_representation
+        (10.0 * meter, 20.0 * si::kilo * meters, 30.0 * si::centi * meter);
+
+    matrix<double> m(3, 3);
+    for (unsigned i = 0; i < m.size1(); ++i)
+        for (unsigned j = 0; j < m.size2(); ++j)
+            m(i, j) = 3 * i + j;
+
+    auto result = boost::astronomy::coordinate::matrix_multiply(point, m);
+
+    BOOST_CHECK_CLOSE(result.get_x().value(), 80.0, 0.001);
+    BOOST_CHECK_CLOSE(result.get_y().value(), 260.0, 0.001);
+    BOOST_CHECK_CLOSE(result.get_z().value(), 440.0, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_x()), quantity<si::length>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_y()), quantity<decltype(si::kilo*meter)>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_z()), quantity<decltype(si::centi*meter)>>::value));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

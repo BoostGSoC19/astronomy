@@ -237,6 +237,22 @@ BOOST_AUTO_TEST_CASE(spherical_equatorial_representation_dot_product)
         <bu::multiply_typeof_helper<si::length, si::length>::type>>::value));
 }
 
+BOOST_AUTO_TEST_CASE(spherical_equatorial_representation_scalar_multiplication)
+{
+    auto point1 = make_spherical_equatorial_representation(25.0 * bud::degrees, 30.0 * bud::degrees, 90.0*meter);
+
+    auto result = boost::astronomy::coordinate::multiply(point1, 2);
+
+    BOOST_CHECK_CLOSE(result.get_lat().value(), 25.0, 0.001);
+    BOOST_CHECK_CLOSE(result.get_lon().value(), 30.0, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dist().value(), 180.0, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_lat()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_lon()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dist()), quantity<si::length>>::value));
+}
+
 BOOST_AUTO_TEST_CASE(spherical_equatorial_representation_unit_vector)
 {
     auto point1 = make_spherical_equatorial_representation(25.0 * bud::degrees, 30.0 * bud::degrees, 90.0*meter);
@@ -276,6 +292,23 @@ BOOST_AUTO_TEST_CASE(spherical_equatorial_representation_sum)
     BOOST_CHECK_CLOSE(result.get_lat().value(), 24.3128259, 0.001);
     BOOST_CHECK_CLOSE(result.get_lon().value(), 40.2412189, 0.001);
     BOOST_CHECK_CLOSE(result.get_dist().value(), 29.6314681, 0.001);
+
+    //checking whether quantity stored is as expected or not
+    BOOST_TEST((std::is_same<decltype(result.get_lat()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_lon()), quantity<bud::plane_angle>>::value));
+    BOOST_TEST((std::is_same<decltype(result.get_dist()), quantity<si::length>>::value));
+}
+
+BOOST_AUTO_TEST_CASE(spherical_equatorial_representation_difference)
+{
+    auto point1 = make_spherical_equatorial_representation(15.0 * bud::degrees, 30.0 * bud::degrees, 10.0 * meters);
+    auto point2 = make_spherical_equatorial_representation(30.0 * bud::degrees, 45.0 * bud::degrees, 20.0 * meters);
+
+    auto result = boost::astronomy::coordinate::difference(point2, point1);
+
+    BOOST_CHECK_CLOSE(result.get_lat().value(), 51.206, 0.001);
+    BOOST_CHECK_CLOSE(result.get_lon().value(), 55.8705, 0.001);
+    BOOST_CHECK_CLOSE(result.get_dist().value(), 11.0443, 0.001);
 
     //checking whether quantity stored is as expected or not
     BOOST_TEST((std::is_same<decltype(result.get_lat()), quantity<bud::plane_angle>>::value));

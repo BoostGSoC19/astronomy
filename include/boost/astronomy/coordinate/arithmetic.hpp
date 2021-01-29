@@ -21,15 +21,19 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/geometry/core/cs.hpp>
 #include <boost/units/conversion.hpp>
 
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+
 #include <boost/astronomy/coordinate/rep/base_representation.hpp>
 #include <boost/astronomy/coordinate/rep/cartesian_representation.hpp>
 #include <boost/astronomy/coordinate/rep/representation.hpp>
 #include <boost/astronomy/coordinate/diff/differential.hpp>
 
-namespace boost { namespace astronomy { namespace coordinate {
-
 namespace bg = boost::geometry;
 namespace bu = boost::units;
+using namespace boost::numeric::ublas;
+
+namespace boost { namespace astronomy { namespace coordinate {
 
 //!Returns the cross product of cartesian_representation(representation1) and representation2
 template
@@ -283,6 +287,40 @@ auto dot(Representation1 const& representation1, Representation2 const& represen
 }
 
 
+//! Returns scalar product of the cartesian vector with a factor
+template <typename ...Args>
+cartesian_representation<Args...>
+multiply(cartesian_representation<Args...> const& vector, double factor)
+{
+    bg::model::point
+    <
+        typename cartesian_representation<Args...>::type,
+        3,
+        bg::cs::cartesian
+    > tempPoint;
+
+    bg::set<0>(tempPoint, vector.get_x().value() * factor);
+    bg::set<1>(tempPoint, vector.get_y().value() * factor);
+    bg::set<2>(tempPoint, vector.get_z().value() * factor);
+
+    return cartesian_representation<Args...>(tempPoint);
+}
+
+
+//! Returns scalar product of given vector other than cartesian with a factor
+template <typename Coordinate>
+auto multiply(Coordinate const& vector, double factor)
+{
+    Coordinate tempVector;
+
+    tempVector.set_lat(vector.get_lat());
+    tempVector.set_lon(vector.get_lon());
+    tempVector.set_dist(vector.get_dist() * factor);
+
+    return tempVector;
+}
+
+
 //! Returns magnitude of the cartesian vector
 template
 <
@@ -330,42 +368,13 @@ auto magnitude(Coordinate const& vector)
 }
 
 
-//! Returns the unit vector of vector given
-template <typename ...Args>
-cartesian_representation<Args...>
-unit_vector(cartesian_representation<Args...> const& vector)
-{
-    bg::model::point
-    <
-        typename cartesian_representation<Args...>::type,
-        3,
-        bg::cs::cartesian
-    > tempPoint;
-    auto mag = magnitude(vector); //magnitude of vector
-
-    //performing calculations to find unit vector
-    bg::set<0>(tempPoint, vector.get_x().value() / mag.value());
-    bg::set<1>(tempPoint,
-        vector.get_y().value() /
-        static_cast<typename cartesian_representation<Args...>::quantity2>(mag).value());
-    bg::set<2>(tempPoint,
-        vector.get_z().value() /
-        static_cast<typename cartesian_representation<Args...>::quantity3>(mag).value());
-
-    return cartesian_representation<Args...>(tempPoint);
-}
-
-//! Returns unit vector of given vector other than Cartesian
+//! Returns unit vector of given vector
 template <typename Coordinate>
 auto unit_vector(Coordinate const& vector)
 {
-    Coordinate tempVector;
+    auto mag = magnitude(vector); //magnitude of vector
 
-    tempVector.set_lat(vector.get_lat());
-    tempVector.set_lon(vector.get_lon());
-    tempVector.set_dist(1.0 * typename Coordinate::quantity3::unit_type());
-
-    return tempVector;
+    return multiply(vector, 1/mag.value());
 }
 
 
@@ -427,6 +436,64 @@ Representation1 sum
 }
 
 
+//! Returns difference of representation1 and representation2
+template<typename Representation1, typename Representation2>
+Representation1 difference
+(
+    Representation1 const& representation1,
+    Representation2 const& representation2
+)
+{
+    /*!both the coordinates/vector are first converted into
+    cartesian coordinate system then difference of cartesian
+    vectors is converted into the type of first argument and returned*/
+
+    /*checking types if it is not subclass of
+    base_representaion then compile time erorr is generated*/
+    //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+    //    <
+    //        boost::astronomy::coordinate::base_representation,
+    //        Representation1
+    //    >::value),
+    //    "First argument type is expected to be a representation class");
+    //BOOST_STATIC_ASSERT_MSG((boost::astronomy::detail::is_base_template_of
+    //    <
+    //        boost::astronomy::coordinate::base_representation,
+    //        Representation2
+    //    >::value),
+    //    "Second argument type is expected to be a representation class");
+
+    /*converting both coordinates/vector into cartesian system*/
+    bg::model::point
+    <
+        typename std::conditional
+        <
+            sizeof(typename Representation2::type) >=
+                sizeof(typename Representation1::type),
+            typename Representation2::type,
+            typename Representation1::type
+        >::type,
+        3,
+        bg::cs::cartesian
+    > result;
+
+    auto cartesian1 = make_cartesian_representation(representation1);
+    auto cartesian2 = make_cartesian_representation(representation2);
+
+    typedef decltype(cartesian1) cartesian1_type;
+
+    //performing calculation to find the sum
+    bg::set<0>(result, (cartesian1.get_x().value() -
+        static_cast<typename cartesian1_type::quantity1>(cartesian2.get_x()).value()));
+    bg::set<1>(result, (cartesian1.get_y().value() -
+        static_cast<typename cartesian1_type::quantity2>(cartesian2.get_y()).value()));
+    bg::set<2>(result, (cartesian1.get_z().value() -
+        static_cast<typename cartesian1_type::quantity3>(cartesian2.get_z()).value()));
+
+    return Representation1(result);
+}
+
+
 //! Returns mean of representation1 and representation2
 template<typename Representation1, typename Representation2>
 Representation1 mean
@@ -475,6 +542,34 @@ Representation1 mean
 
     return Representation1(result);
 }
+
+
+//! Returns multiplication of a matrix with the cartesian representation
+template <typename ...Args, typename MatrixType = double>
+cartesian_representation<Args...>
+matrix_multiply(cartesian_representation<Args...> const& representation, matrix<MatrixType> mul)
+{
+    matrix<double> vec = matrix<double>(3,1);
+
+    vec(0,0) = representation.get_x().value();
+    vec(1,0) = representation.get_y().value();
+    vec(2,0) = representation.get_z().value();
+
+    vec = prod(mul, vec);
+
+    bg::model::point
+    <
+        typename cartesian_representation<Args...>::type,
+        3,
+        bg::cs::cartesian
+    > ans;
+    bg::set<0>(ans, vec(0,0));
+    bg::set<1>(ans, vec(1,0));
+    bg::set<2>(ans, vec(2,0));
+
+    return cartesian_representation<Args...>(ans);
+}
+
 
 }}} // namespace boost::astronomy::coordinate
 #endif // !BOOST_ASTRONOMY_COORDINATE_ARITHMETIC_HPP
