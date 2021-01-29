@@ -21,15 +21,19 @@ file License.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/geometry/core/cs.hpp>
 #include <boost/units/conversion.hpp>
 
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+
 #include <boost/astronomy/coordinate/rep/base_representation.hpp>
 #include <boost/astronomy/coordinate/rep/cartesian_representation.hpp>
 #include <boost/astronomy/coordinate/rep/representation.hpp>
 #include <boost/astronomy/coordinate/diff/differential.hpp>
 
-namespace boost { namespace astronomy { namespace coordinate {
-
 namespace bg = boost::geometry;
 namespace bu = boost::units;
+using namespace boost::numeric::ublas;
+
+namespace boost { namespace astronomy { namespace coordinate {
 
 //!Returns the cross product of cartesian_representation(representation1) and representation2
 template
@@ -538,6 +542,34 @@ Representation1 mean
 
     return Representation1(result);
 }
+
+
+//! Returns multiplication of a matrix with the cartesian representation
+template <typename ...Args, typename MatrixType = double>
+cartesian_representation<Args...>
+matrix_multiply(cartesian_representation<Args...> const& representation, matrix<MatrixType> mul)
+{
+    matrix<double> vec = matrix<double>(3,1);
+
+    vec(0,0) = representation.get_x().value();
+    vec(1,0) = representation.get_y().value();
+    vec(2,0) = representation.get_z().value();
+
+    vec = prod(mul, vec);
+
+    bg::model::point
+    <
+        typename cartesian_representation<Args...>::type,
+        3,
+        bg::cs::cartesian
+    > ans;
+    bg::set<0>(ans, vec(0,0));
+    bg::set<1>(ans, vec(1,0));
+    bg::set<2>(ans, vec(2,0));
+
+    return cartesian_representation<Args...>(ans);
+}
+
 
 }}} // namespace boost::astronomy::coordinate
 #endif // !BOOST_ASTRONOMY_COORDINATE_ARITHMETIC_HPP
